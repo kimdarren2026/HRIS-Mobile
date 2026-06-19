@@ -15,19 +15,23 @@ class ExampleTest extends TestCase
         $response->assertRedirect('/login');
     }
 
-    #[DataProvider('staticPreviewRoutes')]
-    public function test_static_preview_routes_are_available(string $path): void
+    public function test_login_and_preview_routes_are_public(): void
+    {
+        $this->get('/login')->assertOk()->assertSee('HRIS Mobile App');
+        $this->get('/preview')->assertOk()->assertSee('HRIS Mobile App');
+    }
+
+    #[DataProvider('protectedStaticRoutes')]
+    public function test_protected_static_routes_redirect_guests_to_login(string $path): void
     {
         $response = $this->get($path);
 
-        $response->assertOk();
-        $this->assertNotEmpty($response->getContent());
+        $response->assertRedirect('/login');
     }
 
-    public static function staticPreviewRoutes(): array
+    public static function protectedStaticRoutes(): array
     {
         return [
-            ['/login'],
             ['/employee/dashboard'],
             ['/attendance/checkin'],
             ['/attendance/checkin-outside'],
@@ -43,7 +47,6 @@ class ExampleTest extends TestCase
             ['/admin/dashboard'],
             ['/finance/dashboard'],
             ['/settings'],
-            ['/preview'],
         ];
     }
 }

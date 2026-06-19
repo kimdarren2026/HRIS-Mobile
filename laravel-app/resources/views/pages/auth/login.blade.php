@@ -179,7 +179,13 @@
 </div>
 <!-- Form Area -->
 <div class="flex-1 px-container-margin pt-4 flex flex-col gap-6 w-full">
-<form action="/employee/dashboard" class="flex flex-col gap-unit-md w-full" method="GET">
+<form action="{{ route('login.attempt') }}" class="flex flex-col gap-unit-md w-full" method="POST">
+@csrf
+@if ($errors->any())
+<div class="rounded-lg border border-error/20 bg-error-container/40 px-3 py-2 text-sm text-error">
+{{ $errors->first() }}
+</div>
+@endif
 <!-- Email Field -->
 <div class="flex flex-col gap-unit-xs">
 <label class="font-label-md text-label-md text-on-surface-variant" for="email">Email</label>
@@ -189,7 +195,7 @@
                                 mail
                             </span>
 </div>
-<input class="block w-full pl-10 pr-3 py-3 border border-border rounded-lg bg-surface focus:ring-primary focus:border-primary font-body-md text-body-md text-on-surface shadow-sm" id="email" name="email" placeholder="employee@company.com" required="" type="email">
+<input class="block w-full pl-10 pr-3 py-3 border border-border rounded-lg bg-surface focus:ring-primary focus:border-primary font-body-md text-body-md text-on-surface shadow-sm" id="email" name="email" placeholder="employee@company.com" required="" type="email" value="{{ old('email') }}">
 </div>
 </div>
 <!-- Password Field -->
@@ -210,7 +216,7 @@
 </div>
 <!-- Forgot Password Link -->
 <div class="flex justify-end w-full mt-2">
-<!-- TODO Phase 4: connect action -->
+<!-- TODO Phase 5: connect action -->
 <a class="font-label-md text-label-md text-primary hover:text-primary-fixed-variant transition-colors" href="#">Forgot Password?</a>
 </div>
 </div>

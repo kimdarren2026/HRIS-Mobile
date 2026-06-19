@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AuthController;
 use Illuminate\Support\Facades\Route;
 
 $screens = [
@@ -23,9 +24,43 @@ $screens = [
 
 Route::redirect('/', '/login');
 
-foreach ($screens as $screen) {
-    Route::get($screen['uri'], fn () => view($screen['view']));
-}
+Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
+Route::post('/login', [AuthController::class, 'login'])
+    ->middleware('throttle:5,15')
+    ->name('login.attempt');
+Route::post('/logout', [AuthController::class, 'logout'])
+    ->middleware('auth')
+    ->name('logout');
+
+Route::middleware(['auth', 'role:employee'])->group(function (): void {
+    Route::view('/employee/dashboard', 'pages.employee.dashboard');
+    Route::view('/attendance/checkin', 'pages.attendance.checkin');
+    Route::view('/attendance/checkin-outside', 'pages.attendance.checkin-outside');
+    Route::view('/attendance/history', 'pages.attendance.history');
+    Route::view('/leave/request', 'pages.leave.request');
+    Route::view('/leave/history', 'pages.leave.history');
+    Route::view('/payslip/detail', 'pages.payslip.detail');
+});
+
+Route::middleware(['auth', 'role:admin_hr,super_admin'])->group(function (): void {
+    Route::view('/admin/dashboard', 'pages.admin.dashboard');
+    Route::view('/hr/approval-queue', 'pages.hr.approval-queue');
+    Route::view('/hr/employees', 'pages.hr.employees');
+    Route::view('/settings', 'pages.settings.index');
+});
+
+Route::middleware(['auth', 'role:finance,super_admin'])->group(function (): void {
+    Route::view('/finance/dashboard', 'pages.finance.dashboard');
+    Route::view('/payroll/periods', 'pages.payroll.periods');
+});
+
+Route::middleware(['auth', 'role:admin_hr,finance,super_admin'])->group(function (): void {
+    Route::view('/reports', 'pages.reports.index');
+});
+
+Route::middleware(['auth', 'role:employee,admin_hr,finance,super_admin'])->group(function (): void {
+    Route::view('/profile', 'pages.profile.show');
+});
 
 Route::get('/preview', fn () => view('pages.preview.index', [
     'screens' => $screens,

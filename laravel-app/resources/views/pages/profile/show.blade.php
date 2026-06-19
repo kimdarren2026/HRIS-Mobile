@@ -272,10 +272,13 @@
 <span class="material-symbols-outlined text-[20px]">edit</span>
                 Edit Profile
             </button>
-<button class="w-full h-12 text-danger font-semibold rounded-xl active:opacity-70 transition-opacity flex items-center justify-center gap-2" onclick="window.location.href='/login'">
+<form action="{{ route('logout') }}" method="POST">
+@csrf
+<button class="w-full h-12 text-danger font-semibold rounded-xl active:opacity-70 transition-opacity flex items-center justify-center gap-2" type="submit">
 <span class="material-symbols-outlined text-[20px]">logout</span>
                 Logout
             </button>
+</form>
 </section>
 </main>
 <!-- Bottom Navigation Bar -->
