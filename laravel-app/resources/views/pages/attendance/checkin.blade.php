@@ -1,6 +1,7 @@
 <!DOCTYPE html><html class="light" lang="en"><head>
 <meta charset="utf-8">
 <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
+<meta name="csrf-token" content="{{ csrf_token() }}">
 <title>Attendance Check-In - HRIS Mobile App</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
@@ -179,23 +180,54 @@
   </style>
 </head>
 <body class="bg-background text-on-surface font-body-md min-h-screen flex flex-col antialiased w-full max-w-[390px] mx-auto overflow-x-hidden pb-24">
-<!-- TopAppBar (Suppressed as per rules for transactional screen, but replacing with simplified back header as requested) -->
+
+@if($alreadyCheckedIn)
+<!-- Already checked in today -->
 <header class="fixed top-0 left-1/2 -translate-x-1/2 w-full max-w-[390px] z-50 flex items-center px-container-margin h-16 bg-surface border-b border-border shadow-sm">
-<button aria-label="Go back" class="p-2 -ml-2 rounded-full hover:bg-surface-container active:scale-95 transition-all text-on-surface-variant focus:outline-none" onclick="window.location.href='/employee/dashboard'">
-<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">arrow_back</span>
-</button>
+<a href="/employee/dashboard" class="p-2 -ml-2 rounded-full hover:bg-surface-container active:scale-95 transition-all text-on-surface-variant"><span class="material-symbols-outlined">arrow_back</span></a>
 <h1 class="font-headline-md text-headline-md text-primary ml-2 flex-1">Check In</h1>
 </header>
-<!-- Main Content Canvas -->
+<main class="flex-1 mt-16 px-container-margin py-unit-md flex flex-col items-center justify-center gap-unit-lg">
+<div class="flex flex-col items-center gap-4 py-12">
+<span class="material-symbols-outlined text-success text-[64px]" style="font-variation-settings:'FILL' 1;">check_circle</span>
+<h2 class="font-headline-md text-headline-md text-on-surface">Sudah Check-In Hari Ini</h2>
+<p class="font-body-md text-body-md text-on-surface-variant text-center">Anda sudah melakukan check-in untuk hari ini. Silakan cek riwayat presensi Anda.</p>
+<a href="/attendance/history" class="mt-4 bg-primary text-on-primary font-label-md text-label-md px-6 py-3 rounded-xl">Lihat Riwayat</a>
+</div>
+</main>
+@else
+
+{{-- Session error --}}
+@if($errors->has('general'))
+<div class="fixed top-0 left-1/2 -translate-x-1/2 w-full max-w-[390px] z-[60] px-container-margin pt-2">
+<div class="bg-error-container text-on-error-container rounded-lg px-4 py-3 font-body-md text-body-md flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px] shrink-0">error</span>
+<span>{{ $errors->first('general') }}</span>
+</div>
+</div>
+@endif
+
+<header class="fixed top-0 left-1/2 -translate-x-1/2 w-full max-w-[390px] z-50 flex items-center px-container-margin h-16 bg-surface border-b border-border shadow-sm">
+<a href="/employee/dashboard" class="p-2 -ml-2 rounded-full hover:bg-surface-container active:scale-95 transition-all text-on-surface-variant"><span class="material-symbols-outlined" style="font-variation-settings:'FILL' 0;">arrow_back</span></a>
+<h1 class="font-headline-md text-headline-md text-primary ml-2 flex-1">Check In</h1>
+</header>
+
+<form id="checkin-form" method="POST" action="/attendance/check-in" enctype="multipart/form-data">
+@csrf
+<input type="hidden" id="lat" name="lat">
+<input type="hidden" id="lng" name="lng">
+
 <main class="flex-1 mt-16 px-container-margin py-unit-md flex flex-col gap-unit-lg">
+
 <!-- Time Context -->
 <section class="flex flex-col items-center justify-center pt-unit-sm">
-<p class="font-body-md text-body-md text-on-surface-variant mb-1" id="current-date">Thursday, Oct 26</p>
+<p class="font-body-md text-body-md text-on-surface-variant mb-1" id="current-date">—</p>
 <div class="flex items-baseline gap-1">
-<span class="font-headline-lg text-4xl font-bold tracking-tight text-on-surface" id="current-time">08:45</span>
-<span class="font-label-md text-label-md text-on-surface-variant font-bold">AM</span>
+<span class="font-headline-lg text-4xl font-bold tracking-tight text-on-surface" id="current-time">--:--</span>
+<span class="font-label-md text-label-md text-on-surface-variant font-bold" id="ampm">--</span>
 </div>
 </section>
+
 <!-- Location Card -->
 <section class="bg-surface rounded-xl border border-border shadow-sm overflow-hidden flex flex-col">
 <div class="p-4 border-b border-border flex justify-between items-center bg-surface-container-low">
@@ -203,89 +235,350 @@
 <span class="material-symbols-outlined text-primary text-xl">location_on</span>
 <h2 class="font-label-md text-label-md text-on-surface">Your Location</h2>
 </div>
-<!-- Status Badge -->
-<div class="flex items-center gap-1.5 px-2 py-1 rounded-full bg-success/10 border border-success/20"><div class="w-1.5 h-1.5 rounded-full bg-success animate-pulse"></div><span class="font-status-badge text-status-badge text-success">Within office radius</span></div>
+<div id="radius-badge" class="flex items-center gap-1.5 px-2 py-1 rounded-full bg-surface-container border border-outline-variant/50">
+<div class="w-1.5 h-1.5 rounded-full bg-outline animate-pulse"></div>
+<span class="font-status-badge text-status-badge text-on-surface-variant">Detecting GPS...</span>
 </div>
-<!-- Map Preview Area -->
-<div class="relative w-full h-32 bg-surface-container overflow-hidden">
-<div class="absolute inset-0 bg-cover bg-center opacity-80 mix-blend-multiply" data-alt="A clean, modern top-down satellite map view of a corporate office park area, showing streets and buildings in a light gray and blue UI color palette, resembling a modern digital mapping application. The lighting is bright and clear." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCQ2p0LO_StLCobSmCIwR5iYZpSZDmOUUNNveknET2pp6_bLdcuCyB6L4d48eOUGBlqNM8clsbaLcsKsLKRsUbpjKOlmcf1A9XBptEOhhMCOeI43vRj4jROALHhdUCLsMXKfqQuc1vWes3a0rQyHRaoQWv4JZlJZ-0_7U5Av-G4IG3jInocLMTFrUbqCcCxSXr0PAIefMI6F7INpqalm1JfVFzYJR6c7Vt2v61eD3OnlAH__s6saZdr4whrPzsERDhdkC0IWJNR9qQ')"></div>
-<!-- Center Pin -->
-<div class="absolute inset-0 flex items-center justify-center">
+</div>
+<div class="relative w-full h-32 bg-surface-container overflow-hidden flex items-center justify-center">
+<div id="gps-error-msg" class="hidden flex-col items-center gap-2 text-center px-4">
+<span class="material-symbols-outlined text-error text-[32px]">location_off</span>
+<p class="font-label-sm text-label-sm text-error" id="gps-error-text">Izin lokasi ditolak. Aktifkan GPS di pengaturan browser.</p>
+</div>
+<div id="gps-ok" class="flex items-center justify-center w-full h-full">
 <div class="relative flex items-center justify-center">
 <div class="absolute w-12 h-12 rounded-full bg-primary/20 animate-pin-pulse"></div>
 <div class="absolute w-4 h-4 rounded-full bg-primary shadow-sm border-2 border-white z-10"></div>
-<!-- Placeholder Pin Icon for clarity -->
-<span class="material-symbols-outlined absolute -top-8 text-primary drop-shadow-md" style="font-variation-settings: 'FILL' 1; font-size: 32px;">location_on</span>
+<span class="material-symbols-outlined absolute -top-8 text-primary drop-shadow-md" style="font-variation-settings:'FILL' 1; font-size:32px;">location_on</span>
 </div>
 </div>
 </div>
-<!-- GPS Details Footer -->
 <div class="p-3 bg-surface text-center">
 <p class="font-label-sm text-label-sm text-on-surface-variant flex items-center justify-center gap-1">
 <span class="material-symbols-outlined text-[14px]">my_location</span>
-                    Accuracy: 5m <span class="mx-1">•</span> HQ Building, Sector 4
-                </p>
-<p class="font-label-sm text-label-sm text-on-surface-variant mt-2 opacity-80 italic">Note: Reason field only required when outside office radius.</p></div>
+<span id="gps-detail">Waiting for location...</span>
+</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant mt-2 opacity-80 italic">Reason required only when outside office radius.</p>
+</div>
 </section>
+
 <!-- Selfie Capture Section -->
 <section class="flex flex-col gap-unit-xs">
 <label class="font-label-md text-label-md text-on-surface px-1">Photo Verification</label>
-<div class="relative w-full h-48 bg-surface-container-high rounded-xl border-2 border-dashed border-outline-variant overflow-hidden group active:border-primary transition-colors cursor-pointer flex flex-col items-center justify-center">
-<!-- Placeholder for actual camera feed -->
-<div class="absolute inset-0 bg-surface-dim z-0"></div>
-<div class="z-10 flex flex-col items-center gap-2 text-on-surface-variant group-hover:text-primary transition-colors">
+@error('photo')
+<p class="text-error font-label-sm text-label-sm px-1">{{ $message }}</p>
+@enderror
+<div id="camera-error" class="hidden bg-error-container text-on-error-container rounded-lg px-4 py-3 font-label-sm text-label-sm items-center gap-2">
+<span class="material-symbols-outlined text-[16px] shrink-0">videocam_off</span>
+<span id="camera-error-text">Kamera tidak tersedia.</span>
+</div>
+<div id="camera-area" class="relative w-full h-48 bg-surface-container-high rounded-xl border-2 border-dashed border-outline-variant overflow-hidden">
+<div id="camera-loading" class="absolute inset-0 flex flex-col items-center justify-center gap-2 text-on-surface-variant z-10">
 <div class="w-14 h-14 rounded-full bg-surface shadow-sm flex items-center justify-center">
-<span class="material-symbols-outlined text-3xl" style="font-variation-settings: 'FILL' 0;">photo_camera</span>
+<span class="material-symbols-outlined text-3xl" style="font-variation-settings:'FILL' 0;">photo_camera</span>
 </div>
-<span class="font-label-sm text-label-sm font-medium">Tap to take selfie</span>
+<span class="font-label-sm text-label-sm font-medium">Memulai kamera...</span>
 </div>
+<video id="selfie-video" autoplay playsinline muted class="hidden absolute inset-0 w-full h-full object-cover z-10"></video>
+<div id="capture-overlay" class="hidden absolute inset-0 flex items-end justify-center pb-3 z-20">
+<button type="button" id="capture-btn" class="bg-primary text-on-primary rounded-full px-5 py-2 font-label-md text-label-md flex items-center gap-1.5 shadow-md active:scale-95 transition-all">
+<span class="material-symbols-outlined text-[18px]" style="font-variation-settings:'FILL' 1;">photo_camera</span>
+Capture Selfie
+</button>
 </div>
+<img id="photo-preview" class="hidden absolute inset-0 w-full h-full object-cover z-10" alt="Selfie preview">
+<button type="button" id="photo-retake" class="hidden absolute bottom-2 right-2 z-20 bg-surface/80 rounded-full px-3 py-1 font-label-sm text-label-sm text-primary backdrop-blur-sm">Retake</button>
+</div>
+<canvas id="selfie-canvas" class="hidden"></canvas>
 </section>
-<!-- Conditional Reason Input (Mocked as visible for design requirement) -->
-<section class="flex flex-col gap-unit-xs hidden">
+
+<!-- Reason (hidden until outside radius detected) -->
+<section id="reason-section" class="flex flex-col gap-unit-xs hidden">
 <label class="font-label-md text-label-md text-on-surface px-1 flex justify-between" for="reason">
-                Reason for checking in outside radius
-                <span class="text-danger">*</span>
+Reason for checking in outside radius <span class="text-danger">*</span>
 </label>
-<textarea class="w-full rounded-lg border border-outline-variant bg-surface px-4 py-3 font-body-md text-body-md text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-shadow resize-none placeholder:text-outline" id="reason" placeholder="E.g., Client meeting, working remotely..." rows="2"></textarea>
+@error('reason')
+<p class="text-error font-label-sm text-label-sm px-1">{{ $message }}</p>
+@enderror
+<textarea id="reason" name="reason" rows="3"
+    class="w-full rounded-lg border border-outline-variant bg-surface px-4 py-3 font-body-md text-body-md text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-shadow resize-none placeholder:text-outline"
+    placeholder="E.g., Client meeting, working remotely... (min. 10 characters)"
+    maxlength="500">{{ old('reason') }}</textarea>
+<p class="font-label-sm text-label-sm text-warning flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">pending</span> Status: Pending HR Review
+</p>
 </section>
+
 </main>
-<!-- Bottom Action Area (Fixed) -->
+</form>
+
+<!-- Fixed submit button (outside form but linked via form="checkin-form") -->
 <div class="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[390px] px-container-margin pb-unit-md pt-unit-sm bg-surface/90 backdrop-blur-md border-t border-border z-40">
-<button class="w-full bg-primary hover:bg-primary/90 text-on-primary font-headline-md text-body-lg font-semibold py-3.5 rounded-xl shadow-sm active:scale-[0.98] transition-all flex items-center justify-center gap-2" onclick="window.location.href='/attendance/history'">
-<span class="material-symbols-outlined text-xl" style="font-variation-settings: 'FILL' 1;">login</span>
-            Confirm Check In
-        </button>
+<button id="submit-btn" type="submit" form="checkin-form" disabled
+    class="w-full bg-primary hover:bg-primary/90 disabled:opacity-40 disabled:cursor-not-allowed text-on-primary font-headline-md text-body-lg font-semibold py-3.5 rounded-xl shadow-sm active:scale-[0.98] transition-all flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-xl" style="font-variation-settings:'FILL' 1;">login</span>
+<span id="submit-label">Confirm Check In</span>
+</button>
 </div>
+
+@endif
+
 <script>
-        // Simple script to update clock
-        function updateClock() {
-            const now = new Date();
-            const timeElement = document.getElementById('current-time');
-            const dateElement = document.getElementById('current-date');
-            
-            if(timeElement) {
-                let hours = now.getHours();
-                let minutes = now.getMinutes();
-                const ampm = hours >= 12 ? 'PM' : 'AM';
-                hours = hours % 12;
-                hours = hours ? hours : 12; 
-                minutes = minutes < 10 ? '0' + minutes : minutes;
-                
-                // Assuming we want to keep the AM/PM span separate based on the HTML structure
-                timeElement.innerText = hours + ':' + minutes;
-                // Update AM/PM span which is the next sibling
-                const ampmSpan = timeElement.nextElementSibling;
-                if(ampmSpan) ampmSpan.innerText = ampm;
+(function() {
+    // Office coords from server
+    const OFFICE_LAT    = @json($officeLocation ? (float) $officeLocation->latitude   : null);
+    const OFFICE_LNG    = @json($officeLocation ? (float) $officeLocation->longitude  : null);
+    const OFFICE_RADIUS = @json($officeLocation ? (int)   $officeLocation->radius_meters : 100);
+
+    let gpsReady   = false;
+    let photoReady = false;
+
+    // ── Clock ──────────────────────────────────────────────────────────────
+    function updateClock() {
+        const now  = new Date();
+        let h      = now.getHours(), m = now.getMinutes();
+        const ampm = h >= 12 ? 'PM' : 'AM';
+        h = h % 12 || 12;
+        const el = document.getElementById('current-time');
+        if (el) el.innerText = h + ':' + (m < 10 ? '0' + m : m);
+        const ap = document.getElementById('ampm');
+        if (ap) ap.innerText = ampm;
+        const de = document.getElementById('current-date');
+        if (de) de.innerText = now.toLocaleDateString('id-ID', { weekday:'long', day:'numeric', month:'short', year:'numeric' });
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    // ── Haversine distance ─────────────────────────────────────────────────
+    function haversine(lat1, lng1, lat2, lng2) {
+        const R = 6371000, toR = Math.PI / 180;
+        const dLat = (lat2 - lat1) * toR, dLng = (lng2 - lng1) * toR;
+        const a = Math.sin(dLat/2)**2 + Math.cos(lat1*toR)*Math.cos(lat2*toR)*Math.sin(dLng/2)**2;
+        return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    }
+
+    // ── Submit guard ───────────────────────────────────────────────────────
+    function updateSubmit() {
+        const btn = document.getElementById('submit-btn');
+        if (!btn) return;
+        btn.disabled = !(gpsReady && photoReady);
+    }
+
+    // ── GPS ────────────────────────────────────────────────────────────────
+    if (document.getElementById('checkin-form')) {
+        if (!navigator.geolocation) {
+            showGpsError('Browser ini tidak mendukung GPS.');
+        } else {
+            navigator.geolocation.getCurrentPosition(
+                function(pos) {
+                    const lat = pos.coords.latitude;
+                    const lng = pos.coords.longitude;
+                    const acc = Math.round(pos.coords.accuracy);
+
+                    document.getElementById('lat').value = lat;
+                    document.getElementById('lng').value = lng;
+
+                    gpsReady = true;
+                    updateSubmit();
+
+                    // Check radius to show/hide reason field and update badge
+                    let withinRadius = true;
+                    if (OFFICE_LAT !== null) {
+                        const dist = haversine(lat, lng, OFFICE_LAT, OFFICE_LNG);
+                        withinRadius = dist <= OFFICE_RADIUS;
+
+                        const badge   = document.getElementById('radius-badge');
+                        const detail  = document.getElementById('gps-detail');
+                        const reason  = document.getElementById('reason-section');
+                        const label   = document.getElementById('submit-label');
+
+                        detail.innerText = 'Accuracy: ' + acc + 'm';
+
+                        if (withinRadius) {
+                            badge.className   = 'flex items-center gap-1.5 px-2 py-1 rounded-full bg-success/10 border border-success/20';
+                            badge.innerHTML   = '<div class="w-1.5 h-1.5 rounded-full bg-success animate-pulse"></div><span class="font-status-badge text-status-badge text-success">Within office radius</span>';
+                            if (reason) reason.classList.add('hidden');
+                            if (label)  label.innerText = 'Confirm Check In';
+                        } else {
+                            badge.className   = 'flex items-center gap-1.5 px-2 py-1 rounded-full bg-error-container border border-error/20';
+                            badge.innerHTML   = '<div class="w-1.5 h-1.5 rounded-full bg-error animate-pulse"></div><span class="font-status-badge text-status-badge text-error">Outside office radius</span>';
+                            const distM       = Math.round(haversine(lat, lng, OFFICE_LAT, OFFICE_LNG));
+                            detail.innerText  = 'Accuracy: ' + acc + 'm • ' + distM + 'm from office';
+                            if (reason) reason.classList.remove('hidden');
+                            if (label)  label.innerText = 'Submit for HR Review';
+                        }
+                    } else {
+                        document.getElementById('gps-detail').innerText = 'Accuracy: ' + acc + 'm';
+                    }
+                },
+                function(err) {
+                    const msgs = {
+                        1: 'Izin lokasi ditolak. Aktifkan akses lokasi di pengaturan browser.',
+                        2: 'Posisi tidak tersedia. Pastikan GPS perangkat aktif.',
+                        3: 'Timeout GPS. Coba lagi.',
+                    };
+                    showGpsError(msgs[err.code] || 'Gagal mendapatkan lokasi.');
+                },
+                { enableHighAccuracy: true, timeout: 12000, maximumAge: 0 }
+            );
+        }
+    }
+
+    function showGpsError(msg) {
+        const errDiv = document.getElementById('gps-error-msg');
+        const okDiv  = document.getElementById('gps-ok');
+        const errTxt = document.getElementById('gps-error-text');
+        if (errDiv) { errDiv.classList.remove('hidden'); errDiv.classList.add('flex'); }
+        if (okDiv)  okDiv.classList.add('hidden');
+        if (errTxt) errTxt.innerText = msg;
+        const badge = document.getElementById('radius-badge');
+        if (badge) {
+            badge.className = 'flex items-center gap-1.5 px-2 py-1 rounded-full bg-error-container border border-error/20';
+            badge.innerHTML = '<span class="material-symbols-outlined text-error text-[14px]">location_off</span><span class="font-status-badge text-status-badge text-error">GPS unavailable</span>';
+        }
+    }
+
+    // ── Camera / Selfie (getUserMedia) ────────────────────────────────────
+    let cameraStream = null;
+    let capturedBlob = null;
+
+    function showCameraError(msg) {
+        const errDiv = document.getElementById('camera-error');
+        const errTxt = document.getElementById('camera-error-text');
+        const area   = document.getElementById('camera-area');
+        if (errTxt) errTxt.innerText = msg;
+        if (errDiv) { errDiv.classList.remove('hidden'); errDiv.classList.add('flex'); }
+        if (area)   area.classList.add('hidden');
+    }
+
+    function startCamera() {
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+            showCameraError('Browser ini tidak mendukung akses kamera langsung.');
+            return;
+        }
+        navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: false })
+            .then(function(stream) {
+                cameraStream = stream;
+                const video   = document.getElementById('selfie-video');
+                const loading = document.getElementById('camera-loading');
+                const overlay = document.getElementById('capture-overlay');
+                if (!video) return;
+                video.srcObject = stream;
+                video.onloadedmetadata = function() {
+                    if (loading) loading.classList.add('hidden');
+                    video.classList.remove('hidden');
+                    if (overlay) overlay.classList.remove('hidden');
+                };
+            })
+            .catch(function(err) {
+                let msg = 'Kamera tidak tersedia.';
+                if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
+                    msg = 'Izin kamera ditolak. Aktifkan izin kamera di pengaturan browser, lalu muat ulang halaman.';
+                } else if (err.name === 'NotFoundError' || err.name === 'DevicesNotFoundError') {
+                    msg = 'Tidak ada kamera yang terdeteksi pada perangkat ini.';
+                } else if (err.name === 'NotReadableError') {
+                    msg = 'Kamera sedang digunakan oleh aplikasi lain.';
+                }
+                showCameraError(msg);
+            });
+    }
+
+    const captureBtn = document.getElementById('capture-btn');
+    if (captureBtn) {
+        captureBtn.addEventListener('click', function() {
+            const video   = document.getElementById('selfie-video');
+            const canvas  = document.getElementById('selfie-canvas');
+            const preview = document.getElementById('photo-preview');
+            const retake  = document.getElementById('photo-retake');
+            const overlay = document.getElementById('capture-overlay');
+            if (!video || !canvas || video.videoWidth === 0) return;
+
+            canvas.width  = video.videoWidth;
+            canvas.height = video.videoHeight;
+            canvas.getContext('2d').drawImage(video, 0, 0);
+
+            const dataUrl = canvas.toDataURL('image/jpeg', 0.9);
+            if (preview) { preview.src = dataUrl; preview.classList.remove('hidden'); }
+            if (overlay) overlay.classList.add('hidden');
+            video.classList.add('hidden');
+            if (retake)  retake.classList.remove('hidden');
+
+            if (cameraStream) {
+                cameraStream.getTracks().forEach(function(t) { t.stop(); });
+                cameraStream = null;
             }
 
-            if(dateElement) {
-                const options = { weekday: 'long', month: 'short', day: 'numeric' };
-                dateElement.innerText = now.toLocaleDateString('en-US', options);
-            }
-        }
-        
-        setInterval(updateClock, 1000);
-        updateClock();
-    </script>
+            canvas.toBlob(function(blob) {
+                capturedBlob = blob;
+                photoReady   = true;
+                updateSubmit();
+            }, 'image/jpeg', 0.9);
+        });
+    }
+
+    const retakeBtn = document.getElementById('photo-retake');
+    if (retakeBtn) {
+        retakeBtn.addEventListener('click', function() {
+            const preview = document.getElementById('photo-preview');
+            if (preview) { preview.src = ''; preview.classList.add('hidden'); }
+            retakeBtn.classList.add('hidden');
+            capturedBlob = null;
+            photoReady   = false;
+            updateSubmit();
+            startCamera();
+        });
+    }
+
+    // Intercept form submit — send captured blob via fetch
+    const checkinForm = document.getElementById('checkin-form');
+    if (checkinForm) {
+        checkinForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            if (!capturedBlob) return;
+
+            const btn = document.getElementById('submit-btn');
+            const lbl = document.getElementById('submit-label');
+            if (btn) btn.disabled = true;
+            if (lbl) lbl.innerText = 'Submitting...';
+
+            const csrf     = document.querySelector('meta[name="csrf-token"]')?.content || '';
+            const formData = new FormData(checkinForm);
+            formData.set('photo', capturedBlob, 'selfie.jpg');
+
+            fetch('/attendance/check-in', {
+                method:   'POST',
+                headers:  { 'X-CSRF-TOKEN': csrf },
+                body:     formData,
+                redirect: 'follow',
+            })
+            .then(function(r) {
+                if (r.url && r.url.includes('/attendance/history')) {
+                    window.location.replace(r.url);
+                } else {
+                    return r.text().then(function(html) {
+                        document.open();
+                        document.write(html);
+                        document.close();
+                    });
+                }
+            })
+            .catch(function() {
+                if (btn) btn.disabled = false;
+                if (lbl) lbl.innerText = 'Confirm Check In';
+            });
+        });
+    }
+
+    // If there are old validation errors, show reason field
+    @if($errors->has('reason') || old('reason'))
+    const rs = document.getElementById('reason-section');
+    if (rs) rs.classList.remove('hidden');
+    @endif
+
+    // Start camera only when the check-in form is present
+    if (document.getElementById('checkin-form')) {
+        startCamera();
+    }
+})();
+</script>
 </body></html>

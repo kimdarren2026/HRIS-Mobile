@@ -1,29 +1,33 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\Employee\AttendanceController;
+use App\Http\Controllers\HR\AttendanceApprovalController;
 use Illuminate\Support\Facades\Route;
 
+// ── Preview (design reference, no auth) ────────────────────────────────────
 $screens = [
-    ['label' => '01 Login', 'uri' => '/login', 'view' => 'pages.auth.login'],
-    ['label' => '02 Employee Dashboard', 'uri' => '/employee/dashboard', 'view' => 'pages.employee.dashboard'],
-    ['label' => '03A Attendance Check-in Within Radius', 'uri' => '/attendance/checkin', 'view' => 'pages.attendance.checkin'],
-    ['label' => '03B Attendance Check-in Outside Radius', 'uri' => '/attendance/checkin-outside', 'view' => 'pages.attendance.checkin-outside'],
-    ['label' => '04 Attendance History', 'uri' => '/attendance/history', 'view' => 'pages.attendance.history'],
-    ['label' => '05 Leave Request', 'uri' => '/leave/request', 'view' => 'pages.leave.request'],
-    ['label' => '06 Leave History', 'uri' => '/leave/history', 'view' => 'pages.leave.history'],
-    ['label' => '07 Payslip Detail', 'uri' => '/payslip/detail', 'view' => 'pages.payslip.detail'],
-    ['label' => '08 HR Approval Queue', 'uri' => '/hr/approval-queue', 'view' => 'pages.hr.approval-queue'],
-    ['label' => '09 Employee Management', 'uri' => '/hr/employees', 'view' => 'pages.hr.employees'],
-    ['label' => '10 Payroll Periods', 'uri' => '/payroll/periods', 'view' => 'pages.payroll.periods'],
-    ['label' => '11 Reports & Analytics', 'uri' => '/reports', 'view' => 'pages.reports.index'],
-    ['label' => '12 Employee Profile', 'uri' => '/profile', 'view' => 'pages.profile.show'],
-    ['label' => '13 Admin HR Dashboard', 'uri' => '/admin/dashboard', 'view' => 'pages.admin.dashboard'],
-    ['label' => '14 Finance Payroll Dashboard', 'uri' => '/finance/dashboard', 'view' => 'pages.finance.dashboard'],
-    ['label' => '15 System Settings', 'uri' => '/settings', 'view' => 'pages.settings.index'],
+    ['label' => '01 Login',                                     'uri' => '/login',                  'view' => 'pages.auth.login'],
+    ['label' => '02 Employee Dashboard',                        'uri' => '/employee/dashboard',     'view' => 'pages.employee.dashboard'],
+    ['label' => '03A Attendance Check-in Within Radius',        'uri' => '/attendance/checkin',     'view' => 'pages.attendance.checkin'],
+    ['label' => '03B Attendance Check-in Outside Radius',       'uri' => '/attendance/checkin-outside', 'view' => 'pages.attendance.checkin-outside'],
+    ['label' => '04 Attendance History',                        'uri' => '/attendance/history',     'view' => 'pages.attendance.history'],
+    ['label' => '05 Leave Request',                             'uri' => '/leave/request',          'view' => 'pages.leave.request'],
+    ['label' => '06 Leave History',                             'uri' => '/leave/history',          'view' => 'pages.leave.history'],
+    ['label' => '07 Payslip Detail',                            'uri' => '/payslip/detail',         'view' => 'pages.payslip.detail'],
+    ['label' => '08 HR Approval Queue',                         'uri' => '/hr/approval-queue',      'view' => 'pages.hr.approval-queue'],
+    ['label' => '09 Employee Management',                       'uri' => '/hr/employees',           'view' => 'pages.hr.employees'],
+    ['label' => '10 Payroll Periods',                           'uri' => '/payroll/periods',        'view' => 'pages.payroll.periods'],
+    ['label' => '11 Reports & Analytics',                       'uri' => '/reports',                'view' => 'pages.reports.index'],
+    ['label' => '12 Employee Profile',                          'uri' => '/profile',                'view' => 'pages.profile.show'],
+    ['label' => '13 Admin HR Dashboard',                        'uri' => '/admin/dashboard',        'view' => 'pages.admin.dashboard'],
+    ['label' => '14 Finance Payroll Dashboard',                 'uri' => '/finance/dashboard',      'view' => 'pages.finance.dashboard'],
+    ['label' => '15 System Settings',                           'uri' => '/settings',               'view' => 'pages.settings.index'],
 ];
 
 Route::redirect('/', '/login');
 
+// ── Auth routes ─────────────────────────────────────────────────────────────
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'login'])
     ->middleware('throttle:5,15')
@@ -32,36 +36,57 @@ Route::post('/logout', [AuthController::class, 'logout'])
     ->middleware('auth')
     ->name('logout');
 
+// ── Protected selfie (auth only; policy in controller) ──────────────────────
+Route::middleware('auth')->group(function (): void {
+    Route::get('/attendance/photo/{attendanceRecord}', [AttendanceController::class, 'photo']);
+});
+
+// ── Employee routes ──────────────────────────────────────────────────────────
 Route::middleware(['auth', 'role:employee'])->group(function (): void {
     Route::view('/employee/dashboard', 'pages.employee.dashboard');
-    Route::view('/attendance/checkin', 'pages.attendance.checkin');
-    Route::view('/attendance/checkin-outside', 'pages.attendance.checkin-outside');
-    Route::view('/attendance/history', 'pages.attendance.history');
-    Route::view('/leave/request', 'pages.leave.request');
-    Route::view('/leave/history', 'pages.leave.history');
-    Route::view('/payslip/detail', 'pages.payslip.detail');
+
+    // Attendance — functional (Phase 5)
+    Route::get('/attendance/checkin',         [AttendanceController::class, 'showCheckIn']);
+    Route::get('/attendance/checkin-outside', [AttendanceController::class, 'showCheckIn']);
+    Route::post('/attendance/check-in',       [AttendanceController::class, 'checkIn'])
+        ->middleware('throttle:10,1');
+    Route::get('/attendance/history', [AttendanceController::class, 'history']);
+
+    // Static views (Phase 1-4, preserved)
+    Route::view('/leave/request',   'pages.leave.request');
+    Route::view('/leave/history',   'pages.leave.history');
+    Route::view('/payslip/detail',  'pages.payslip.detail');
 });
 
+// ── HR / Super Admin routes ──────────────────────────────────────────────────
 Route::middleware(['auth', 'role:admin_hr,super_admin'])->group(function (): void {
     Route::view('/admin/dashboard', 'pages.admin.dashboard');
-    Route::view('/hr/approval-queue', 'pages.hr.approval-queue');
+
+    // Attendance approval — functional (Phase 5)
+    Route::get('/hr/approval-queue',                           [AttendanceApprovalController::class, 'index']);
+    Route::post('/hr/attendance/{attendanceRecord}/approve',   [AttendanceApprovalController::class, 'approve']);
+    Route::post('/hr/attendance/{attendanceRecord}/reject',    [AttendanceApprovalController::class, 'reject']);
+
+    // Static views (Phase 1-4, preserved)
     Route::view('/hr/employees', 'pages.hr.employees');
-    Route::view('/settings', 'pages.settings.index');
+    Route::view('/settings',     'pages.settings.index');
 });
 
+// ── Finance / Super Admin routes ─────────────────────────────────────────────
 Route::middleware(['auth', 'role:finance,super_admin'])->group(function (): void {
     Route::view('/finance/dashboard', 'pages.finance.dashboard');
-    Route::view('/payroll/periods', 'pages.payroll.periods');
+    Route::view('/payroll/periods',   'pages.payroll.periods');
 });
 
+// ── HR + Finance + Super Admin ───────────────────────────────────────────────
 Route::middleware(['auth', 'role:admin_hr,finance,super_admin'])->group(function (): void {
     Route::view('/reports', 'pages.reports.index');
 });
 
+// ── All authenticated users ───────────────────────────────────────────────────
 Route::middleware(['auth', 'role:employee,admin_hr,finance,super_admin'])->group(function (): void {
     Route::view('/profile', 'pages.profile.show');
 });
 
-Route::get('/preview', fn () => view('pages.preview.index', [
-    'screens' => $screens,
-]));
+// ── Design preview (unauthenticated) ────────────────────────────────────────
+Route::get('/preview', fn () => view('pages.preview.index', ['screens' => $screens]));

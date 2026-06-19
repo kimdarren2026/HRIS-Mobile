@@ -159,129 +159,92 @@
                 Custom Range
             </button>
 </div>
-<!-- Attendance Log (Stacked Cards) -->
+@if(session('success'))
+<div class="mb-unit-md bg-success/10 border border-success/30 text-success rounded-lg px-4 py-3 font-body-md text-body-md flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">check_circle</span> {{ session('success') }}
+</div>
+@endif
+<!-- Attendance Log (Dynamic Cards) -->
 <div class="flex flex-col gap-unit-md">
-<!-- Card 1: Approved -->
-<div class="bg-surface-container-lowest border border-border rounded-xl p-unit-md shadow-[0px_1px_2px_0px_rgba(0,0,0,0.05)] flex flex-col gap-3 relative overflow-hidden group">
-<div class="absolute left-0 top-0 bottom-0 w-1 bg-success rounded-l-xl"></div>
-<div class="flex justify-between items-start pl-2">
-<div>
-<h3 class="text-headline-md font-headline-md text-on-background">Jun 18, 2024</h3>
-<p class="text-label-sm font-label-sm text-on-surface-variant mt-0.5">Tuesday</p>
-</div>
-<span class="px-2 py-1 rounded-full bg-success/10 text-success text-status-badge font-status-badge uppercase tracking-wider flex items-center gap-1">
-<span class="material-symbols-outlined text-[14px]">check_circle</span>
-                        Approved
-                    </span>
-</div>
-<div class="grid grid-cols-2 gap-4 mt-2 pl-2">
-<div>
-<p class="text-label-sm font-label-sm text-on-surface-variant mb-1 uppercase">Check-in</p>
-<p class="text-body-md font-body-md text-on-background font-medium">08:00 AM</p>
-</div>
-<div>
-<p class="text-label-sm font-label-sm text-on-surface-variant mb-1 uppercase">Check-out</p>
-<p class="text-body-md font-body-md text-on-background font-medium">05:00 PM</p>
-</div>
-</div>
-<div class="pl-2 pt-2 border-t border-surface-variant flex justify-between items-center">
-<span class="text-label-sm font-label-sm text-on-surface-variant">Total Work Hours</span>
-<span class="text-body-md font-body-md font-semibold text-on-background">9h</span>
-</div>
-</div>
-<!-- Card 2: Pending Review -->
+@forelse($records as $record)
+@php
+$statusColor = match($record->status) {
+    'APPROVED'       => 'bg-success',
+    'PENDING_REVIEW' => 'bg-warning',
+    'REJECTED'       => 'bg-danger',
+    default          => 'bg-outline',
+};
+$badgeCls = match($record->status) {
+    'APPROVED'       => 'bg-success/10 text-success',
+    'PENDING_REVIEW' => 'bg-warning/10 text-warning',
+    'REJECTED'       => 'bg-danger/10 text-danger',
+    default          => 'bg-surface-container text-on-surface-variant',
+};
+$badgeIcon = match($record->status) {
+    'APPROVED'       => 'check_circle',
+    'PENDING_REVIEW' => 'pending',
+    'REJECTED'       => 'cancel',
+    default          => 'info',
+};
+$badgeLabel = match($record->status) {
+    'APPROVED'       => 'Approved',
+    'PENDING_REVIEW' => 'Pending Review',
+    'REJECTED'       => 'Rejected',
+    default          => $record->status,
+};
+@endphp
 <div class="bg-surface-container-lowest border border-border rounded-xl p-unit-md shadow-[0px_1px_2px_0px_rgba(0,0,0,0.05)] flex flex-col gap-3 relative overflow-hidden">
-<div class="absolute left-0 top-0 bottom-0 w-1 bg-warning rounded-l-xl"></div>
+<div class="absolute left-0 top-0 bottom-0 w-1 {{ $statusColor }} rounded-l-xl"></div>
 <div class="flex justify-between items-start pl-2">
 <div>
-<h3 class="text-headline-md font-headline-md text-on-background">Jun 17, 2024</h3>
-<p class="text-label-sm font-label-sm text-on-surface-variant mt-0.5">Monday</p>
+<h3 class="text-headline-md font-headline-md text-on-background">{{ $record->attendance_date->format('M d, Y') }}</h3>
+<p class="text-label-sm font-label-sm text-on-surface-variant mt-0.5">{{ $record->attendance_date->format('l') }}</p>
 </div>
-<span class="px-2 py-1 rounded-full bg-warning/10 text-warning text-status-badge font-status-badge uppercase tracking-wider flex items-center gap-1">
-<span class="material-symbols-outlined text-[14px]">pending</span>
-                        Pending Review
-                    </span>
+<span class="px-2 py-1 rounded-full {{ $badgeCls }} text-status-badge font-status-badge uppercase tracking-wider flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">{{ $badgeIcon }}</span> {{ $badgeLabel }}
+</span>
 </div>
 <div class="grid grid-cols-2 gap-4 mt-2 pl-2">
 <div>
 <p class="text-label-sm font-label-sm text-on-surface-variant mb-1 uppercase">Check-in</p>
-<p class="text-body-md font-body-md text-on-background font-medium">08:15 AM</p>
+<p class="text-body-md font-body-md text-on-background font-medium">{{ $record->check_in_time ? $record->check_in_time->format('h:i A') : '--:--' }}</p>
 </div>
 <div>
 <p class="text-label-sm font-label-sm text-on-surface-variant mb-1 uppercase">Check-out</p>
-<p class="text-body-md font-body-md text-on-background font-medium">05:15 PM</p>
+<p class="text-body-md font-body-md text-on-background font-medium">{{ $record->check_out_time ? $record->check_out_time->format('h:i A') : '--:--' }}</p>
 </div>
 </div>
+@if($record->status === 'PENDING_REVIEW' && $record->out_of_radius_reason)
 <div class="pl-2 mt-1 bg-surface-container p-2 rounded-lg border border-warning/20 flex gap-2 items-start">
 <span class="material-symbols-outlined text-warning text-[16px] mt-0.5">info</span>
-<p class="text-label-sm font-label-sm text-on-surface-variant italic">Reason Preview: "Outside office radius"</p>
+<p class="text-label-sm font-label-sm text-on-surface-variant italic">"{{ $record->out_of_radius_reason }}"</p>
 </div>
-<div class="pl-2 pt-2 border-t border-surface-variant flex justify-between items-center">
-<span class="text-label-sm font-label-sm text-on-surface-variant">Total Work Hours</span>
-<span class="text-body-md font-body-md font-semibold text-on-background">9h</span>
+@endif
+@if($record->status === 'REJECTED' && $record->approval_note)
+<div class="pl-2 mt-1 bg-error-container/30 p-2 rounded-lg border border-danger/20 flex gap-2 items-start">
+<span class="material-symbols-outlined text-danger text-[16px] mt-0.5">cancel</span>
+<p class="text-label-sm font-label-sm text-on-surface-variant italic">HR Note: "{{ $record->approval_note }}"</p>
 </div>
+@endif
+@if($record->check_in_photo_path)
+<div class="pl-2 pt-2 border-t border-surface-variant">
+<a href="/attendance/photo/{{ $record->id }}" target="_blank" class="inline-flex items-center gap-1 text-primary font-label-sm text-label-sm hover:underline">
+<span class="material-symbols-outlined text-[14px]">photo_camera</span> View selfie
+</a>
 </div>
-<!-- Card 3: Missing Check-out -->
-<div class="bg-surface-container-lowest border border-border rounded-xl p-unit-md shadow-[0px_1px_2px_0px_rgba(0,0,0,0.05)] flex flex-col gap-3 relative overflow-hidden">
-<div class="absolute left-0 top-0 bottom-0 w-1 bg-danger rounded-l-xl"></div>
-<div class="flex justify-between items-start pl-2">
-<div>
-<h3 class="text-headline-md font-headline-md text-on-background">Jun 16, 2024</h3>
-<p class="text-label-sm font-label-sm text-on-surface-variant mt-0.5">Sunday</p>
+@endif
 </div>
-<span class="px-2 py-1 rounded-full bg-danger/10 text-danger text-status-badge font-status-badge uppercase tracking-wider flex items-center gap-1">
-<span class="material-symbols-outlined text-[14px]">warning</span>
-                        Missing Check-out
-                    </span>
+@empty
+<div class="flex flex-col items-center justify-center py-16 text-center opacity-50 select-none">
+<span class="material-symbols-outlined text-[48px] mb-2">event_busy</span>
+<p class="font-body-md text-body-md text-on-surface-variant">Belum ada data presensi.</p>
+<a href="/attendance/checkin" class="mt-4 text-primary font-label-md text-label-md hover:underline">Check in sekarang</a>
 </div>
-<div class="grid grid-cols-2 gap-4 mt-2 pl-2">
-<div>
-<p class="text-label-sm font-label-sm text-on-surface-variant mb-1 uppercase">Check-in</p>
-<p class="text-body-md font-body-md text-on-background font-medium">08:05 AM</p>
+@endforelse
 </div>
-<div>
-<p class="text-label-sm font-label-sm text-danger mb-1 uppercase">Check-out</p>
-<p class="text-body-md font-body-md text-danger font-medium">--:--</p>
-</div>
-</div>
-<div class="pl-2 pt-2 border-t border-surface-variant flex justify-between items-center">
-<span class="text-label-sm font-label-sm text-on-surface-variant">Total Work Hours</span>
-<span class="text-body-md font-body-md font-semibold text-on-surface-variant">--</span>
-</div>
-<div class="pl-2 mt-2">
-<!-- TODO Phase 4: connect action -->
-<button class="w-full py-2 border border-danger text-danger rounded-lg text-label-md font-label-md hover:bg-danger/5 transition-colors">Request Correction</button>
-</div>
-</div>
-<!-- Card 4: Rejected -->
-<div class="bg-surface-container-lowest border border-border rounded-xl p-unit-md shadow-[0px_1px_2px_0px_rgba(0,0,0,0.05)] flex flex-col gap-3 relative overflow-hidden">
-<div class="absolute left-0 top-0 bottom-0 w-1 bg-danger rounded-l-xl"></div>
-<div class="flex justify-between items-start pl-2">
-<div>
-<h3 class="text-headline-md font-headline-md text-on-background">Jun 15, 2024</h3>
-<p class="text-label-sm font-label-sm text-on-surface-variant mt-0.5">Saturday</p>
-</div>
-<span class="px-2 py-1 rounded-full bg-danger text-on-error text-status-badge font-status-badge uppercase tracking-wider flex items-center gap-1">
-<span class="material-symbols-outlined text-[14px]">cancel</span>
-                        Rejected
-                    </span>
-</div>
-<div class="grid grid-cols-2 gap-4 mt-2 pl-2">
-<div>
-<p class="text-label-sm font-label-sm text-on-surface-variant mb-1 uppercase">Check-in</p>
-<p class="text-body-md font-body-md text-on-background font-medium">09:00 AM</p>
-</div>
-<div>
-<p class="text-label-sm font-label-sm text-on-surface-variant mb-1 uppercase">Check-out</p>
-<p class="text-body-md font-body-md text-on-background font-medium">06:00 PM</p>
-</div>
-</div>
-<div class="pl-2 pt-2 border-t border-surface-variant flex justify-between items-center">
-<span class="text-label-sm font-label-sm text-on-surface-variant">Total Work Hours</span>
-<span class="text-body-md font-body-md font-semibold text-on-background line-through opacity-50">9h</span>
-</div>
-</div>
-</div>
+@if(method_exists($records, 'hasPages') && $records->hasPages())
+<div class="mt-unit-lg">{{ $records->links() }}</div>
+@endif
 <!-- Spacer for Bottom Nav on Mobile -->
 <div class="h-8"></div>
 </main>

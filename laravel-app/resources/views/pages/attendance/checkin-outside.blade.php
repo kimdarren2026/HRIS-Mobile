@@ -1,6 +1,7 @@
 <!DOCTYPE html><html lang="en"><head>
 <meta charset="utf-8">
 <meta content="width=device-width, initial-scale=1.0" name="viewport">
+<meta name="csrf-token" content="{{ csrf_token() }}">
 <title>Attendance Check-in - HRIS Mobile App</title>
 <!-- Google Fonts & Material Symbols -->
 <link href="https://fonts.googleapis.com" rel="preconnect">
@@ -134,73 +135,91 @@
 <h1 class="flex-1 text-center font-headline-md text-headline-md text-on-surface mr-8">Check In</h1>
 </header>
 <!-- Scrollable Content -->
+<form id="checkin-outside-form" method="POST" action="/attendance/check-in" enctype="multipart/form-data">
+@csrf
+<input type="hidden" id="lat-out" name="lat">
+<input type="hidden" id="lng-out" name="lng">
+
 <main class="flex-1 overflow-y-auto pb-6">
 <!-- Top Section: Date & Time -->
 <div class="py-unit-lg flex flex-col items-center">
-<div class="font-headline-lg text-[32px] leading-tight font-bold text-on-surface">11:04 PM</div>
-<div class="font-body-md text-body-md text-on-surface-variant mt-1">Thursday, Jun 18</div>
+<div class="font-headline-lg text-[32px] leading-tight font-bold text-on-surface" id="time-out">--:-- --</div>
+<div class="font-body-md text-body-md text-on-surface-variant mt-1" id="date-out">—</div>
 </div>
 <!-- Location Card -->
 <div class="mx-container-margin bg-surface border border-border rounded-xl shadow-sm p-unit-md mb-unit-lg">
 <div class="flex justify-between items-start mb-unit-sm">
 <div>
 <h2 class="font-headline-md text-[16px] font-semibold text-on-surface">Your Location</h2>
-<p class="font-body-md text-body-md text-on-surface-variant mt-1">HQ Building, Sector 4</p>
+<p class="font-body-md text-body-md text-on-surface-variant mt-1" id="loc-detail-out">Detecting GPS...</p>
 </div>
 <div class="bg-error-container text-on-error-container px-2 py-1 rounded-full font-label-sm text-label-sm flex items-center gap-1 shrink-0">
-<span class="material-symbols-outlined text-[14px]" data-icon="warning" style="font-variation-settings: 'FILL' 1;">warning</span>
-                        Outside office radius
-                    </div>
+<span class="material-symbols-outlined text-[14px]" style="font-variation-settings: 'FILL' 1;">warning</span>
+Outside office radius
+</div>
 </div>
 <!-- Map Preview -->
-<div class="w-full h-32 rounded-lg relative overflow-hidden mb-3 border border-border">
-<div class="absolute inset-0 bg-cover bg-center" data-alt="A detailed, modern minimalist map interface in a mobile app, showing an urban area with light gray roads and pale blue water, featuring a distinct red location pin marking a spot slightly outside a faint blue circular office radius overlay." data-location="HQ Building, Sector 4" style="background-image: url('https://www.gstatic.com/labs-code/stitch/stitch-placeholder-300x300.svg')"></div>
-<div class="absolute inset-0 bg-black/5"></div>
-<!-- Center Pin -->
+<div class="w-full h-32 rounded-lg relative overflow-hidden mb-3 border border-border flex items-center justify-center bg-surface-container">
 <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-danger drop-shadow-md">
-<span class="material-symbols-outlined text-[32px]" data-icon="location_on" style="font-variation-settings: 'FILL' 1;">location_on</span>
+<span class="material-symbols-outlined text-[32px]" style="font-variation-settings: 'FILL' 1;">location_on</span>
 </div>
 </div>
-<!-- Meta Info -->
 <div class="flex justify-between items-center font-label-sm text-label-sm">
-<span class="text-danger font-semibold flex items-center gap-1">
-<span class="material-symbols-outlined text-[14px]" data-icon="error">error</span>
-                        350m from office
-                    </span>
-<span class="text-outline flex items-center gap-1">
-<span class="material-symbols-outlined text-[14px]" data-icon="my_location">my_location</span>
-                        Accuracy: 5m
-                    </span>
+<span class="text-danger font-semibold flex items-center gap-1" id="dist-out">
+<span class="material-symbols-outlined text-[14px]">error</span> Outside radius
+</span>
+<span class="text-outline flex items-center gap-1" id="acc-out">
+<span class="material-symbols-outlined text-[14px]">my_location</span> Accuracy: --
+</span>
 </div>
 </div>
 <!-- Verification Section -->
 <div class="mx-container-margin bg-surface border border-border rounded-xl shadow-sm p-unit-md mb-unit-lg">
 <h2 class="font-headline-md text-[16px] font-semibold text-on-surface mb-unit-sm">Photo Verification</h2>
-<!-- TODO Phase 4: connect action -->
-<button class="w-full h-32 border-2 border-dashed border-outline-variant rounded-lg flex flex-col items-center justify-center bg-surface-container-low hover:bg-surface-container transition-colors text-on-surface-variant gap-2 group">
-<span class="material-symbols-outlined text-[32px] group-hover:text-primary transition-colors" data-icon="photo_camera">photo_camera</span>
-<span class="font-body-md text-body-md">Tap to take selfie</span>
+@error('photo')<p class="text-error font-label-sm text-label-sm mb-2">{{ $message }}</p>@enderror
+<div id="camera-error-out" class="hidden bg-error-container text-on-error-container rounded-lg px-4 py-3 mb-2 font-label-sm text-label-sm items-center gap-2">
+<span class="material-symbols-outlined text-[16px] shrink-0">videocam_off</span>
+<span id="camera-error-text-out">Kamera tidak tersedia.</span>
+</div>
+<div id="camera-area-out" class="w-full h-32 border-2 border-dashed border-outline-variant rounded-lg relative overflow-hidden bg-surface-container-low">
+<div id="camera-loading-out" class="absolute inset-0 flex flex-col items-center justify-center gap-2 text-on-surface-variant z-10">
+<span class="material-symbols-outlined text-[32px]">photo_camera</span>
+<span class="font-body-md text-body-md">Memulai kamera...</span>
+</div>
+<video id="selfie-video-out" autoplay playsinline muted class="hidden absolute inset-0 w-full h-full object-cover z-10"></video>
+<div id="capture-overlay-out" class="hidden absolute inset-0 flex items-end justify-center pb-2 z-20">
+<button type="button" id="capture-btn-out" class="bg-primary text-on-primary rounded-full px-4 py-1.5 font-label-md text-label-md flex items-center gap-1.5 shadow-md active:scale-95 transition-all">
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings:'FILL' 1;">photo_camera</span>
+Capture Selfie
 </button>
+</div>
+<img id="photo-preview-out" class="hidden absolute inset-0 w-full h-full object-cover z-10" alt="Selfie preview">
+<button type="button" id="photo-retake-out" class="hidden absolute bottom-2 right-2 z-20 bg-surface/80 rounded-full px-2 py-1 font-label-sm text-label-sm text-primary backdrop-blur-sm">Retake</button>
+</div>
+<canvas id="selfie-canvas-out" class="hidden"></canvas>
 </div>
 <!-- Required Inputs Section -->
 <div class="mx-container-margin">
 <label class="block font-label-md text-label-md text-on-surface mb-2">
-                    Reason for outside office radius <span class="text-error">*</span>
+Reason for outside office radius <span class="text-error">*</span>
 </label>
-<textarea class="w-full border border-outline-variant rounded-lg p-3 font-body-md text-body-md text-on-surface bg-surface focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all placeholder:text-outline resize-none h-24" placeholder="Explain why you are checking in outside the office radius..."></textarea>
+@error('reason')<p class="text-error font-label-sm text-label-sm mb-1">{{ $message }}</p>@enderror
+<textarea id="reason-out" name="reason" rows="4" maxlength="500"
+    class="w-full border border-outline-variant rounded-lg p-3 font-body-md text-body-md text-on-surface bg-surface focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all placeholder:text-outline resize-none"
+    placeholder="Explain why you are checking in outside the office radius... (min 10 characters)">{{ old('reason') }}</textarea>
 <div class="mt-2 flex flex-col gap-1">
 <p class="font-body-md text-[13px] text-on-surface-variant">This attendance will be submitted for HR review.</p>
 <p class="font-label-md text-label-md text-warning flex items-center gap-1 mt-1">
-<span class="material-symbols-outlined text-[16px]" data-icon="pending">pending</span>
-                        Status: Pending Review
-                    </p>
+<span class="material-symbols-outlined text-[16px]">pending</span> Status: Pending Review
+</p>
 </div>
-<!-- Action Button -->
-<button class="w-full bg-primary text-on-primary py-3.5 rounded-lg font-label-md text-label-md mt-8 hover:bg-on-primary-fixed-variant transition-colors shadow-sm active:scale-[0.98]" onclick="window.location.href='/attendance/history'">
-                    Submit for HR Review
-                </button>
+<button id="submit-btn-out" type="submit" disabled
+    class="w-full bg-primary text-on-primary disabled:opacity-40 disabled:cursor-not-allowed py-3.5 rounded-lg font-label-md text-label-md mt-8 hover:bg-on-primary-fixed-variant transition-colors shadow-sm active:scale-[0.98]">
+Submit for HR Review
+</button>
 </div>
 </main>
+</form>
 <!-- BottomNavBar (from Shared Components JSON) -->
 <nav class="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[390px] z-50 flex justify-around items-center px-2 py-3 bg-surface border-t border-border backdrop-blur-md shadow-lg">
 <!-- Inactive: Home -->
@@ -230,4 +249,168 @@
 </button>
 </nav>
 </div>
+<script>
+(function() {
+    let gpsOk = false, photoOk = false;
+    function trySubmit() {
+        const btn = document.getElementById('submit-btn-out');
+        if (btn) btn.disabled = !(gpsOk && photoOk);
+    }
+    // Clock
+    function tick() {
+        const n = new Date();
+        let h = n.getHours(), m = n.getMinutes(), ap = h>=12?'PM':'AM';
+        h = h%12||12;
+        const tel = document.getElementById('time-out');
+        const del = document.getElementById('date-out');
+        if (tel) tel.innerText = h+':'+(m<10?'0'+m:m)+' '+ap;
+        if (del) del.innerText = n.toLocaleDateString('id-ID',{weekday:'long',day:'numeric',month:'short',year:'numeric'});
+    }
+    setInterval(tick,1000); tick();
+    // GPS
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function(p) {
+            document.getElementById('lat-out').value = p.coords.latitude;
+            document.getElementById('lng-out').value = p.coords.longitude;
+            const acc = Math.round(p.coords.accuracy);
+            const accEl = document.getElementById('acc-out');
+            if (accEl) accEl.innerHTML = '<span class="material-symbols-outlined text-[14px]">my_location</span> Accuracy: '+acc+'m';
+            gpsOk = true; trySubmit();
+        }, function(e) {
+            const loc = document.getElementById('loc-detail-out');
+            if (loc) loc.innerText = 'GPS unavailable — check browser permissions.';
+        }, {enableHighAccuracy:true,timeout:12000});
+    }
+    // Camera / Selfie (getUserMedia)
+    let cameraStreamOut = null;
+    let capturedBlobOut = null;
+
+    function showCameraErrorOut(msg) {
+        const errDiv = document.getElementById('camera-error-out');
+        const errTxt = document.getElementById('camera-error-text-out');
+        const area   = document.getElementById('camera-area-out');
+        if (errTxt) errTxt.innerText = msg;
+        if (errDiv) { errDiv.classList.remove('hidden'); errDiv.classList.add('flex'); }
+        if (area)   area.classList.add('hidden');
+    }
+
+    function startCameraOut() {
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+            showCameraErrorOut('Browser ini tidak mendukung akses kamera langsung.');
+            return;
+        }
+        navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: false })
+            .then(function(stream) {
+                cameraStreamOut = stream;
+                const video   = document.getElementById('selfie-video-out');
+                const loading = document.getElementById('camera-loading-out');
+                const overlay = document.getElementById('capture-overlay-out');
+                if (!video) return;
+                video.srcObject = stream;
+                video.onloadedmetadata = function() {
+                    if (loading) loading.classList.add('hidden');
+                    video.classList.remove('hidden');
+                    if (overlay) overlay.classList.remove('hidden');
+                };
+            })
+            .catch(function(err) {
+                let msg = 'Kamera tidak tersedia.';
+                if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
+                    msg = 'Izin kamera ditolak. Aktifkan izin kamera di pengaturan browser, lalu muat ulang halaman.';
+                } else if (err.name === 'NotFoundError' || err.name === 'DevicesNotFoundError') {
+                    msg = 'Tidak ada kamera yang terdeteksi pada perangkat ini.';
+                } else if (err.name === 'NotReadableError') {
+                    msg = 'Kamera sedang digunakan oleh aplikasi lain.';
+                }
+                showCameraErrorOut(msg);
+            });
+    }
+
+    const captureBtnOut = document.getElementById('capture-btn-out');
+    if (captureBtnOut) {
+        captureBtnOut.addEventListener('click', function() {
+            const video   = document.getElementById('selfie-video-out');
+            const canvas  = document.getElementById('selfie-canvas-out');
+            const preview = document.getElementById('photo-preview-out');
+            const retake  = document.getElementById('photo-retake-out');
+            const overlay = document.getElementById('capture-overlay-out');
+            if (!video || !canvas || video.videoWidth === 0) return;
+
+            canvas.width  = video.videoWidth;
+            canvas.height = video.videoHeight;
+            canvas.getContext('2d').drawImage(video, 0, 0);
+
+            const dataUrl = canvas.toDataURL('image/jpeg', 0.9);
+            if (preview) { preview.src = dataUrl; preview.classList.remove('hidden'); }
+            if (overlay) overlay.classList.add('hidden');
+            video.classList.add('hidden');
+            if (retake)  retake.classList.remove('hidden');
+
+            if (cameraStreamOut) {
+                cameraStreamOut.getTracks().forEach(function(t) { t.stop(); });
+                cameraStreamOut = null;
+            }
+
+            canvas.toBlob(function(blob) {
+                capturedBlobOut = blob;
+                photoOk = true;
+                trySubmit();
+            }, 'image/jpeg', 0.9);
+        });
+    }
+
+    const retakeBtnOut = document.getElementById('photo-retake-out');
+    if (retakeBtnOut) {
+        retakeBtnOut.addEventListener('click', function() {
+            const preview = document.getElementById('photo-preview-out');
+            if (preview) { preview.src = ''; preview.classList.add('hidden'); }
+            retakeBtnOut.classList.add('hidden');
+            capturedBlobOut = null;
+            photoOk = false;
+            trySubmit();
+            startCameraOut();
+        });
+    }
+
+    // Intercept form submit — send captured blob via fetch
+    const outsideForm = document.getElementById('checkin-outside-form');
+    if (outsideForm) {
+        outsideForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            if (!capturedBlobOut) return;
+
+            const btn = document.getElementById('submit-btn-out');
+            if (btn) btn.disabled = true;
+
+            const csrf     = document.querySelector('meta[name="csrf-token"]')?.content || '';
+            const formData = new FormData(outsideForm);
+            formData.set('photo', capturedBlobOut, 'selfie.jpg');
+
+            fetch('/attendance/check-in', {
+                method:   'POST',
+                headers:  { 'X-CSRF-TOKEN': csrf },
+                body:     formData,
+                redirect: 'follow',
+            })
+            .then(function(r) {
+                if (r.url && r.url.includes('/attendance/history')) {
+                    window.location.replace(r.url);
+                } else {
+                    return r.text().then(function(html) {
+                        document.open();
+                        document.write(html);
+                        document.close();
+                    });
+                }
+            })
+            .catch(function() {
+                if (btn) btn.disabled = false;
+            });
+        });
+    }
+
+    // Start camera on page load
+    startCameraOut();
+})();
+</script>
 </body></html>

@@ -153,87 +153,104 @@
 </div>
 <!-- Approval List Content -->
 <div class="p-container-margin flex flex-col gap-unit-lg">
-<!-- Attendance Card 1 -->
+
+@if(session('success'))
+<div class="bg-success/10 border border-success/30 text-success rounded-lg px-4 py-3 font-body-md text-body-md flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">check_circle</span> {{ session('success') }}
+</div>
+@endif
+
+@forelse($pending as $record)
 <div class="bg-surface border border-outline-variant rounded-xl shadow-sm overflow-hidden flex flex-col gap-unit-md p-unit-md">
 <div class="flex items-start justify-between">
 <div class="flex gap-3">
-<img class="w-12 h-12 rounded-full object-cover" data-alt="Professional studio portrait of a young male professional named Alex Rivers with a friendly expression, wearing a modern business casual outfit. The lighting is soft and corporate, set against a clean, light-blue gradient background that aligns with a high-end SaaS HR application aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBFZucuwSCiIpIQ8NTu3ufVaO9HDfpBg9iK1quu3yd12T94WzAcKNDJEZjC6-XddiosLeS7V08IT1_5Jsh3pqAHsBw6RvF9q6tiI_IXhsKeX16_jLXKqgAqWXDziJ7AguUv_np5VXdyZ0qJZCIxAwxZiJ4yR4kxv5jiszkTuSiC1t5Ow4oVxh7sA-1EXCHnZ6u7zLwURfsCjGgU8o_stE3Rsx_Bww4Hm3l8F4UNxZ2fQuWSsLZZyJ4xjOlaJwut00VVWMs3DMBPisk"/>
+<div class="w-12 h-12 rounded-full bg-primary-container flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-on-primary-container">person</span>
+</div>
 <div>
-<h3 class="font-headline-md text-[16px] font-bold text-on-surface">Alex Rivers</h3>
-<p class="font-body-md text-on-surface-variant">Product • 2 hours ago</p>
+<h3 class="font-headline-md text-[16px] font-bold text-on-surface">{{ $record->employee->user->name ?? '—' }}</h3>
+<p class="font-body-md text-on-surface-variant">
+{{ $record->employee->department->name ?? '—' }} &bull; {{ $record->check_in_time?->diffForHumans() }}
+</p>
 </div>
 </div>
-<div class="bg-warning/10 text-warning px-3 py-1 rounded-full font-status-badge text-status-badge">
-                    Pending Review
-                </div>
+<div class="bg-warning/10 text-warning px-3 py-1 rounded-full font-status-badge text-status-badge shrink-0">
+Pending Review
+</div>
 </div>
 <div class="bg-surface-container-low p-3 rounded-lg border border-outline-variant/30">
 <div class="flex items-center gap-2 mb-1">
 <span class="material-symbols-outlined text-primary text-[18px]">location_on</span>
-<span class="font-label-md text-label-md text-on-surface-variant">Check-in outside radius - 350m</span>
+<span class="font-label-md text-label-md text-on-surface-variant">
+Check-in {{ $record->check_in_time?->format('d M Y, h:i A') }}
+</span>
 </div>
-<p class="font-body-md text-on-surface-variant mt-2 italic leading-relaxed">
-                    "Site visit at client office in downtown."
-                </p>
+@if($record->out_of_radius_reason)
+<p class="font-body-md text-on-surface-variant mt-2 italic leading-relaxed">"{{ $record->out_of_radius_reason }}"</p>
+@endif
+@if($record->check_in_photo_path)
+<a href="/attendance/photo/{{ $record->id }}" target="_blank"
+   class="inline-flex items-center gap-1 mt-2 text-primary font-label-sm text-label-sm hover:underline">
+<span class="material-symbols-outlined text-[14px]">photo_camera</span> View selfie
+</a>
+@endif
 </div>
-<div class="flex gap-3 pt-2">
-<!-- TODO Phase 4: connect action -->
-<button class="flex-1 bg-success text-on-primary py-3 rounded-lg font-label-md flex items-center justify-center gap-2 active:scale-95 transition-transform">
-<span class="material-symbols-outlined text-[18px]">check_circle</span>
-                    Approve
-                </button>
-<!-- TODO Phase 4: connect action -->
-<button class="flex-1 border-2 border-danger text-danger py-3 rounded-lg font-label-md flex items-center justify-center gap-2 active:scale-95 transition-transform">
-<span class="material-symbols-outlined text-[18px]">block</span>
-                    Reject
-                    <span class="material-symbols-outlined text-[14px]">edit_note</span>
-</button>
-</div>
-</div>
-<!-- Attendance Card 2 -->
-<div class="bg-surface border border-outline-variant rounded-xl shadow-sm overflow-hidden flex flex-col gap-unit-md p-unit-md">
-<div class="flex items-start justify-between">
+
+{{-- Approve form --}}
+<form method="POST" action="/hr/attendance/{{ $record->id }}/approve" class="flex gap-3 pt-2 flex-col">
+@csrf
+<input type="text" name="approval_note" placeholder="Optional note for employee..." maxlength="1000"
+    class="w-full border border-outline-variant rounded-lg px-3 py-2 font-body-md text-body-md text-on-surface bg-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none placeholder:text-outline">
 <div class="flex gap-3">
-<img class="w-12 h-12 rounded-full object-cover" data-alt="A professional headshot of a female employee named Sarah Jenkins with long brown hair, wearing a professional blazer. She has a confident, warm smile, photographed in a modern office environment with soft bokeh background. The overall aesthetic is professional, clean, and reliable, using soft natural light." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDCpfvrkH6sas_8gGJghK2lRRpD_sDMDvvQEzfG_G6Syo-G6DOVBQhS9jPzdM0ATv_shPeh6jAOfzGYbxrMTVP-jI2rrydilmOyYwRvwawGPRBXiIdseE_GKBwStrjEYUfEcffYeo3Hoc0viDG0pvXID-R_TrHoMaJD_epwsj4emIffYwtvvDpocVAVMQ8dsveYG7zEP1DnwtnzJEzghfZXqOmLVC7np-2U6Cn0ViUpwIkA_oVPkJJO6VAguH-kSTuUxCdWYpSAMQ0"/>
-<div>
-<h3 class="font-headline-md text-[16px] font-bold text-on-surface">Sarah Jenkins</h3>
-<p class="font-body-md text-on-surface-variant">Marketing • 4 hours ago</p>
-</div>
-</div>
-<div class="bg-warning/10 text-warning px-3 py-1 rounded-full font-status-badge text-status-badge">
-                    Pending Review
-                </div>
-</div>
-<div class="bg-surface-container-low p-3 rounded-lg border border-outline-variant/30">
-<div class="flex items-center gap-2 mb-1">
-<span class="material-symbols-outlined text-primary text-[18px]">distance</span>
-<span class="font-label-md text-label-md text-on-surface-variant">Check-in outside radius - 1.2km</span>
-</div>
-<p class="font-body-md text-on-surface-variant mt-2 italic leading-relaxed">
-                    "Forgot to check in at the entrance, checked in from my desk."
-                </p>
-</div>
-<div class="flex gap-3 pt-2">
-<!-- TODO Phase 4: connect action -->
-<button class="flex-1 bg-success text-on-primary py-3 rounded-lg font-label-md flex items-center justify-center gap-2 active:scale-95 transition-transform">
-<span class="material-symbols-outlined text-[18px]">check_circle</span>
-                    Approve
-                </button>
-<!-- TODO Phase 4: connect action -->
-<button class="flex-1 border-2 border-danger text-danger py-3 rounded-lg font-label-md flex items-center justify-center gap-2 active:scale-95 transition-transform">
-<span class="material-symbols-outlined text-[18px]">block</span>
-                    Reject
-                    <span class="material-symbols-outlined text-[14px]">edit_note</span>
+<button type="submit"
+    class="flex-1 bg-success text-on-primary py-3 rounded-lg font-label-md flex items-center justify-center gap-2 active:scale-95 transition-transform">
+<span class="material-symbols-outlined text-[18px]">check_circle</span> Approve
+</button>
+
+{{-- Reject toggle --}}
+<button type="button" onclick="toggleReject({{ $record->id }})"
+    class="flex-1 border-2 border-danger text-danger py-3 rounded-lg font-label-md flex items-center justify-center gap-2 active:scale-95 transition-transform">
+<span class="material-symbols-outlined text-[18px]">block</span> Reject
 </button>
 </div>
+</form>
+
+{{-- Reject form (hidden by default) --}}
+<form id="reject-form-{{ $record->id }}" method="POST" action="/hr/attendance/{{ $record->id }}/reject" class="hidden flex-col gap-2">
+@csrf
+@if($errors->has('approval_note'))
+<p class="text-error font-label-sm text-label-sm">{{ $errors->first('approval_note') }}</p>
+@endif
+<textarea name="approval_note" rows="3" maxlength="1000" required minlength="10" placeholder="Alasan penolakan (wajib, min 10 karakter)..."
+    class="w-full border border-danger rounded-lg px-3 py-2 font-body-md text-body-md text-on-surface bg-surface focus:border-error focus:ring-1 focus:ring-error outline-none resize-none placeholder:text-outline">{{ old('approval_note') }}</textarea>
+<button type="submit"
+    class="w-full bg-danger text-on-error py-3 rounded-lg font-label-md flex items-center justify-center gap-2 active:scale-95 transition-transform">
+<span class="material-symbols-outlined text-[18px]">cancel</span> Confirm Rejection
+</button>
+</form>
 </div>
-<!-- List Placeholder / Empty State hint -->
-<div class="flex flex-col items-center justify-center py-unit-xl opacity-20 select-none">
+@empty
+<div class="flex flex-col items-center justify-center py-unit-xl opacity-40 select-none">
 <span class="material-symbols-outlined text-[64px]">rule</span>
-<p class="font-label-md mt-2">End of queue</p>
+<p class="font-label-md mt-2 text-on-surface-variant">Tidak ada presensi pending review.</p>
 </div>
+@endforelse
+
+@if(method_exists($pending, 'hasPages') && $pending->hasPages())
+<div class="pb-4">{{ $pending->links() }}</div>
+@endif
+
 </div>
 </main>
+
+<script>
+function toggleReject(id) {
+    const f = document.getElementById('reject-form-' + id);
+    if (!f) return;
+    f.classList.toggle('hidden');
+    f.classList.toggle('flex');
+}
+</script>
 <!-- BottomNavBar -->
 <nav class="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[390px] z-50 bg-surface/80 backdrop-blur-md border-t border-outline-variant shadow-sm h-[72px] flex justify-around items-center px-unit-sm pb-safe">
 <!-- Home -->
