@@ -124,10 +124,11 @@
 <body class="bg-background text-on-surface min-h-screen max-w-[390px] mx-auto overflow-x-hidden pb-24">
 <!-- Top AppBar -->
 <header class="fixed top-0 left-1/2 -translate-x-1/2 w-full max-w-[390px] z-50 bg-surface-bright border-b border-outline-variant shadow-sm flex justify-between items-center h-16 px-container-margin">
-<button class="material-symbols-outlined text-primary p-2 active:opacity-80 transition-opacity hover:bg-surface-container rounded-full" data-icon="menu">menu</button>
+<button class="material-symbols-outlined text-primary p-2 active:opacity-80 transition-opacity hover:bg-surface-container rounded-full" data-icon="menu" onclick="window.location.href='/settings'">menu</button>
 <div class="flex flex-col items-center">
 <span class="font-headline-lg text-headline-lg text-primary tracking-tight">HRIS Mobile App</span>
 </div>
+<!-- TODO Phase 4: connect action -->
 <button class="material-symbols-outlined text-primary p-2 active:opacity-80 transition-opacity hover:bg-surface-container rounded-full relative" data-icon="notifications">
             notifications
             <span class="absolute top-2 right-2 w-2 h-2 bg-error rounded-full"></span>
@@ -166,19 +167,19 @@
 <section class="space-y-unit-sm">
 <h2 class="font-label-md text-label-md text-outline px-1">QUICK ACTIONS</h2>
 <div class="grid grid-cols-2 gap-card-gap">
-<button class="flex items-center gap-3 bg-primary text-white p-unit-md rounded-xl active:scale-95 transition-transform text-left">
+<button class="flex items-center gap-3 bg-primary text-white p-unit-md rounded-xl active:scale-95 transition-transform text-left" onclick="window.location.href='/hr/approval-queue'">
 <span class="material-symbols-outlined" data-icon="fact_check">fact_check</span>
 <span class="font-label-md text-label-md">Review Attendance</span>
 </button>
-<button class="flex items-center gap-3 bg-secondary text-white p-unit-md rounded-xl active:scale-95 transition-transform text-left">
+<button class="flex items-center gap-3 bg-secondary text-white p-unit-md rounded-xl active:scale-95 transition-transform text-left" onclick="window.location.href='/hr/approval-queue'">
 <span class="material-symbols-outlined" data-icon="edit_calendar">edit_calendar</span>
 <span class="font-label-md text-label-md">Review Leave</span>
 </button>
-<button class="flex items-center gap-3 bg-surface-container-high text-on-surface p-unit-md rounded-xl active:scale-95 transition-transform text-left border border-outline-variant">
+<button class="flex items-center gap-3 bg-surface-container-high text-on-surface p-unit-md rounded-xl active:scale-95 transition-transform text-left border border-outline-variant" onclick="window.location.href='/hr/employees'">
 <span class="material-symbols-outlined text-primary" data-icon="manage_accounts">manage_accounts</span>
 <span class="font-label-md text-label-md">Manage Employees</span>
 </button>
-<button class="flex items-center gap-3 bg-surface-container-high text-on-surface p-unit-md rounded-xl active:scale-95 transition-transform text-left border border-outline-variant">
+<button class="flex items-center gap-3 bg-surface-container-high text-on-surface p-unit-md rounded-xl active:scale-95 transition-transform text-left border border-outline-variant" onclick="window.location.href='/reports'">
 <span class="material-symbols-outlined text-primary" data-icon="analytics">analytics</span>
 <span class="font-label-md text-label-md">View Reports</span>
 </button>
@@ -262,7 +263,7 @@
 <section class="bg-surface-container-lowest p-unit-md rounded-xl border border-border shadow-sm space-y-4 mb-8">
 <div class="flex justify-between items-center">
 <h2 class="font-headline-md text-headline-md text-on-surface">Recent Activity</h2>
-<button class="text-primary font-label-md hover:underline">View All</button>
+<button class="text-primary font-label-md hover:underline" onclick="window.location.href='/hr/approval-queue'">View All</button>
 </div>
 <div class="space-y-4">
 <!-- Activity Item -->
@@ -311,27 +312,27 @@
 <!-- Bottom Navigation Bar -->
 <nav class="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[390px] z-50 bg-surface-container-lowest rounded-t-xl border-t border-outline-variant shadow-[0px_-1px_2px_0px_rgba(0,0,0,0.05)] flex justify-around items-center h-[72px] pb-safe px-2">
 <!-- Home (Active) -->
-<button class="flex flex-col items-center justify-center text-primary font-bold hover:bg-surface-container-low transition-all active:scale-95 duration-200">
+<button class="flex flex-col items-center justify-center text-primary font-bold hover:bg-surface-container-low transition-all active:scale-95 duration-200" onclick="window.location.href='/admin/dashboard'">
 <span class="material-symbols-outlined" data-icon="home" style="font-variation-settings: 'FILL' 1;">home</span>
 <span class="font-label-sm text-label-sm">Home</span>
 </button>
 <!-- Employees -->
-<button class="flex flex-col items-center justify-center text-outline hover:bg-surface-container-low transition-all active:scale-95 duration-200">
+<button class="flex flex-col items-center justify-center text-outline hover:bg-surface-container-low transition-all active:scale-95 duration-200" onclick="window.location.href='/hr/employees'">
 <span class="material-symbols-outlined" data-icon="badge">badge</span>
 <span class="font-label-sm text-label-sm">Employees</span>
 </button>
 <!-- Approvals -->
-<button class="flex flex-col items-center justify-center text-outline hover:bg-surface-container-low transition-all active:scale-95 duration-200">
+<button class="flex flex-col items-center justify-center text-outline hover:bg-surface-container-low transition-all active:scale-95 duration-200" onclick="window.location.href='/hr/approval-queue'">
 <span class="material-symbols-outlined" data-icon="fact_check">fact_check</span>
 <span class="font-label-sm text-label-sm">Approvals</span>
 </button>
 <!-- Reports -->
-<button class="flex flex-col items-center justify-center text-outline hover:bg-surface-container-low transition-all active:scale-95 duration-200">
+<button class="flex flex-col items-center justify-center text-outline hover:bg-surface-container-low transition-all active:scale-95 duration-200" onclick="window.location.href='/reports'">
 <span class="material-symbols-outlined" data-icon="analytics">analytics</span>
 <span class="font-label-sm text-label-sm">Reports</span>
 </button>
 <!-- Profile -->
-<button class="flex flex-col items-center justify-center text-outline hover:bg-surface-container-low transition-all active:scale-95 duration-200">
+<button class="flex flex-col items-center justify-center text-outline hover:bg-surface-container-low transition-all active:scale-95 duration-200" onclick="window.location.href='/profile'">
 <span class="material-symbols-outlined" data-icon="person">person</span>
 <span class="font-label-sm text-label-sm">Profile</span>
 </button>

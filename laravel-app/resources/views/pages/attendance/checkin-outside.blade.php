@@ -128,7 +128,7 @@
 <div class="w-full max-w-[390px] h-auto min-h-screen bg-background relative overflow-hidden flex flex-col shadow-2xl pb-20">
 <!-- Header -->
 <header class="flex items-center px-container-margin h-16 bg-surface border-b border-border sticky top-0 z-40 shrink-0">
-<button class="p-2 -ml-2 text-on-surface-variant hover:bg-surface-container rounded-full transition-colors">
+<button class="p-2 -ml-2 text-on-surface-variant hover:bg-surface-container rounded-full transition-colors" onclick="window.location.href='/employee/dashboard'">
 <span class="material-symbols-outlined" data-icon="arrow_back">arrow_back</span>
 </button>
 <h1 class="flex-1 text-center font-headline-md text-headline-md text-on-surface mr-8">Check In</h1>
@@ -176,6 +176,7 @@
 <!-- Verification Section -->
 <div class="mx-container-margin bg-surface border border-border rounded-xl shadow-sm p-unit-md mb-unit-lg">
 <h2 class="font-headline-md text-[16px] font-semibold text-on-surface mb-unit-sm">Photo Verification</h2>
+<!-- TODO Phase 4: connect action -->
 <button class="w-full h-32 border-2 border-dashed border-outline-variant rounded-lg flex flex-col items-center justify-center bg-surface-container-low hover:bg-surface-container transition-colors text-on-surface-variant gap-2 group">
 <span class="material-symbols-outlined text-[32px] group-hover:text-primary transition-colors" data-icon="photo_camera">photo_camera</span>
 <span class="font-body-md text-body-md">Tap to take selfie</span>
@@ -195,7 +196,7 @@
                     </p>
 </div>
 <!-- Action Button -->
-<button class="w-full bg-primary text-on-primary py-3.5 rounded-lg font-label-md text-label-md mt-8 hover:bg-on-primary-fixed-variant transition-colors shadow-sm active:scale-[0.98]">
+<button class="w-full bg-primary text-on-primary py-3.5 rounded-lg font-label-md text-label-md mt-8 hover:bg-on-primary-fixed-variant transition-colors shadow-sm active:scale-[0.98]" onclick="window.location.href='/attendance/history'">
                     Submit for HR Review
                 </button>
 </div>
@@ -203,27 +204,27 @@
 <!-- BottomNavBar (from Shared Components JSON) -->
 <nav class="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[390px] z-50 flex justify-around items-center px-2 py-3 bg-surface border-t border-border backdrop-blur-md shadow-lg">
 <!-- Inactive: Home -->
-<button class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 hover:bg-surface-container-high rounded-lg transition-all duration-200">
+<button class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 hover:bg-surface-container-high rounded-lg transition-all duration-200" onclick="window.location.href='/employee/dashboard'">
 <span class="material-symbols-outlined" data-icon="home">home</span>
 <span class="font-label-sm text-label-sm mt-1">Home</span>
 </button>
 <!-- Active: Attendance -->
-<button class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-full px-4 py-1 active:scale-90 transition-all duration-200">
+<button class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-full px-4 py-1 active:scale-90 transition-all duration-200" onclick="window.location.href='/attendance/checkin'">
 <span class="material-symbols-outlined" data-icon="schedule" style="font-variation-settings: 'FILL' 1;">schedule</span>
 <span class="font-label-sm text-label-sm mt-1">Attendance</span>
 </button>
 <!-- Inactive: Leave -->
-<button class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 hover:bg-surface-container-high rounded-lg transition-all duration-200">
+<button class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 hover:bg-surface-container-high rounded-lg transition-all duration-200" onclick="window.location.href='/leave/history'">
 <span class="material-symbols-outlined" data-icon="event_note">event_note</span>
 <span class="font-label-sm text-label-sm mt-1">Leave</span>
 </button>
 <!-- Inactive: Payslip -->
-<button class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 hover:bg-surface-container-high rounded-lg transition-all duration-200">
+<button class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 hover:bg-surface-container-high rounded-lg transition-all duration-200" onclick="window.location.href='/payslip/detail'">
 <span class="material-symbols-outlined" data-icon="payments">payments</span>
 <span class="font-label-sm text-label-sm mt-1">Payslip</span>
 </button>
 <!-- Inactive: Profile -->
-<button class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 hover:bg-surface-container-high rounded-lg transition-all duration-200">
+<button class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 hover:bg-surface-container-high rounded-lg transition-all duration-200" onclick="window.location.href='/profile'">
 <span class="material-symbols-outlined" data-icon="person">person</span>
 <span class="font-label-sm text-label-sm mt-1">Profile</span>
 </button>

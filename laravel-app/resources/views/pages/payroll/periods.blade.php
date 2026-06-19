@@ -121,11 +121,12 @@
 <!-- TopAppBar -->
 <header class="fixed top-0 left-1/2 -translate-x-1/2 w-full max-w-[390px] z-50 bg-surface border-b border-border shadow-sm h-16 flex justify-between items-center px-container-margin">
 <div class="flex items-center gap-3">
-<button class="transition-colors duration-200 active:opacity-70 text-primary p-1">
+<button class="transition-colors duration-200 active:opacity-70 text-primary p-1" onclick="window.location.href='/finance/dashboard'">
 <span class="material-symbols-outlined">menu</span>
 </button>
 <h1 class="font-headline-md text-headline-md font-bold text-primary">Payroll Periods</h1>
 </div>
+<!-- TODO Phase 4: connect action -->
 <button class="transition-colors duration-200 active:opacity-70 text-primary p-1 relative">
 <span class="material-symbols-outlined">notifications</span>
 <span class="absolute top-1 right-1 w-2 h-2 bg-danger rounded-full border border-surface"></span>
@@ -164,10 +165,12 @@
 </section>
 <!-- Action Buttons -->
 <section class="flex flex-col gap-unit-sm">
+<!-- TODO Phase 4: connect action -->
 <button class="w-full bg-primary-container text-on-primary py-3.5 rounded-xl font-label-md text-label-md flex items-center justify-center gap-2 active:scale-[0.98] transition-transform">
 <span class="material-symbols-outlined">add_circle</span>
         Create New Period
       </button>
+<!-- TODO Phase 4: connect action -->
 <button class="w-full border border-primary text-primary py-3.5 rounded-xl font-label-md text-label-md flex items-center justify-center gap-2 active:scale-[0.98] transition-transform bg-white">
 <span class="material-symbols-outlined">download</span>
         Export History
@@ -211,8 +214,9 @@
           </div>
 </div><div class="flex items-center gap-1.5 font-label-md text-label-md text-on-surface-variant"><span class="material-symbols-outlined text-[18px]">payments</span>Total Net Salary: $685,400</div>
 <div class="grid grid-cols-3 gap-2 pt-2 border-t border-border">
-<button class="bg-surface-container-low text-primary py-2 rounded-lg font-label-sm text-label-sm active:bg-surface-variant">View</button>
-<button class="bg-surface-container-low text-primary py-2 rounded-lg font-label-sm text-label-sm active:bg-surface-variant">Process</button>
+<button class="bg-surface-container-low text-primary py-2 rounded-lg font-label-sm text-label-sm active:bg-surface-variant" onclick="window.location.href='/payroll/periods'">View</button>
+<button class="bg-surface-container-low text-primary py-2 rounded-lg font-label-sm text-label-sm active:bg-surface-variant" onclick="window.location.href='/payroll/periods'">Process</button>
+<!-- TODO Phase 4: connect action -->
 <button class="bg-primary text-white py-2 rounded-lg font-label-sm text-label-sm active:opacity-90">Approve</button>
 </div>
 </div>
@@ -232,7 +236,7 @@
           </div>
 </div><div class="flex items-center gap-1.5 font-label-md text-label-md text-on-surface-variant"><span class="material-symbols-outlined text-[18px]">payments</span>Total Net Salary: $658,200</div>
 <div class="pt-2 border-t border-border">
-<button class="w-full bg-surface-container-low text-primary py-2 rounded-lg font-label-sm text-label-sm active:bg-surface-variant">View Report</button>
+<button class="w-full bg-surface-container-low text-primary py-2 rounded-lg font-label-sm text-label-sm active:bg-surface-variant" onclick="window.location.href='/reports'">View Report</button>
 </div>
 </div>
 <!-- Card 3: April 2026 -->
@@ -251,7 +255,7 @@
           </div>
 </div><div class="flex items-center gap-1.5 font-label-md text-label-md text-on-surface-variant"><span class="material-symbols-outlined text-[18px]">payments</span>Total Net Salary: $645,100</div>
 <div class="pt-2 border-t border-border">
-<button class="w-full bg-surface-container-low text-primary py-2 rounded-lg font-label-sm text-label-sm active:bg-surface-variant">View</button>
+<button class="w-full bg-surface-container-low text-primary py-2 rounded-lg font-label-sm text-label-sm active:bg-surface-variant" onclick="window.location.href='/payroll/periods'">View</button>
 </div>
 </div>
 <!-- Card 4: July 2026 -->
@@ -270,31 +274,31 @@
           </div>
 </div><div class="flex items-center gap-1.5 font-label-md text-label-md text-on-surface-variant"><span class="material-symbols-outlined text-[18px]">payments</span>Total Net Salary: $0</div>
 <div class="grid grid-cols-2 gap-2 pt-2 border-t border-border">
-<button class="bg-surface-container-low text-primary py-2 rounded-lg font-label-sm text-label-sm active:bg-surface-variant">View</button>
-<button class="bg-primary text-white py-2 rounded-lg font-label-sm text-label-sm active:opacity-90">Process</button>
+<button class="bg-surface-container-low text-primary py-2 rounded-lg font-label-sm text-label-sm active:bg-surface-variant" onclick="window.location.href='/payroll/periods'">View</button>
+<button class="bg-primary text-white py-2 rounded-lg font-label-sm text-label-sm active:opacity-90" onclick="window.location.href='/payroll/periods'">Process</button>
 </div>
 </div>
 </section>
 </main>
 <!-- BottomNavBar -->
 <nav class="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[390px] z-50 bg-surface/80 backdrop-blur-md border-t border-border shadow-lg flex justify-around items-center h-18 pb-safe px-unit-xs">
-<a class="flex flex-col items-center justify-center text-on-surface-variant transition-transform active:scale-95 duration-150 py-2" href="#">
+<a class="flex flex-col items-center justify-center text-on-surface-variant transition-transform active:scale-95 duration-150 py-2" href="/finance/dashboard">
 <span class="material-symbols-outlined">home</span>
 <span class="font-label-sm text-label-sm">Home</span>
 </a>
-<a class="flex flex-col items-center justify-center text-on-surface-variant transition-transform active:scale-95 duration-150 py-2" href="#">
+<a class="flex flex-col items-center justify-center text-on-surface-variant transition-transform active:scale-95 duration-150 py-2" href="/hr/employees">
 <span class="material-symbols-outlined">badge</span>
 <span class="font-label-sm text-label-sm">Employees</span>
 </a>
-<a class="flex flex-col items-center justify-center text-on-surface-variant transition-transform active:scale-95 duration-150 py-2" href="#">
+<a class="flex flex-col items-center justify-center text-on-surface-variant transition-transform active:scale-95 duration-150 py-2" href="/hr/approval-queue">
 <span class="material-symbols-outlined">fact_check</span>
 <span class="font-label-sm text-label-sm">Approvals</span>
 </a>
-<a class="flex flex-col items-center justify-center text-primary bg-secondary-fixed rounded-xl px-3 py-1 transition-transform active:scale-95 duration-150" href="#">
+<a class="flex flex-col items-center justify-center text-primary bg-secondary-fixed rounded-xl px-3 py-1 transition-transform active:scale-95 duration-150" href="/reports">
 <span class="material-symbols-outlined">analytics</span>
 <span class="font-label-sm text-label-sm">Reports</span>
 </a>
-<a class="flex flex-col items-center justify-center text-on-surface-variant transition-transform active:scale-95 duration-150 py-2" href="#">
+<a class="flex flex-col items-center justify-center text-on-surface-variant transition-transform active:scale-95 duration-150 py-2" href="/profile">
 <span class="material-symbols-outlined">person</span>
 <span class="font-label-sm text-label-sm">Profile</span>
 </a>

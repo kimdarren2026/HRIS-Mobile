@@ -179,7 +179,7 @@
 </div>
 <!-- Form Area -->
 <div class="flex-1 px-container-margin pt-4 flex flex-col gap-6 w-full">
-<form action="#" class="flex flex-col gap-unit-md w-full" method="POST">
+<form action="/employee/dashboard" class="flex flex-col gap-unit-md w-full" method="GET">
 <!-- Email Field -->
 <div class="flex flex-col gap-unit-xs">
 <label class="font-label-md text-label-md text-on-surface-variant" for="email">Email</label>
@@ -210,6 +210,7 @@
 </div>
 <!-- Forgot Password Link -->
 <div class="flex justify-end w-full mt-2">
+<!-- TODO Phase 4: connect action -->
 <a class="font-label-md text-label-md text-primary hover:text-primary-fixed-variant transition-colors" href="#">Forgot Password?</a>
 </div>
 </div>

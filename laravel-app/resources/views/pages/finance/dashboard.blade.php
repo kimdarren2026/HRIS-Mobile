@@ -128,10 +128,12 @@
 <body class="bg-background text-on-background min-h-screen max-w-[390px] mx-auto overflow-x-hidden">
 <!-- TopAppBar -->
 <header class="fixed top-0 left-1/2 -translate-x-1/2 w-full max-w-[390px] z-50 flex justify-between items-center px-container-margin h-16 bg-surface border-b border-border shadow-sm">
+<!-- TODO Phase 4: connect action -->
 <button class="text-primary active:scale-95 duration-100 p-2 rounded-full hover:bg-surface-container transition-colors">
 <span class="material-symbols-outlined">menu</span>
 </button>
 <h1 class="font-headline-md text-headline-md font-bold text-primary">HRIS Mobile App</h1>
+<!-- TODO Phase 4: connect action -->
 <button class="text-primary active:scale-95 duration-100 p-2 rounded-full hover:bg-surface-container transition-colors relative">
 <span class="material-symbols-outlined">notifications</span>
 <span class="absolute top-2 right-2 w-2 h-2 bg-danger rounded-full border-2 border-surface"></span>
@@ -167,7 +169,7 @@
 </section>
 <!-- Primary Action -->
 <section class="mb-unit-lg">
-<button class="w-full py-4 bg-primary text-on-primary font-headline-md text-headline-md rounded-xl shadow-sm active:scale-[0.98] transition-transform flex justify-center items-center gap-2">
+<button class="w-full py-4 bg-primary text-on-primary font-headline-md text-headline-md rounded-xl shadow-sm active:scale-[0.98] transition-transform flex justify-center items-center gap-2" onclick="window.location.href='/payroll/periods'">
 <span class="material-symbols-outlined">payments</span>
                 Process Current Payroll
             </button>
@@ -256,7 +258,7 @@
 <section class="mb-unit-xl">
 <div class="flex justify-between items-center mb-4">
 <h3 class="font-label-md text-label-md text-on-surface-variant uppercase tracking-widest">Recent Payroll Periods</h3>
-<button class="text-primary font-label-md text-label-md hover:underline">See All</button>
+<button class="text-primary font-label-md text-label-md hover:underline" onclick="window.location.href='/payroll/periods'">See All</button>
 </div>
 <div class="space-y-card-gap">
 <!-- May 2026 Payroll Card -->
@@ -287,7 +289,7 @@
 <div class="bg-success h-2 rounded-full w-full"></div>
 </div>
 </div>
-<button class="w-full py-2 border border-primary text-primary font-label-md text-label-md rounded-lg active:scale-95 transition-transform">
+<button class="w-full py-2 border border-primary text-primary font-label-md text-label-md rounded-lg active:scale-95 transition-transform" onclick="window.location.href='/payroll/periods'">
                         View Details
                     </button>
 </div>
@@ -319,7 +321,7 @@
 <div class="bg-success h-2 rounded-full w-full"></div>
 </div>
 </div>
-<button class="w-full py-2 border border-primary text-primary font-label-md text-label-md rounded-lg active:scale-95 transition-transform">
+<button class="w-full py-2 border border-primary text-primary font-label-md text-label-md rounded-lg active:scale-95 transition-transform" onclick="window.location.href='/payroll/periods'">
                         View Details
                     </button>
 </div>
@@ -328,24 +330,25 @@
 </main>
 <!-- BottomNavBar - Updated items -->
 <nav class="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[390px] z-50 flex justify-around items-center h-18 pb-safe px-2 bg-surface/80 border-t border-border backdrop-blur-md shadow-[0_-1px_2px_0_rgba(0,0,0,0.05)] py-2">
-<a class="flex flex-col items-center justify-center bg-secondary-fixed text-on-secondary-fixed rounded-full px-4 py-1 active:scale-90 transition-transform duration-200" href="#">
+<a class="flex flex-col items-center justify-center bg-secondary-fixed text-on-secondary-fixed rounded-full px-4 py-1 active:scale-90 transition-transform duration-200" href="/finance/dashboard">
 <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">home</span>
 <span class="font-label-md text-label-md">Home</span>
 </a>
-<a class="flex flex-col items-center justify-center text-on-surface-variant px-2 py-1 hover:text-primary active:scale-90 transition-transform duration-200" href="#">
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-2 py-1 hover:text-primary active:scale-90 transition-transform duration-200" href="/payroll/periods">
 <span class="material-symbols-outlined">payments</span>
 <span class="font-label-md text-label-md">Payroll</span>
 </a>
-<a class="flex flex-col items-center justify-center text-on-surface-variant px-2 py-1 hover:text-primary active:scale-90 transition-transform duration-200" href="#">
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-2 py-1 hover:text-primary active:scale-90 transition-transform duration-200" href="/reports">
 <span class="material-symbols-outlined">assessment</span>
 <span class="font-label-md text-label-md">Reports</span>
 </a>
+<!-- TODO Phase 4: connect action -->
 <a class="flex flex-col items-center justify-center text-on-surface-variant px-2 py-1 hover:text-primary active:scale-90 transition-transform duration-200 relative" href="#">
 <span class="material-symbols-outlined">notifications</span>
 <span class="absolute top-1 right-3 w-1.5 h-1.5 bg-danger rounded-full"></span>
 <span class="font-label-md text-label-md">Notifications</span>
 </a>
-<a class="flex flex-col items-center justify-center text-on-surface-variant px-2 py-1 hover:text-primary active:scale-90 transition-transform duration-200" href="#">
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-2 py-1 hover:text-primary active:scale-90 transition-transform duration-200" href="/profile">
 <span class="material-symbols-outlined">account_circle</span>
 <span class="font-label-md text-label-md">Profile</span>
 </a>

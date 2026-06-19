@@ -122,10 +122,11 @@
 <body class="bg-background text-on-surface font-body-md min-h-screen flex flex-col items-center">
 <!-- Top App Bar -->
 <header class="fixed top-0 left-1/2 -translate-x-1/2 w-full max-w-[390px] z-50 flex justify-between items-center px-container-margin h-16 bg-surface border-b border-border shadow-sm">
-<button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container active:scale-95 transition-all">
+<button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container active:scale-95 transition-all" onclick="window.location.href='/employee/dashboard'">
 <span class="material-symbols-outlined text-primary">arrow_back</span>
 </button>
 <h1 class="text-headline-md font-headline-md font-bold text-primary">Payslip Detail</h1>
+<!-- TODO Phase 4: connect action -->
 <button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container active:scale-95 transition-all">
 <span class="material-symbols-outlined text-primary">notifications</span>
 </button>
@@ -239,6 +240,7 @@
 </section>
 <!-- Footer Actions -->
 <section class="space-y-4 pt-4">
+<!-- TODO Phase 4: connect action -->
 <button class="w-full h-14 bg-white border-2 border-primary text-primary font-bold rounded-xl flex items-center justify-center gap-2 hover:bg-primary-container/10 active:scale-95 transition-all">
 <span class="material-symbols-outlined">download</span>
                 Download PDF Payslip
@@ -254,27 +256,27 @@
 <!-- Bottom Navigation Bar -->
 <nav class="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[390px] z-50 flex justify-around items-center px-2 py-3 bg-surface border-t border-border backdrop-blur-md shadow-lg">
 <!-- Home -->
-<a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 hover:bg-surface-container-high rounded-lg transition-colors" href="#">
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 hover:bg-surface-container-high rounded-lg transition-colors" href="/employee/dashboard">
 <span class="material-symbols-outlined">home</span>
 <span class="font-label-sm text-label-sm-mobile mt-1">Home</span>
 </a>
 <!-- Attendance -->
-<a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 hover:bg-surface-container-high rounded-lg transition-colors" href="#">
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 hover:bg-surface-container-high rounded-lg transition-colors" href="/attendance/checkin">
 <span class="material-symbols-outlined">schedule</span>
 <span class="font-label-sm text-label-sm-mobile mt-1">Attendance</span>
 </a>
 <!-- Leave -->
-<a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 hover:bg-surface-container-high rounded-lg transition-colors" href="#">
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 hover:bg-surface-container-high rounded-lg transition-colors" href="/leave/history">
 <span class="material-symbols-outlined">event_note</span>
 <span class="font-label-sm text-label-sm-mobile mt-1">Leave</span>
 </a>
 <!-- Payslip (Active) -->
-<a class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-full px-4 py-1 transition-all active:scale-90 shadow-md" href="#">
+<a class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-full px-4 py-1 transition-all active:scale-90 shadow-md" href="/payslip/detail">
 <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">payments</span>
 <span class="font-label-sm text-label-sm-mobile mt-1">Payslip</span>
 </a>
 <!-- Profile -->
-<a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 hover:bg-surface-container-high rounded-lg transition-colors" href="#">
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 hover:bg-surface-container-high rounded-lg transition-colors" href="/profile">
 <span class="material-symbols-outlined">person</span>
 <span class="font-label-sm text-label-sm-mobile mt-1">Profile</span>
 </a>

@@ -249,6 +249,7 @@
 <span class="text-body-md font-body-md font-semibold text-on-surface-variant">--</span>
 </div>
 <div class="pl-2 mt-2">
+<!-- TODO Phase 4: connect action -->
 <button class="w-full py-2 border border-danger text-danger rounded-lg text-label-md font-label-md hover:bg-danger/5 transition-colors">Request Correction</button>
 </div>
 </div>
@@ -287,30 +288,30 @@
 <!-- BottomNavBar (Mobile Only via layout rules) -->
 <nav class="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[390px] z-50 flex justify-around items-center px-2 py-3 bg-surface border-t border-border backdrop-blur-md shadow-lg dark:shadow-none">
 <!-- Inactive: Home -->
-<div class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 active:scale-90 transition-all duration-200 cursor-pointer hover:bg-surface-container-high rounded-lg">
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 active:scale-90 transition-all duration-200 cursor-pointer hover:bg-surface-container-high rounded-lg" href="/employee/dashboard">
 <span class="material-symbols-outlined text-[24px]">home</span>
 <span class="font-label-sm text-label-sm mt-1">Home</span>
-</div>
+</a>
 <!-- Active: Attendance -->
-<div class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-full px-4 py-1 active:scale-90 transition-all duration-200 cursor-pointer shadow-sm">
+<a class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-full px-4 py-1 active:scale-90 transition-all duration-200 cursor-pointer shadow-sm" href="/attendance/checkin">
 <span class="material-symbols-outlined text-[24px]" style="font-variation-settings: 'FILL' 1;">schedule</span>
 <span class="font-label-sm text-label-sm mt-1">Attendance</span>
-</div>
+</a>
 <!-- Inactive: Leave -->
-<div class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 active:scale-90 transition-all duration-200 cursor-pointer hover:bg-surface-container-high rounded-lg">
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 active:scale-90 transition-all duration-200 cursor-pointer hover:bg-surface-container-high rounded-lg" href="/leave/history">
 <span class="material-symbols-outlined text-[24px]">event_note</span>
 <span class="font-label-sm text-label-sm mt-1">Leave</span>
-</div>
+</a>
 <!-- Inactive: Payslip -->
-<div class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 active:scale-90 transition-all duration-200 cursor-pointer hover:bg-surface-container-high rounded-lg">
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 active:scale-90 transition-all duration-200 cursor-pointer hover:bg-surface-container-high rounded-lg" href="/payslip/detail">
 <span class="material-symbols-outlined text-[24px]">payments</span>
 <span class="font-label-sm text-label-sm mt-1">Payslip</span>
-</div>
+</a>
 <!-- Inactive: Profile -->
-<div class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 active:scale-90 transition-all duration-200 cursor-pointer hover:bg-surface-container-high rounded-lg">
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 active:scale-90 transition-all duration-200 cursor-pointer hover:bg-surface-container-high rounded-lg" href="/profile">
 <span class="material-symbols-outlined text-[24px]">person</span>
 <span class="font-label-sm text-label-sm mt-1">Profile</span>
-</div>
+</a>
 </nav>
 <!-- Navigation Drawer (Desktop/Tablet Hidden structure for responsiveness context, optional render, leaving out to focus on canvas) -->
 </body></html>

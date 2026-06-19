@@ -121,10 +121,11 @@
 <body class="bg-background text-on-surface flex flex-col items-center min-h-screen">
 <!-- Top App Bar -->
 <header class="fixed top-0 left-1/2 -translate-x-1/2 w-full max-w-[390px] z-50 bg-surface border-b border-outline-variant shadow-sm flex justify-between items-center px-container-margin h-16 mx-auto">
-<button class="p-2 rounded-full hover:bg-surface-container-low transition-colors active:scale-95 duration-150">
+<button class="p-2 rounded-full hover:bg-surface-container-low transition-colors active:scale-95 duration-150" onclick="window.location.href='/admin/dashboard'">
 <span class="material-symbols-outlined text-primary">menu</span>
 </button>
 <h1 class="font-headline-md text-headline-md-mobile font-bold text-primary">System Settings</h1>
+<!-- TODO Phase 4: connect action -->
 <button class="p-2 rounded-full hover:bg-surface-container-low transition-colors active:scale-95 duration-150 relative">
 <span class="material-symbols-outlined text-primary">notifications</span>
 <span class="absolute top-2 right-2 w-2 h-2 bg-danger rounded-full"></span>
@@ -146,6 +147,7 @@
 <span class="font-status-badge text-status-badge text-primary bg-primary-container/20 px-2 py-1 rounded">100 meters</span>
 </div>
 </div>
+<!-- TODO Phase 4: connect action -->
 <button class="mt-2 border border-primary text-primary font-label-md text-label-md py-2.5 rounded-lg active:scale-95 transition-transform hover:bg-primary/5">
                 Manage Location
             </button>
@@ -174,6 +176,7 @@
 <span class="font-body-md text-body-md font-semibold">Various</span>
 </div>
 </div>
+<!-- TODO Phase 4: connect action -->
 <button class="mt-2 border border-primary text-primary font-label-md text-label-md py-2.5 rounded-lg active:scale-95 transition-transform hover:bg-primary/5">
                 Manage Leave Types
             </button>
@@ -192,6 +195,7 @@
 </div>
 <div class="flex flex-wrap gap-1.5 mt-1"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase bg-surface-container-high text-outline">Draft</span><span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase bg-surface-container-high text-outline">Calculated</span><span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase bg-primary-container/20 text-primary">HR Review</span><span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase bg-surface-container-high text-outline">Finance Approval</span><span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase bg-surface-container-high text-outline">Locked</span><span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase bg-surface-container-high text-outline">Paid</span></div>
 </div>
+<!-- TODO Phase 4: connect action -->
 <button class="mt-2 border border-primary text-primary font-label-md text-label-md py-2.5 rounded-lg active:scale-95 transition-transform hover:bg-primary/5">
                 Manage Payroll Rules
             </button>
@@ -240,6 +244,7 @@
 <span class="font-label-sm text-label-sm text-outline">2 users</span>
 </li>
 </ul>
+<!-- TODO Phase 4: connect action -->
 <button class="mt-2 border border-primary text-primary font-label-md text-label-md py-2.5 rounded-lg active:scale-95 transition-transform hover:bg-primary/5">
                 Manage Roles
             </button>
@@ -329,23 +334,23 @@
 </main>
 <!-- Bottom Navigation Bar -->
 <nav class="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[390px] z-50 h-18 pb-safe bg-surface/80 backdrop-blur-md border-t border-outline-variant flex justify-around items-center mx-auto py-2">
-<a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-all active:scale-90 duration-200" href="#">
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-all active:scale-90 duration-200" href="/admin/dashboard">
 <span class="material-symbols-outlined">home</span>
 <span class="font-label-sm text-label-sm mt-1">Home</span>
 </a>
-<a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-all active:scale-90 duration-200" href="#">
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-all active:scale-90 duration-200" href="/hr/employees">
 <span class="material-symbols-outlined">group</span>
 <span class="font-label-sm text-label-sm mt-1">Employees</span>
 </a>
-<a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-all active:scale-90 duration-200" href="#">
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-all active:scale-90 duration-200" href="/hr/approval-queue">
 <span class="material-symbols-outlined">rule</span>
 <span class="font-label-sm text-label-sm mt-1">Approvals</span>
 </a>
-<a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-all active:scale-90 duration-200" href="#">
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-all active:scale-90 duration-200" href="/reports">
 <span class="material-symbols-outlined">assessment</span>
 <span class="font-label-sm text-label-sm mt-1">Reports</span>
 </a>
-<a class="flex flex-col items-center justify-center text-primary bg-primary-container/20 rounded-xl px-3 py-1 active:scale-90 duration-200" href="#">
+<a class="flex flex-col items-center justify-center text-primary bg-primary-container/20 rounded-xl px-3 py-1 active:scale-90 duration-200" href="/profile">
 <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">person</span>
 <span class="font-label-sm text-label-sm mt-1">Profile</span>
 </a>

@@ -129,12 +129,13 @@
 <!-- Top AppBar (JSON Source: TopAppBar) -->
 <header class="fixed top-0 left-1/2 -translate-x-1/2 w-full max-w-[390px] z-50 bg-surface dark:bg-surface-dim border-b border-outline-variant dark:border-outline shadow-sm flex justify-between items-center px-container-margin h-16">
 <div class="flex items-center gap-3">
-<button class="text-on-surface-variant hover:bg-surface-container-low transition-colors p-2 rounded-full active:scale-95 duration-150">
+<button class="text-on-surface-variant hover:bg-surface-container-low transition-colors p-2 rounded-full active:scale-95 duration-150" onclick="window.location.href='/settings'">
 <span class="material-symbols-outlined" data-icon="menu">menu</span>
 </button>
 <h1 class="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed-dim">Employee Management</h1>
 </div>
 <div class="flex items-center">
+<!-- TODO Phase 4: connect action -->
 <button class="text-on-surface-variant hover:bg-surface-container-low transition-colors p-2 rounded-full active:scale-95 duration-150">
 <span class="material-symbols-outlined" data-icon="notifications">notifications</span>
 </button>
@@ -144,10 +145,12 @@
 <main class="mt-16 px-container-margin pt-unit-md space-y-unit-lg max-w-2xl mx-auto">
 <!-- Action Buttons -->
 <div class="flex flex-col gap-unit-sm sm:flex-row sm:items-center w-full">
+<!-- TODO Phase 4: connect action -->
 <button class="flex-1 bg-primary text-on-primary py-3 px-6 rounded-xl font-body-md font-bold flex items-center justify-center gap-2 shadow-sm hover:opacity-90 transition-all active:scale-95">
 <span class="material-symbols-outlined text-[20px]" data-icon="person_add">person_add</span>
                 Add Employee
             </button>
+<!-- TODO Phase 4: connect action -->
 <button class="flex-1 border-2 border-primary text-primary py-3 px-6 rounded-xl font-body-md font-bold flex items-center justify-center gap-2 hover:bg-surface-container-low transition-all active:scale-95">
 <span class="material-symbols-outlined text-[20px]" data-icon="download">download</span>
                 Export CSV
@@ -201,6 +204,7 @@
 <p class="font-body-md text-on-surface-variant">Product Designer</p>
 </div>
 </div>
+<!-- TODO Phase 4: connect action -->
 <button class="text-on-surface-variant p-1.5 hover:bg-surface-container rounded-lg transition-colors">
 <span class="material-symbols-outlined" data-icon="more_vert">more_vert</span>
 </button>
@@ -232,6 +236,7 @@
 <p class="font-body-md text-on-surface-variant">Marketing Lead</p>
 </div>
 </div>
+<!-- TODO Phase 4: connect action -->
 <button class="text-on-surface-variant p-1.5 hover:bg-surface-container rounded-lg transition-colors">
 <span class="material-symbols-outlined" data-icon="more_vert">more_vert</span>
 </button>
@@ -263,6 +268,7 @@
 <p class="font-body-md text-on-surface-variant">Senior Backend Eng</p>
 </div>
 </div>
+<!-- TODO Phase 4: connect action -->
 <button class="text-on-surface-variant p-1.5 hover:bg-surface-container rounded-lg transition-colors">
 <span class="material-symbols-outlined" data-icon="more_vert">more_vert</span>
 </button>
@@ -294,6 +300,7 @@
 <p class="font-body-md text-on-surface-variant">HR Coordinator</p>
 </div>
 </div>
+<!-- TODO Phase 4: connect action -->
 <button class="text-on-surface-variant p-1.5 hover:bg-surface-container rounded-lg transition-colors">
 <span class="material-symbols-outlined" data-icon="more_vert">more_vert</span>
 </button>
@@ -321,27 +328,27 @@
 <!-- Active State Logic: Mapping "Employee Management" page to "Employees" tab -->
 <nav class="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[390px] z-50 bg-surface/80 dark:bg-surface-dim/80 backdrop-blur-md border-t border-outline-variant dark:border-outline shadow-sm flex justify-around items-center h-[72px] pb-safe px-unit-sm">
 <!-- Tab: Home -->
-<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant px-3 py-1.5 hover:bg-surface-container dark:hover:bg-surface-container-high transition-all active:scale-90 duration-200" href="#">
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant px-3 py-1.5 hover:bg-surface-container dark:hover:bg-surface-container-high transition-all active:scale-90 duration-200" href="/admin/dashboard">
 <span class="material-symbols-outlined" data-icon="home">home</span>
 <span class="font-label-md text-label-md">Home</span>
 </a>
 <!-- Tab: Employees (ACTIVE) -->
-<a class="flex flex-col items-center justify-center bg-secondary-container dark:bg-secondary text-on-secondary-container dark:text-on-secondary rounded-xl px-3 py-1.5 active:scale-90 duration-200" href="#">
+<a class="flex flex-col items-center justify-center bg-secondary-container dark:bg-secondary text-on-secondary-container dark:text-on-secondary rounded-xl px-3 py-1.5 active:scale-90 duration-200" href="/hr/employees">
 <span class="material-symbols-outlined" data-icon="groups" style="font-variation-settings: 'FILL' 1;">groups</span>
 <span class="font-label-md text-label-md">Employees</span>
 </a>
 <!-- Tab: Approvals -->
-<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant px-3 py-1.5 hover:bg-surface-container dark:hover:bg-surface-container-high transition-all active:scale-90 duration-200" href="#">
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant px-3 py-1.5 hover:bg-surface-container dark:hover:bg-surface-container-high transition-all active:scale-90 duration-200" href="/hr/approval-queue">
 <span class="material-symbols-outlined" data-icon="rule">rule</span>
 <span class="font-label-md text-label-md">Approvals</span>
 </a>
 <!-- Tab: Reports -->
-<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant px-3 py-1.5 hover:bg-surface-container dark:hover:bg-surface-container-high transition-all active:scale-90 duration-200" href="#">
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant px-3 py-1.5 hover:bg-surface-container dark:hover:bg-surface-container-high transition-all active:scale-90 duration-200" href="/reports">
 <span class="material-symbols-outlined" data-icon="assessment">assessment</span>
 <span class="font-label-md text-label-md">Reports</span>
 </a>
 <!-- Tab: Profile -->
-<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant px-3 py-1.5 hover:bg-surface-container dark:hover:bg-surface-container-high transition-all active:scale-90 duration-200" href="#">
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant px-3 py-1.5 hover:bg-surface-container dark:hover:bg-surface-container-high transition-all active:scale-90 duration-200" href="/profile">
 <span class="material-symbols-outlined" data-icon="person">person</span>
 <span class="font-label-md text-label-md">Profile</span>
 </a>

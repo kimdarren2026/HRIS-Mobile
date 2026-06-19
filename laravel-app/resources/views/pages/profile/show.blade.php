@@ -130,10 +130,11 @@
 <body class="bg-surface text-on-surface min-h-screen flex flex-col items-center">
 <!-- Top App Bar -->
 <header class="fixed top-0 left-1/2 -translate-x-1/2 w-full max-w-[390px] z-50 flex justify-between items-center px-container-margin h-16 bg-surface border-b border-border shadow-sm">
-<button aria-label="Back" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container transition-colors active:scale-95">
+<button aria-label="Back" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container transition-colors active:scale-95" onclick="window.location.href='/employee/dashboard'">
 <span class="material-symbols-outlined text-primary">arrow_back</span>
 </button>
 <h1 class="text-headline-md font-headline-md font-bold text-primary">Employee Profile</h1>
+<!-- TODO Phase 4: connect action -->
 <button aria-label="Notifications" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container transition-colors active:scale-95">
 <span class="material-symbols-outlined text-primary">notifications</span>
 </button>
@@ -266,11 +267,12 @@
 </section>
 <!-- Action Buttons -->
 <section class="flex flex-col gap-unit-md pt-unit-md">
+<!-- TODO Phase 4: connect action -->
 <button class="w-full h-14 bg-primary text-white font-semibold rounded-xl shadow-lg active:scale-95 transition-transform duration-150 flex items-center justify-center gap-2">
 <span class="material-symbols-outlined text-[20px]">edit</span>
                 Edit Profile
             </button>
-<button class="w-full h-12 text-danger font-semibold rounded-xl active:opacity-70 transition-opacity flex items-center justify-center gap-2">
+<button class="w-full h-12 text-danger font-semibold rounded-xl active:opacity-70 transition-opacity flex items-center justify-center gap-2" onclick="window.location.href='/login'">
 <span class="material-symbols-outlined text-[20px]">logout</span>
                 Logout
             </button>
@@ -279,27 +281,27 @@
 <!-- Bottom Navigation Bar -->
 <nav class="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[390px] z-50 flex justify-around items-center px-2 py-3 bg-surface border-t border-border backdrop-blur-md shadow-lg h-20">
 <!-- Home -->
-<a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 hover:bg-surface-container-high transition-all active:scale-90" href="#">
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 hover:bg-surface-container-high transition-all active:scale-90" href="/employee/dashboard">
 <span class="material-symbols-outlined" data-icon="home">home</span>
 <span class="font-label-sm text-label-sm-mobile mt-1">Home</span>
 </a>
 <!-- Attendance -->
-<a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 hover:bg-surface-container-high transition-all active:scale-90" href="#">
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 hover:bg-surface-container-high transition-all active:scale-90" href="/attendance/checkin">
 <span class="material-symbols-outlined" data-icon="schedule">schedule</span>
 <span class="font-label-sm text-label-sm-mobile mt-1">Attendance</span>
 </a>
 <!-- Leave -->
-<a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 hover:bg-surface-container-high transition-all active:scale-90" href="#">
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 hover:bg-surface-container-high transition-all active:scale-90" href="/leave/history">
 <span class="material-symbols-outlined" data-icon="event_note">event_note</span>
 <span class="font-label-sm text-label-sm-mobile mt-1">Leave</span>
 </a>
 <!-- Payslip -->
-<a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 hover:bg-surface-container-high transition-all active:scale-90" href="#">
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 hover:bg-surface-container-high transition-all active:scale-90" href="/payslip/detail">
 <span class="material-symbols-outlined" data-icon="payments">payments</span>
 <span class="font-label-sm text-label-sm-mobile mt-1">Payslip</span>
 </a>
 <!-- Profile (Active) -->
-<a class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-full px-4 py-1 active:scale-90 transition-all" href="#">
+<a class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-full px-4 py-1 active:scale-90 transition-all" href="/profile">
 <span class="material-symbols-outlined" data-icon="person" style="font-variation-settings: 'FILL' 1;">person</span>
 <span class="font-label-sm text-label-sm-mobile mt-1">Profile</span>
 </a>

@@ -133,11 +133,12 @@
 <!-- TopAppBar -->
 <header class="fixed top-0 left-1/2 -translate-x-1/2 w-full max-w-[390px] z-50 bg-surface dark:bg-surface-dim shadow-sm border-b border-outline-variant dark:border-outline flex justify-between items-center px-container-margin h-16">
 <div class="flex items-center gap-3">
-<button class="active:scale-95 duration-150 p-2 rounded-full hover:bg-surface-container-low transition-colors">
+<button class="active:scale-95 duration-150 p-2 rounded-full hover:bg-surface-container-low transition-colors" onclick="window.location.href='/settings'">
 <span class="material-symbols-outlined text-primary dark:text-primary-fixed-dim">menu</span>
 </button>
 <h1 class="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed-dim">Reports &amp; Analytics</h1>
 </div>
+<!-- TODO Phase 4: connect action -->
 <button class="active:scale-95 duration-150 p-2 rounded-full hover:bg-surface-container-low transition-colors relative">
 <span class="material-symbols-outlined text-primary dark:text-primary-fixed-dim">notifications</span>
 <span class="absolute top-2 right-2 w-2 h-2 bg-danger rounded-full border-2 border-surface"></span>
@@ -156,6 +157,7 @@
 </select>
 <span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-outline">expand_more</span>
 </div>
+<!-- TODO Phase 4: connect action -->
 <button class="flex items-center gap-unit-xs px-4 py-2.5 border border-primary text-primary rounded-xl font-label-md text-label-md hover:bg-primary/5 active:scale-95 transition-all">
 <span class="material-symbols-outlined text-[20px]">download</span>
                     Export
@@ -279,7 +281,7 @@
 <span>Unpaid: 5 employees</span>
 </div>
 </div>
-<button class="w-full mt-4 py-2.5 text-primary font-label-md text-label-md hover:bg-primary/5 rounded-lg transition-colors flex items-center justify-center gap-2">
+<button class="w-full mt-4 py-2.5 text-primary font-label-md text-label-md hover:bg-primary/5 rounded-lg transition-colors flex items-center justify-center gap-2" onclick="window.location.href='/payroll/periods'">
                 Review Payroll Details
                 <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
 </button>
@@ -339,23 +341,23 @@
 </main>
 <!-- BottomNavBar -->
 <nav class="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[390px] z-50 bg-surface/80 dark:bg-surface-dim/80 backdrop-blur-md border-t border-outline-variant dark:border-outline flex justify-around items-center h-[72px] pb-safe px-unit-sm shadow-sm">
-<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant px-3 py-1.5 hover:bg-surface-container dark:hover:bg-surface-container-high transition-all active:scale-90 duration-200" href="#">
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant px-3 py-1.5 hover:bg-surface-container dark:hover:bg-surface-container-high transition-all active:scale-90 duration-200" href="/admin/dashboard">
 <span class="material-symbols-outlined">home</span>
 <span class="font-label-md text-label-md">Home</span>
 </a>
-<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant px-3 py-1.5 hover:bg-surface-container dark:hover:bg-surface-container-high transition-all active:scale-90 duration-200" href="#">
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant px-3 py-1.5 hover:bg-surface-container dark:hover:bg-surface-container-high transition-all active:scale-90 duration-200" href="/hr/employees">
 <span class="material-symbols-outlined">groups</span>
 <span class="font-label-md text-label-md">Employees</span>
 </a>
-<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant px-3 py-1.5 hover:bg-surface-container dark:hover:bg-surface-container-high transition-all active:scale-90 duration-200" href="#">
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant px-3 py-1.5 hover:bg-surface-container dark:hover:bg-surface-container-high transition-all active:scale-90 duration-200" href="/hr/approval-queue">
 <span class="material-symbols-outlined">rule</span>
 <span class="font-label-md text-label-md">Approvals</span>
 </a>
-<a class="flex flex-col items-center justify-center bg-secondary-container dark:bg-secondary text-on-secondary-container dark:text-on-secondary rounded-xl px-3 py-1.5 active:scale-90 duration-200" href="#">
+<a class="flex flex-col items-center justify-center bg-secondary-container dark:bg-secondary text-on-secondary-container dark:text-on-secondary rounded-xl px-3 py-1.5 active:scale-90 duration-200" href="/reports">
 <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">assessment</span>
 <span class="font-label-md text-label-md">Reports</span>
 </a>
-<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant px-3 py-1.5 hover:bg-surface-container dark:hover:bg-surface-container-high transition-all active:scale-90 duration-200" href="#">
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant px-3 py-1.5 hover:bg-surface-container dark:hover:bg-surface-container-high transition-all active:scale-90 duration-200" href="/profile">
 <span class="material-symbols-outlined">person</span>
 <span class="font-label-md text-label-md">Profile</span>
 </a>

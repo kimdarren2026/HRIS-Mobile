@@ -113,10 +113,11 @@
 <body class="bg-surface text-on-surface min-h-screen max-w-[390px] mx-auto overflow-x-hidden pb-40">
 <!-- TopAppBar Semantic Shell: linear transactional flow so no BottomNavBar -->
 <header class="fixed top-0 left-1/2 -translate-x-1/2 w-full max-w-[390px] z-50 flex items-center justify-between px-container-margin h-16 bg-surface-container-lowest shadow-sm border-b border-outline-variant">
-<button class="w-10 h-10 flex items-center justify-center text-primary hover:bg-surface-container-low active:opacity-70 transition-opacity rounded-full">
+<button class="w-10 h-10 flex items-center justify-center text-primary hover:bg-surface-container-low active:opacity-70 transition-opacity rounded-full" onclick="window.location.href='/leave/history'">
 <span class="material-symbols-outlined">arrow_back</span>
 </button>
 <h1 class="text-headline-md font-headline-md font-bold text-primary">Request Leave</h1>
+<!-- TODO Phase 4: connect action -->
 <button class="w-10 h-10 flex items-center justify-center text-primary hover:bg-surface-container-low active:opacity-70 transition-opacity rounded-full">
 <span class="material-symbols-outlined">info</span>
 </button>
@@ -174,30 +175,30 @@
 <p class="text-label-sm font-label-sm text-on-surface-variant text-center px-unit-md">
             Leave balance will be deducted only after HR approval.
         </p>
-<button class="w-full h-12 bg-primary-container text-on-primary-container rounded-lg text-body-lg font-body-lg font-semibold shadow-sm hover:bg-secondary-container active:scale-95 transition-all flex items-center justify-center gap-unit-sm" type="button">
+<button class="w-full h-12 bg-primary-container text-on-primary-container rounded-lg text-body-lg font-body-lg font-semibold shadow-sm hover:bg-secondary-container active:scale-95 transition-all flex items-center justify-center gap-unit-sm" onclick="window.location.href='/leave/history'" type="button">
 <span>Submit Request</span>
 <span class="material-symbols-outlined text-[20px]">send</span>
 </button>
 </main>
 <!-- BottomNavBar Suppression Rule: Task-Focused transactional page (implies temporary departure from main flow, contains back action). Navigation shell suppressed. -->
 <nav class="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[390px] mx-auto h-16 bg-surface-container-lowest border-t border-outline-variant flex items-center justify-around px-unit-sm z-50">
-<a class="flex flex-col items-center gap-unit-xs text-on-surface-variant hover:text-primary transition-colors" href="#">
+<a class="flex flex-col items-center gap-unit-xs text-on-surface-variant hover:text-primary transition-colors" href="/employee/dashboard">
 <span class="material-symbols-outlined">home</span>
 <span class="text-label-sm">Home</span>
 </a>
-<a class="flex flex-col items-center gap-unit-xs text-on-surface-variant hover:text-primary transition-colors" href="#">
+<a class="flex flex-col items-center gap-unit-xs text-on-surface-variant hover:text-primary transition-colors" href="/attendance/checkin">
 <span class="material-symbols-outlined">schedule</span>
 <span class="text-label-sm">Attendance</span>
 </a>
-<a class="flex flex-col items-center gap-unit-xs text-primary" href="#">
+<a class="flex flex-col items-center gap-unit-xs text-primary" href="/leave/history">
 <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">event_note</span>
 <span class="text-label-sm font-bold">Leave</span>
 </a>
-<a class="flex flex-col items-center gap-unit-xs text-on-surface-variant hover:text-primary transition-colors" href="#">
+<a class="flex flex-col items-center gap-unit-xs text-on-surface-variant hover:text-primary transition-colors" href="/payslip/detail">
 <span class="material-symbols-outlined">payments</span>
 <span class="text-label-sm">Payslip</span>
 </a>
-<a class="flex flex-col items-center gap-unit-xs text-on-surface-variant hover:text-primary transition-colors" href="#">
+<a class="flex flex-col items-center gap-unit-xs text-on-surface-variant hover:text-primary transition-colors" href="/profile">
 <span class="material-symbols-outlined">person</span>
 <span class="text-label-sm">Profile</span>
 </a>

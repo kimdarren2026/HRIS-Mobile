@@ -185,6 +185,7 @@
 <h1 class="font-headline-md text-headline-md text-on-background">Hi, Alex</h1>
 </div>
 </div>
+<!-- TODO Phase 4: connect action -->
 <button class="relative p-2 text-on-surface-variant hover:bg-surface-container rounded-full transition-colors">
 <span class="material-symbols-outlined">notifications</span>
 <span class="absolute top-2 right-2 w-2 h-2 bg-danger rounded-full border border-background"></span>
@@ -204,7 +205,7 @@
                     Not Checked In
                 </div>
 </div>
-<button class="w-full bg-primary-container text-on-primary font-label-md text-label-md py-3 rounded-lg shadow-sm active:scale-95 transition-transform duration-150 flex items-center justify-center gap-2">
+<button class="w-full bg-primary-container text-on-primary font-label-md text-label-md py-3 rounded-lg shadow-sm active:scale-95 transition-transform duration-150 flex items-center justify-center gap-2" onclick="window.location.href='/attendance/checkin'">
 <span class="material-symbols-outlined" data-weight="fill">location_on</span>
                 Check In Now
             </button>
@@ -262,7 +263,7 @@
 <p class="font-body-md text-body-md text-on-background font-semibold">Net Pay</p>
 <p class="font-headline-md text-headline-md text-on-background">Ready to View</p>
 </div>
-<button class="text-primary font-label-md text-label-md flex items-center gap-1 hover:underline active:opacity-70 transition-opacity">
+<button class="text-primary font-label-md text-label-md flex items-center gap-1 hover:underline active:opacity-70 transition-opacity" onclick="window.location.href='/payslip/detail'">
                     View Details
                     <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
 </button>
@@ -272,24 +273,24 @@
 <!-- Bottom Navigation Bar (Shared Component) -->
 <nav class="bg-surface fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[390px] z-50 flex justify-around items-center px-2 py-3 border-t border-border backdrop-blur-md mx-auto">
 <!-- Active Tab: Home -->
-<a class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-full px-4 py-1 active:scale-90 transition-all duration-200" href="#">
+<a class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-full px-4 py-1 active:scale-90 transition-all duration-200" href="/employee/dashboard">
 <span class="material-symbols-outlined" data-weight="fill">home</span>
 <span class="font-label-sm text-label-sm mt-0.5">Home</span>
 </a>
 <!-- Inactive Tabs -->
-<a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 hover:bg-surface-container-highest rounded-full active:scale-90 transition-all duration-200" href="#">
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 hover:bg-surface-container-highest rounded-full active:scale-90 transition-all duration-200" href="/attendance/checkin">
 <span class="material-symbols-outlined">schedule</span>
 <span class="font-label-sm text-label-sm mt-0.5">Attendance</span>
 </a>
-<a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 hover:bg-surface-container-highest rounded-full active:scale-90 transition-all duration-200" href="#">
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 hover:bg-surface-container-highest rounded-full active:scale-90 transition-all duration-200" href="/leave/history">
 <span class="material-symbols-outlined">event_note</span>
 <span class="font-label-sm text-label-sm mt-0.5">Leave</span>
 </a>
-<a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 hover:bg-surface-container-highest rounded-full active:scale-90 transition-all duration-200" href="#">
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 hover:bg-surface-container-highest rounded-full active:scale-90 transition-all duration-200" href="/payslip/detail">
 <span class="material-symbols-outlined">payments</span>
 <span class="font-label-sm text-label-sm mt-0.5">Payslip</span>
 </a>
-<a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 hover:bg-surface-container-highest rounded-full active:scale-90 transition-all duration-200" href="#">
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 hover:bg-surface-container-highest rounded-full active:scale-90 transition-all duration-200" href="/profile">
 <span class="material-symbols-outlined">person</span>
 <span class="font-label-sm text-label-sm mt-0.5">Profile</span>
 </a>

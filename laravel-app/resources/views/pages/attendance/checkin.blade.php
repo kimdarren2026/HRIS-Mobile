@@ -181,7 +181,7 @@
 <body class="bg-background text-on-surface font-body-md min-h-screen flex flex-col antialiased w-full max-w-[390px] mx-auto overflow-x-hidden pb-24">
 <!-- TopAppBar (Suppressed as per rules for transactional screen, but replacing with simplified back header as requested) -->
 <header class="fixed top-0 left-1/2 -translate-x-1/2 w-full max-w-[390px] z-50 flex items-center px-container-margin h-16 bg-surface border-b border-border shadow-sm">
-<button aria-label="Go back" class="p-2 -ml-2 rounded-full hover:bg-surface-container active:scale-95 transition-all text-on-surface-variant focus:outline-none">
+<button aria-label="Go back" class="p-2 -ml-2 rounded-full hover:bg-surface-container active:scale-95 transition-all text-on-surface-variant focus:outline-none" onclick="window.location.href='/employee/dashboard'">
 <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">arrow_back</span>
 </button>
 <h1 class="font-headline-md text-headline-md text-primary ml-2 flex-1">Check In</h1>
@@ -252,7 +252,7 @@
 </main>
 <!-- Bottom Action Area (Fixed) -->
 <div class="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[390px] px-container-margin pb-unit-md pt-unit-sm bg-surface/90 backdrop-blur-md border-t border-border z-40">
-<button class="w-full bg-primary hover:bg-primary/90 text-on-primary font-headline-md text-body-lg font-semibold py-3.5 rounded-xl shadow-sm active:scale-[0.98] transition-all flex items-center justify-center gap-2">
+<button class="w-full bg-primary hover:bg-primary/90 text-on-primary font-headline-md text-body-lg font-semibold py-3.5 rounded-xl shadow-sm active:scale-[0.98] transition-all flex items-center justify-center gap-2" onclick="window.location.href='/attendance/history'">
 <span class="material-symbols-outlined text-xl" style="font-variation-settings: 'FILL' 1;">login</span>
             Confirm Check In
         </button>

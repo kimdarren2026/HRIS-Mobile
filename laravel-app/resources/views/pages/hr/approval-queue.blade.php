@@ -119,11 +119,12 @@
 <!-- TopAppBar -->
 <header class="fixed top-0 left-1/2 -translate-x-1/2 w-full max-w-[390px] z-50 bg-surface border-b border-outline-variant shadow-sm h-16 flex justify-between items-center px-container-margin">
 <div class="flex items-center gap-3">
-<button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container-low transition-colors active:scale-95 duration-150">
+<button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container-low transition-colors active:scale-95 duration-150" onclick="window.location.href='/settings'">
 <span class="material-symbols-outlined text-on-surface-variant">menu</span>
 </button>
 <h1 class="font-headline-md text-headline-md font-bold text-primary">HR Approval Queue</h1>
 </div>
+<!-- TODO Phase 4: connect action -->
 <button class="relative w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container-low transition-colors active:scale-95 duration-150">
 <span class="material-symbols-outlined text-on-surface-variant">notifications</span>
 <span class="absolute top-2 right-2 w-2 h-2 bg-danger rounded-full"></span>
@@ -176,10 +177,12 @@
                 </p>
 </div>
 <div class="flex gap-3 pt-2">
+<!-- TODO Phase 4: connect action -->
 <button class="flex-1 bg-success text-on-primary py-3 rounded-lg font-label-md flex items-center justify-center gap-2 active:scale-95 transition-transform">
 <span class="material-symbols-outlined text-[18px]">check_circle</span>
                     Approve
                 </button>
+<!-- TODO Phase 4: connect action -->
 <button class="flex-1 border-2 border-danger text-danger py-3 rounded-lg font-label-md flex items-center justify-center gap-2 active:scale-95 transition-transform">
 <span class="material-symbols-outlined text-[18px]">block</span>
                     Reject
@@ -211,10 +214,12 @@
                 </p>
 </div>
 <div class="flex gap-3 pt-2">
+<!-- TODO Phase 4: connect action -->
 <button class="flex-1 bg-success text-on-primary py-3 rounded-lg font-label-md flex items-center justify-center gap-2 active:scale-95 transition-transform">
 <span class="material-symbols-outlined text-[18px]">check_circle</span>
                     Approve
                 </button>
+<!-- TODO Phase 4: connect action -->
 <button class="flex-1 border-2 border-danger text-danger py-3 rounded-lg font-label-md flex items-center justify-center gap-2 active:scale-95 transition-transform">
 <span class="material-symbols-outlined text-[18px]">block</span>
                     Reject
@@ -232,27 +237,27 @@
 <!-- BottomNavBar -->
 <nav class="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[390px] z-50 bg-surface/80 backdrop-blur-md border-t border-outline-variant shadow-sm h-[72px] flex justify-around items-center px-unit-sm pb-safe">
 <!-- Home -->
-<button class="flex flex-col items-center justify-center text-on-surface-variant px-3 py-1.5 hover:bg-surface-container transition-all active:scale-90 duration-200">
+<button class="flex flex-col items-center justify-center text-on-surface-variant px-3 py-1.5 hover:bg-surface-container transition-all active:scale-90 duration-200" onclick="window.location.href='/admin/dashboard'">
 <span class="material-symbols-outlined">home</span>
 <span class="font-label-md text-[10px] mt-1">Home</span>
 </button>
 <!-- Employees -->
-<button class="flex flex-col items-center justify-center text-on-surface-variant px-3 py-1.5 hover:bg-surface-container transition-all active:scale-90 duration-200">
+<button class="flex flex-col items-center justify-center text-on-surface-variant px-3 py-1.5 hover:bg-surface-container transition-all active:scale-90 duration-200" onclick="window.location.href='/hr/employees'">
 <span class="material-symbols-outlined">groups</span>
 <span class="font-label-md text-[10px] mt-1">Employees</span>
 </button>
 <!-- Approvals (Active) -->
-<button class="flex flex-col items-center justify-center bg-secondary-container text-on-secondary-container rounded-xl px-4 py-1.5 active:scale-90 duration-200">
+<button class="flex flex-col items-center justify-center bg-secondary-container text-on-secondary-container rounded-xl px-4 py-1.5 active:scale-90 duration-200" onclick="window.location.href='/hr/approval-queue'">
 <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">rule</span>
 <span class="font-label-md text-[10px] mt-1">Approvals</span>
 </button>
 <!-- Reports -->
-<button class="flex flex-col items-center justify-center text-on-surface-variant px-3 py-1.5 hover:bg-surface-container transition-all active:scale-90 duration-200">
+<button class="flex flex-col items-center justify-center text-on-surface-variant px-3 py-1.5 hover:bg-surface-container transition-all active:scale-90 duration-200" onclick="window.location.href='/reports'">
 <span class="material-symbols-outlined">assessment</span>
 <span class="font-label-md text-[10px] mt-1">Reports</span>
 </button>
 <!-- Profile -->
-<button class="flex flex-col items-center justify-center text-on-surface-variant px-3 py-1.5 hover:bg-surface-container transition-all active:scale-90 duration-200">
+<button class="flex flex-col items-center justify-center text-on-surface-variant px-3 py-1.5 hover:bg-surface-container transition-all active:scale-90 duration-200" onclick="window.location.href='/profile'">
 <span class="material-symbols-outlined">person</span>
 <span class="font-label-md text-[10px] mt-1">Profile</span>
 </button>

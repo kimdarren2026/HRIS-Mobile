@@ -172,10 +172,12 @@
 <body class="bg-surface font-body-md text-on-surface antialiased min-h-screen flex flex-col mx-auto max-w-[390px] relative pb-[88px]">
 <!-- TopAppBar -->
 <header class="fixed top-0 left-1/2 -translate-x-1/2 w-full max-w-[390px] z-50 flex justify-between items-center px-container-margin h-16 bg-surface border-b border-border shadow-sm mx-auto">
+<!-- TODO Phase 4: connect action -->
 <button class="text-on-surface-variant hover:bg-surface-container active:scale-95 transition-transform duration-150 p-2 rounded-full flex items-center justify-center">
 <span class="material-symbols-outlined text-headline-md font-headline-md">menu</span>
 </button>
 <div class="text-headline-md font-headline-md font-bold text-primary whitespace-nowrap truncate">HRIS Mobile App</div>
+<!-- TODO Phase 4: connect action -->
 <button class="text-on-surface-variant hover:bg-surface-container active:scale-95 transition-transform duration-150 p-2 rounded-full flex items-center justify-center">
 <span class="material-symbols-outlined text-headline-md font-headline-md">notifications</span>
 </button>
@@ -276,28 +278,28 @@
 </div>
 </main>
 <!-- FAB -->
-<button class="fixed bottom-24 right-4 bg-primary-container text-on-primary shadow-lg rounded-full w-14 h-14 flex items-center justify-center hover:bg-primary transition-colors z-40 max-w-[390px] mx-auto left-auto right-4" style="left: calc(50% + 195px - 72px);">
+<button class="fixed bottom-24 right-4 bg-primary-container text-on-primary shadow-lg rounded-full w-14 h-14 flex items-center justify-center hover:bg-primary transition-colors z-40 max-w-[390px] mx-auto left-auto right-4" onclick="window.location.href='/leave/request'" style="left: calc(50% + 195px - 72px);">
 <span class="material-symbols-outlined" data-icon="add">add</span>
 </button>
 <!-- BottomNavBar -->
 <nav class="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[390px] z-50 flex justify-around items-center px-2 py-3 bg-surface border-t border-border backdrop-blur-md shadow-lg mx-auto">
-<a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 hover:bg-surface-container-high active:scale-90 transition-all duration-200" href="#">
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 hover:bg-surface-container-high active:scale-90 transition-all duration-200" href="/employee/dashboard">
 <span class="material-symbols-outlined mb-1" data-icon="home">home</span>
 <span class="font-label-sm text-label-sm">Home</span>
 </a>
-<a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 hover:bg-surface-container-high active:scale-90 transition-all duration-200" href="#">
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 hover:bg-surface-container-high active:scale-90 transition-all duration-200" href="/attendance/checkin">
 <span class="material-symbols-outlined mb-1" data-icon="schedule">schedule</span>
 <span class="font-label-sm text-label-sm">Attendance</span>
 </a>
-<a class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-full px-4 py-1 active:scale-90 transition-all duration-200" href="#">
+<a class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-full px-4 py-1 active:scale-90 transition-all duration-200" href="/leave/history">
 <span class="material-symbols-outlined mb-1" data-icon="event_note" data-weight="fill" style="font-variation-settings: 'FILL' 1;">event_note</span>
 <span class="font-label-sm text-label-sm">Leave</span>
 </a>
-<a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 hover:bg-surface-container-high active:scale-90 transition-all duration-200" href="#">
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 hover:bg-surface-container-high active:scale-90 transition-all duration-200" href="/payslip/detail">
 <span class="material-symbols-outlined mb-1" data-icon="payments">payments</span>
 <span class="font-label-sm text-label-sm">Payslip</span>
 </a>
-<a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 hover:bg-surface-container-high active:scale-90 transition-all duration-200" href="#">
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 hover:bg-surface-container-high active:scale-90 transition-all duration-200" href="/profile">
 <span class="material-symbols-outlined mb-1" data-icon="person">person</span>
 <span class="font-label-sm text-label-sm">Profile</span>
 </a>
