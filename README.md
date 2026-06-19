@@ -41,3 +41,4 @@ HRIS MOBILE/
 - Source code Laravel nanti disimpan di `laravel-app/`.
 - File design Stitch disimpan di `stitch/`.
 - Prompt AI disimpan di `prompts/`.
+# HRIS-Mobile
