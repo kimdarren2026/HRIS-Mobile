@@ -3,6 +3,7 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Employee\AttendanceController;
 use App\Http\Controllers\Employee\LeaveController;
+use App\Http\Controllers\Finance\PayrollPeriodController;
 use App\Http\Controllers\HR\AttendanceApprovalController;
 use App\Http\Controllers\HR\LeaveApprovalController;
 use Illuminate\Support\Facades\Route;
@@ -87,7 +88,17 @@ Route::middleware(['auth', 'role:admin_hr,super_admin'])->group(function (): voi
 // ── Finance / Super Admin routes ─────────────────────────────────────────────
 Route::middleware(['auth', 'role:finance,super_admin'])->group(function (): void {
     Route::view('/finance/dashboard', 'pages.finance.dashboard');
-    Route::view('/payroll/periods',   'pages.payroll.periods');
+
+    // Payroll management — create/calculate restricted to finance + super_admin
+    Route::post('/payroll/periods',                                [PayrollPeriodController::class, 'store'])->name('payroll.periods.store');
+    Route::post('/payroll/periods/{payrollPeriod}/calculate',      [PayrollPeriodController::class, 'calculate'])->name('payroll.periods.calculate');
+    Route::post('/payroll/periods/{payrollPeriod}/submit-hr-review', [PayrollPeriodController::class, 'submitHrReview'])->name('payroll.periods.submit-hr-review');
+});
+
+// ── Payroll view — finance, super_admin, admin_hr (review) ───────────────────
+Route::middleware(['auth', 'role:admin_hr,finance,super_admin'])->group(function (): void {
+    Route::get('/payroll/periods',                [PayrollPeriodController::class, 'index'])->name('payroll.periods.index');
+    Route::get('/payroll/periods/{payrollPeriod}', [PayrollPeriodController::class, 'show'])->name('payroll.periods.show');
 });
 
 // ── HR + Finance + Super Admin ───────────────────────────────────────────────

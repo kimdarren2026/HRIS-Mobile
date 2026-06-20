@@ -3,9 +3,8 @@
 <meta content="width=device-width, initial-scale=1.0" name="viewport">
 <title>Payroll Periods - HRIS Mobile App</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
 <script id="tailwind-config">
     tailwind.config = {
       darkMode: "class",
@@ -102,218 +101,243 @@
     }
   </script>
 <style>
-    body {
-      font-family: 'Inter', sans-serif;
-      -webkit-tap-highlight-color: transparent;
-    }
-    .material-symbols-outlined {
-      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
-    }
-    .custom-scrollbar::-webkit-scrollbar {
-      display: none;
-    }
-    .safe-bottom {
-      padding-bottom: env(safe-area-inset-bottom);
-    }
-  </style>
+    body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
+    .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+    .custom-scrollbar::-webkit-scrollbar { display: none; }
+    .safe-bottom { padding-bottom: env(safe-area-inset-bottom); }
+</style>
 </head>
 <body class="bg-surface text-on-surface overflow-x-hidden w-[390px] mx-auto min-h-screen relative shadow-2xl">
+
 <!-- TopAppBar -->
 <header class="fixed top-0 left-1/2 -translate-x-1/2 w-full max-w-[390px] z-50 bg-surface border-b border-border shadow-sm h-16 flex justify-between items-center px-container-margin">
-<div class="flex items-center gap-3">
-<button class="transition-colors duration-200 active:opacity-70 text-primary p-1" onclick="window.location.href='/finance/dashboard'">
-<span class="material-symbols-outlined">menu</span>
-</button>
-<h1 class="font-headline-md text-headline-md font-bold text-primary">Payroll Periods</h1>
-</div>
-<!-- TODO Phase 4: connect action -->
-<button class="transition-colors duration-200 active:opacity-70 text-primary p-1 relative">
-<span class="material-symbols-outlined">notifications</span>
-<span class="absolute top-1 right-1 w-2 h-2 bg-danger rounded-full border border-surface"></span>
-</button>
+  <div class="flex items-center gap-3">
+    <button class="transition-colors duration-200 active:opacity-70 text-primary p-1" onclick="window.location.href='/finance/dashboard'">
+      <span class="material-symbols-outlined">menu</span>
+    </button>
+    <h1 class="font-headline-md text-headline-md font-bold text-primary">Payroll Periods</h1>
+  </div>
 </header>
+
 <main class="pt-20 pb-28 px-container-margin flex flex-col gap-unit-lg">
-<!-- Top Summary Section -->
-<section class="grid grid-cols-2 gap-unit-sm">
-<div class="col-span-2 bg-white p-4 rounded-xl border border-border shadow-sm flex flex-col justify-between h-28 relative overflow-hidden">
-<div class="z-10">
-<p class="font-label-md text-label-md text-on-surface-variant mb-1">Active Period</p>
-<h2 class="font-headline-lg text-headline-lg text-primary">June 2026</h2>
-</div>
-<div class="z-10 flex items-center text-success font-label-sm text-label-sm gap-1">
-<span class="material-symbols-outlined text-[14px]">calendar_today</span>
-<span class="">Current running</span>
-</div>
-<div class="absolute -right-4 -bottom-4 text-surface-container-high scale-150">
-<span class="material-symbols-outlined text-[96px] opacity-10">receipt_long</span>
-</div>
-</div>
-<div class="bg-white p-4 rounded-xl border border-border shadow-sm flex flex-col justify-between h-24">
-<p class="font-label-md text-label-md text-on-surface-variant">Employees</p>
-<div class="flex items-end justify-between">
-<span class="font-headline-md text-headline-md text-on-surface">125</span>
-<span class="material-symbols-outlined text-primary opacity-40">groups</span>
-</div>
-</div>
-<div class="bg-white p-4 rounded-xl border border-border shadow-sm flex flex-col justify-between h-24">
-<p class="font-label-md text-label-md text-on-surface-variant">Pending Actions</p>
-<div class="flex items-end justify-between">
-<span class="font-headline-md text-headline-md text-warning">3</span>
-<span class="material-symbols-outlined text-warning opacity-40">pending_actions</span>
-</div>
-</div>
-</section>
-<!-- Action Buttons -->
-<section class="flex flex-col gap-unit-sm">
-<!-- TODO Phase 4: connect action -->
-<button class="w-full bg-primary-container text-on-primary py-3.5 rounded-xl font-label-md text-label-md flex items-center justify-center gap-2 active:scale-[0.98] transition-transform">
-<span class="material-symbols-outlined">add_circle</span>
-        Create New Period
-      </button>
-<!-- TODO Phase 4: connect action -->
-<button class="w-full border border-primary text-primary py-3.5 rounded-xl font-label-md text-label-md flex items-center justify-center gap-2 active:scale-[0.98] transition-transform bg-white">
-<span class="material-symbols-outlined">download</span>
-        Export History
-      </button>
-</section>
-<!-- Search & Filters -->
-<section class="flex flex-col gap-unit-sm">
-<div class="relative">
-<span class="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-on-surface-variant">search</span>
-<input class="w-full bg-white border border-border rounded-xl pl-10 pr-4 py-3 text-body-md font-body-md focus:ring-1 focus:ring-primary outline-none" placeholder="Search period name or date range" type="text">
-</div>
-<div class="flex gap-unit-sm">
-<div class="flex-1 relative">
-<select class="w-full bg-white border border-border rounded-xl px-4 py-2.5 text-label-md font-label-md appearance-none"><option>All Status</option><option>Draft</option><option>Calculated</option><option>HR Review</option><option>Finance Approval</option><option>Locked</option><option>Paid</option></select>
-<span class="absolute right-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-on-surface-variant pointer-events-none">expand_more</span>
-</div>
-<div class="flex-1 relative">
-<select class="w-full bg-white border border-border rounded-xl px-4 py-2.5 text-label-md font-label-md appearance-none">
-<option>Year: 2026</option>
-<option>Year: 2025</option>
-</select>
-<span class="absolute right-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-on-surface-variant pointer-events-none">expand_more</span>
-</div>
-</div>
-</section>
-<!-- Payroll Period List -->
-<section class="flex flex-col gap-unit-md">
-<!-- Card 1: June 2026 -->
-<div class="bg-white rounded-xl border border-border shadow-sm p-4 flex flex-col gap-4">
-<div class="flex justify-between items-start">
-<div>
-<h3 class="font-headline-md text-headline-md text-on-surface mb-1">June 2026 Payroll</h3>
-<p class="font-body-md text-body-md text-on-surface-variant">Jun 01 - Jun 30, 2026</p>
-</div>
-<span class="bg-blue-100 text-blue-700 px-3 py-1 rounded-full font-status-badge text-status-badge">Calculated</span>
-</div>
-<div class="flex items-center gap-4 text-on-surface-variant">
-<div class="flex items-center gap-1.5 font-label-md text-label-md">
-<span class="material-symbols-outlined text-[18px]">badge</span>
-            125 Employees
+
+  {{-- Flash messages --}}
+  @if(session('success'))
+    <div class="bg-green-50 border border-green-200 text-green-800 rounded-xl px-4 py-3 font-body-md text-body-md flex items-center gap-2">
+      <span class="material-symbols-outlined text-[18px] text-success">check_circle</span>
+      {{ session('success') }}
+    </div>
+  @endif
+  @if($errors->any())
+    <div class="bg-red-50 border border-red-200 text-red-800 rounded-xl px-4 py-3 font-body-md text-body-md">
+      <ul class="list-disc list-inside space-y-1">
+        @foreach($errors->all() as $error)
+          <li>{{ $error }}</li>
+        @endforeach
+      </ul>
+    </div>
+  @endif
+
+  {{-- Summary Cards --}}
+  <section class="grid grid-cols-2 gap-unit-sm">
+    <div class="col-span-2 bg-white p-4 rounded-xl border border-border shadow-sm flex flex-col justify-between h-28 relative overflow-hidden">
+      <div class="z-10">
+        <p class="font-label-md text-label-md text-on-surface-variant mb-1">Total Periods</p>
+        <h2 class="font-headline-lg text-headline-lg text-primary">{{ $summary['total_periods'] }}</h2>
+      </div>
+      <div class="z-10 flex items-center text-on-surface-variant font-label-sm text-label-sm gap-1">
+        <span class="material-symbols-outlined text-[14px]">calendar_today</span>
+        <span>{{ $summary['draft_count'] }} Draft · {{ $summary['calculated_count'] }} Calculated</span>
+      </div>
+      <div class="absolute -right-4 -bottom-4 text-surface-container-high scale-150">
+        <span class="material-symbols-outlined text-[96px] opacity-10">receipt_long</span>
+      </div>
+    </div>
+  </section>
+
+  {{-- Create Period Button (finance/super_admin only) --}}
+  @if(in_array(auth()->user()->role, ['finance', 'super_admin']))
+  <section class="flex flex-col gap-unit-sm">
+    <button id="toggleCreateForm" onclick="document.getElementById('createForm').classList.toggle('hidden')"
+      class="w-full bg-primary-container text-on-primary py-3.5 rounded-xl font-label-md text-label-md flex items-center justify-center gap-2 active:scale-[0.98] transition-transform">
+      <span class="material-symbols-outlined">add_circle</span>
+      Create New Period
+    </button>
+
+    {{-- Create Period Form --}}
+    <div id="createForm" class="hidden bg-white rounded-xl border border-border shadow-sm p-4 flex flex-col gap-unit-md">
+      <h3 class="font-headline-md text-headline-md text-on-surface">New Payroll Period</h3>
+      <form method="POST" action="{{ route('payroll.periods.store') }}" class="flex flex-col gap-unit-md">
+        @csrf
+        <div class="flex flex-col gap-1">
+          <label class="font-label-md text-label-md text-on-surface-variant">Period Name *</label>
+          <input type="text" name="name" value="{{ old('name') }}" placeholder="e.g. July 2026 Payroll"
+            class="w-full bg-white border border-border rounded-xl px-4 py-3 text-body-md font-body-md focus:ring-1 focus:ring-primary outline-none" required maxlength="100">
+        </div>
+        <div class="grid grid-cols-2 gap-unit-sm">
+          <div class="flex flex-col gap-1">
+            <label class="font-label-md text-label-md text-on-surface-variant">Start Date *</label>
+            <input type="date" name="start_date" value="{{ old('start_date') }}"
+              class="w-full bg-white border border-border rounded-xl px-3 py-3 text-body-md font-body-md focus:ring-1 focus:ring-primary outline-none" required>
           </div>
-</div><div class="flex items-center gap-1.5 font-label-md text-label-md text-on-surface-variant"><span class="material-symbols-outlined text-[18px]">payments</span>Total Net Salary: $685,400</div>
-<div class="grid grid-cols-3 gap-2 pt-2 border-t border-border">
-<button class="bg-surface-container-low text-primary py-2 rounded-lg font-label-sm text-label-sm active:bg-surface-variant" onclick="window.location.href='/payroll/periods'">View</button>
-<button class="bg-surface-container-low text-primary py-2 rounded-lg font-label-sm text-label-sm active:bg-surface-variant" onclick="window.location.href='/payroll/periods'">Process</button>
-<!-- TODO Phase 4: connect action -->
-<button class="bg-primary text-white py-2 rounded-lg font-label-sm text-label-sm active:opacity-90">Approve</button>
-</div>
-</div>
-<!-- Card 2: May 2026 -->
-<div class="bg-white rounded-xl border border-border shadow-sm p-4 flex flex-col gap-4">
-<div class="flex justify-between items-start">
-<div>
-<h3 class="font-headline-md text-headline-md text-on-surface mb-1">May 2026 Payroll</h3>
-<p class="font-body-md text-body-md text-on-surface-variant">May 01 - May 31, 2026</p>
-</div>
-<span class="bg-green-100 text-green-700 px-3 py-1 rounded-full font-status-badge text-status-badge">Paid</span>
-</div>
-<div class="flex items-center gap-4 text-on-surface-variant">
-<div class="flex items-center gap-1.5 font-label-md text-label-md">
-<span class="material-symbols-outlined text-[18px]">badge</span>
-            120 Employees
+          <div class="flex flex-col gap-1">
+            <label class="font-label-md text-label-md text-on-surface-variant">End Date *</label>
+            <input type="date" name="end_date" value="{{ old('end_date') }}"
+              class="w-full bg-white border border-border rounded-xl px-3 py-3 text-body-md font-body-md focus:ring-1 focus:ring-primary outline-none" required>
           </div>
-</div><div class="flex items-center gap-1.5 font-label-md text-label-md text-on-surface-variant"><span class="material-symbols-outlined text-[18px]">payments</span>Total Net Salary: $658,200</div>
-<div class="pt-2 border-t border-border">
-<button class="w-full bg-surface-container-low text-primary py-2 rounded-lg font-label-sm text-label-sm active:bg-surface-variant" onclick="window.location.href='/reports'">View Report</button>
-</div>
-</div>
-<!-- Card 3: April 2026 -->
-<div class="bg-white rounded-xl border border-border shadow-sm p-4 flex flex-col gap-4">
-<div class="flex justify-between items-start">
-<div>
-<h3 class="font-headline-md text-headline-md text-on-surface mb-1">April 2026 Payroll</h3>
-<p class="font-body-md text-body-md text-on-surface-variant">Apr 01 - Apr 30, 2026</p>
-</div>
-<span class="bg-purple-100 text-purple-700 px-3 py-1 rounded-full font-status-badge text-status-badge">Locked</span>
-</div>
-<div class="flex items-center gap-4 text-on-surface-variant">
-<div class="flex items-center gap-1.5 font-label-md text-label-md">
-<span class="material-symbols-outlined text-[18px]">badge</span>
-            118 Employees
+        </div>
+        <div class="flex flex-col gap-1">
+          <label class="font-label-md text-label-md text-on-surface-variant">Pay Date (optional)</label>
+          <input type="date" name="pay_date" value="{{ old('pay_date') }}"
+            class="w-full bg-white border border-border rounded-xl px-4 py-3 text-body-md font-body-md focus:ring-1 focus:ring-primary outline-none">
+        </div>
+        <div class="grid grid-cols-2 gap-unit-sm pt-2">
+          <button type="button" onclick="document.getElementById('createForm').classList.add('hidden')"
+            class="border border-border text-on-surface-variant py-3 rounded-xl font-label-md text-label-md active:bg-surface-variant">
+            Cancel
+          </button>
+          <button type="submit"
+            class="bg-primary text-white py-3 rounded-xl font-label-md text-label-md active:opacity-90">
+            Create
+          </button>
+        </div>
+      </form>
+    </div>
+  </section>
+  @endif
+
+  {{-- Period List --}}
+  <section class="flex flex-col gap-unit-md">
+    @forelse($periods as $period)
+      @php
+        $recordCount = $period->payrollRecords->count();
+        $totalNet    = $period->payrollRecords->sum(fn($r) => (float) $r->net_salary);
+        $totalGross  = $period->payrollRecords->sum(fn($r) => (float) $r->basic_salary + (float) $r->allowance);
+
+        $badgeClass = match($period->status) {
+            'DRAFT'             => 'bg-gray-100 text-gray-600',
+            'CALCULATED'        => 'bg-blue-100 text-blue-700',
+            'HR_REVIEW'         => 'bg-yellow-100 text-yellow-700',
+            'FINANCE_APPROVAL'  => 'bg-orange-100 text-orange-700',
+            'LOCKED'            => 'bg-purple-100 text-purple-700',
+            'PAID'              => 'bg-green-100 text-green-700',
+            default             => 'bg-gray-100 text-gray-600',
+        };
+        $badgeLabel = match($period->status) {
+            'DRAFT'             => 'Draft',
+            'CALCULATED'        => 'Calculated',
+            'HR_REVIEW'         => 'HR Review',
+            'FINANCE_APPROVAL'  => 'Finance Approval',
+            'LOCKED'            => 'Locked',
+            'PAID'              => 'Paid',
+            default             => $period->status,
+        };
+        $canCalculate = in_array(auth()->user()->role, ['finance', 'super_admin']) && $period->status === 'DRAFT';
+        $canSubmitHR  = in_array(auth()->user()->role, ['finance', 'super_admin']) && $period->status === 'CALCULATED';
+      @endphp
+      <div class="bg-white rounded-xl border border-border shadow-sm p-4 flex flex-col gap-4">
+        <div class="flex justify-between items-start">
+          <div>
+            <h3 class="font-headline-md text-headline-md text-on-surface mb-1">{{ $period->name }}</h3>
+            <p class="font-body-md text-body-md text-on-surface-variant">
+              {{ $period->start_date->format('M d') }} – {{ $period->end_date->format('M d, Y') }}
+            </p>
           </div>
-</div><div class="flex items-center gap-1.5 font-label-md text-label-md text-on-surface-variant"><span class="material-symbols-outlined text-[18px]">payments</span>Total Net Salary: $645,100</div>
-<div class="pt-2 border-t border-border">
-<button class="w-full bg-surface-container-low text-primary py-2 rounded-lg font-label-sm text-label-sm active:bg-surface-variant" onclick="window.location.href='/payroll/periods'">View</button>
-</div>
-</div>
-<!-- Card 4: July 2026 -->
-<div class="bg-white rounded-xl border border-border shadow-sm p-4 flex flex-col gap-4">
-<div class="flex justify-between items-start">
-<div>
-<h3 class="font-headline-md text-headline-md text-on-surface mb-1">July 2026 Payroll</h3>
-<p class="font-body-md text-body-md text-on-surface-variant">Jul 01 - Jul 31, 2026</p>
-</div>
-<span class="bg-gray-100 text-gray-600 px-3 py-1 rounded-full font-status-badge text-status-badge">Draft</span>
-</div>
-<div class="flex items-center gap-4 text-on-surface-variant">
-<div class="flex items-center gap-1.5 font-label-md text-label-md">
-<span class="material-symbols-outlined text-[18px]">badge</span>
-            0 Employees
+          <span class="{{ $badgeClass }} px-3 py-1 rounded-full font-status-badge text-status-badge">{{ $badgeLabel }}</span>
+        </div>
+
+        <div class="flex flex-col gap-1">
+          <div class="flex items-center gap-1.5 font-label-md text-label-md text-on-surface-variant">
+            <span class="material-symbols-outlined text-[18px]">badge</span>
+            {{ $recordCount }} {{ Str::plural('Employee', $recordCount) }}
           </div>
-</div><div class="flex items-center gap-1.5 font-label-md text-label-md text-on-surface-variant"><span class="material-symbols-outlined text-[18px]">payments</span>Total Net Salary: $0</div>
-<div class="grid grid-cols-2 gap-2 pt-2 border-t border-border">
-<button class="bg-surface-container-low text-primary py-2 rounded-lg font-label-sm text-label-sm active:bg-surface-variant" onclick="window.location.href='/payroll/periods'">View</button>
-<button class="bg-primary text-white py-2 rounded-lg font-label-sm text-label-sm active:opacity-90" onclick="window.location.href='/payroll/periods'">Process</button>
-</div>
-</div>
-</section>
+          @if($recordCount > 0)
+          <div class="flex items-center gap-1.5 font-label-md text-label-md text-on-surface-variant">
+            <span class="material-symbols-outlined text-[18px]">payments</span>
+            Total Net: Rp {{ number_format($totalNet, 0, ',', '.') }}
+          </div>
+          @endif
+        </div>
+
+        <div class="flex gap-2 pt-2 border-t border-border">
+          <a href="{{ route('payroll.periods.show', $period) }}"
+            class="flex-1 text-center bg-surface-container-low text-primary py-2 rounded-lg font-label-sm text-label-sm active:bg-surface-variant">
+            View
+          </a>
+          @if($canCalculate)
+            <form method="POST" action="{{ route('payroll.periods.calculate', $period) }}" class="flex-1"
+              onsubmit="return confirm('Run payroll calculation for {{ addslashes($period->name) }}?')">
+              @csrf
+              <button type="submit" class="w-full bg-primary text-white py-2 rounded-lg font-label-sm text-label-sm active:opacity-90">
+                Calculate
+              </button>
+            </form>
+          @elseif($canSubmitHR)
+            <form method="POST" action="{{ route('payroll.periods.submit-hr-review', $period) }}" class="flex-1">
+              @csrf
+              <button type="submit" class="w-full bg-secondary text-white py-2 rounded-lg font-label-sm text-label-sm active:opacity-90">
+                Submit HR
+              </button>
+            </form>
+          @endif
+        </div>
+      </div>
+    @empty
+      <div class="bg-white rounded-xl border border-border shadow-sm p-8 flex flex-col items-center gap-3 text-center">
+        <span class="material-symbols-outlined text-[48px] text-on-surface-variant opacity-30">receipt_long</span>
+        <p class="font-body-md text-body-md text-on-surface-variant">No payroll periods yet.</p>
+        @if(in_array(auth()->user()->role, ['finance', 'super_admin']))
+          <p class="font-label-sm text-label-sm text-on-surface-variant">Tap "Create New Period" to get started.</p>
+        @endif
+      </div>
+    @endforelse
+  </section>
+
+  {{-- Pagination --}}
+  @if($periods->hasPages())
+    <div class="flex justify-center gap-unit-sm pt-2">
+      @if($periods->onFirstPage())
+        <span class="px-4 py-2 rounded-xl border border-border text-on-surface-variant font-label-md text-label-md opacity-40">Prev</span>
+      @else
+        <a href="{{ $periods->previousPageUrl() }}" class="px-4 py-2 rounded-xl border border-border text-primary font-label-md text-label-md">Prev</a>
+      @endif
+      @if($periods->hasMorePages())
+        <a href="{{ $periods->nextPageUrl() }}" class="px-4 py-2 rounded-xl border border-border text-primary font-label-md text-label-md">Next</a>
+      @else
+        <span class="px-4 py-2 rounded-xl border border-border text-on-surface-variant font-label-md text-label-md opacity-40">Next</span>
+      @endif
+    </div>
+  @endif
+
 </main>
+
 <!-- BottomNavBar -->
 <nav class="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[390px] z-50 bg-surface/80 backdrop-blur-md border-t border-border shadow-lg flex justify-around items-center h-18 pb-safe px-unit-xs">
-<a class="flex flex-col items-center justify-center text-on-surface-variant transition-transform active:scale-95 duration-150 py-2" href="/finance/dashboard">
-<span class="material-symbols-outlined">home</span>
-<span class="font-label-sm text-label-sm">Home</span>
-</a>
-<a class="flex flex-col items-center justify-center text-on-surface-variant transition-transform active:scale-95 duration-150 py-2" href="/hr/employees">
-<span class="material-symbols-outlined">badge</span>
-<span class="font-label-sm text-label-sm">Employees</span>
-</a>
-<a class="flex flex-col items-center justify-center text-on-surface-variant transition-transform active:scale-95 duration-150 py-2" href="/hr/approval-queue">
-<span class="material-symbols-outlined">fact_check</span>
-<span class="font-label-sm text-label-sm">Approvals</span>
-</a>
-<a class="flex flex-col items-center justify-center text-primary bg-secondary-fixed rounded-xl px-3 py-1 transition-transform active:scale-95 duration-150" href="/reports">
-<span class="material-symbols-outlined">analytics</span>
-<span class="font-label-sm text-label-sm">Reports</span>
-</a>
-<a class="flex flex-col items-center justify-center text-on-surface-variant transition-transform active:scale-95 duration-150 py-2" href="/profile">
-<span class="material-symbols-outlined">person</span>
-<span class="font-label-sm text-label-sm">Profile</span>
-</a>
+  <a class="flex flex-col items-center justify-center text-on-surface-variant transition-transform active:scale-95 duration-150 py-2" href="/finance/dashboard">
+    <span class="material-symbols-outlined">home</span>
+    <span class="font-label-sm text-label-sm">Home</span>
+  </a>
+  <a class="flex flex-col items-center justify-center text-on-surface-variant transition-transform active:scale-95 duration-150 py-2" href="/hr/employees">
+    <span class="material-symbols-outlined">badge</span>
+    <span class="font-label-sm text-label-sm">Employees</span>
+  </a>
+  <a class="flex flex-col items-center justify-center text-on-surface-variant transition-transform active:scale-95 duration-150 py-2" href="/hr/approval-queue">
+    <span class="material-symbols-outlined">fact_check</span>
+    <span class="font-label-sm text-label-sm">Approvals</span>
+  </a>
+  <a class="flex flex-col items-center justify-center text-primary bg-secondary-fixed rounded-xl px-3 py-1 transition-transform active:scale-95 duration-150" href="/payroll/periods">
+    <span class="material-symbols-outlined">receipt_long</span>
+    <span class="font-label-sm text-label-sm">Payroll</span>
+  </a>
+  <a class="flex flex-col items-center justify-center text-on-surface-variant transition-transform active:scale-95 duration-150 py-2" href="/profile">
+    <span class="material-symbols-outlined">person</span>
+    <span class="font-label-sm text-label-sm">Profile</span>
+  </a>
 </nav>
-<script>
-    // Subtle interaction script
-    document.querySelectorAll('button, a').forEach(el => {
-      el.addEventListener('click', (e) => {
-        // Mock navigation or action response
-        if(el.innerText.includes('Create')) {
-          console.log('Action: Create New Period Modal');
-        }
-      });
-    });
-  </script>
 
+{{-- Auto-open form if validation failed --}}
+@if($errors->any() && old('name'))
+<script>document.getElementById('createForm').classList.remove('hidden');</script>
+@endif
 
 </body></html>

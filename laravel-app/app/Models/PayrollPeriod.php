@@ -12,15 +12,20 @@ class PayrollPeriod extends Model
         'name',
         'start_date',
         'end_date',
+        'pay_date',
         'status',
         'created_by',
+        'calculated_by',
+        'calculated_at',
     ];
 
     protected function casts(): array
     {
         return [
-            'start_date' => 'date',
-            'end_date' => 'date',
+            'start_date'     => 'date',
+            'end_date'       => 'date',
+            'pay_date'       => 'date',
+            'calculated_at'  => 'datetime',
         ];
     }
 
