@@ -19,4 +19,9 @@ class PayrollRecordPolicy
 
         return in_array($record->payrollPeriod->status, self::VISIBLE_STATUSES, true);
     }
+
+    public function print(User $user, PayrollRecord $record): bool
+    {
+        return $this->view($user, $record);
+    }
 }

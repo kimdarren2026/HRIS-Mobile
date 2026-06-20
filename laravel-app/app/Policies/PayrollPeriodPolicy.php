@@ -55,4 +55,9 @@ class PayrollPeriodPolicy
         return in_array($user->role, ['finance', 'super_admin'], true)
             && $payrollPeriod->status === 'LOCKED';
     }
+
+    public function export(User $user, PayrollPeriod $payrollPeriod): bool
+    {
+        return in_array($user->role, ['finance', 'super_admin'], true);
+    }
 }

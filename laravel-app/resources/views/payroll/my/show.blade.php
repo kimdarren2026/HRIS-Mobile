@@ -179,6 +179,13 @@
     <span class="font-headline-md text-headline-md text-primary">Rp {{ number_format((float) $payrollRecord->net_salary, 0, ',', '.') }}</span>
   </section>
 
+  {{-- Print Payslip --}}
+  <a href="{{ route('my.payroll.print', $payrollRecord) }}"
+     class="flex items-center justify-center gap-2 w-full bg-primary text-white py-3.5 rounded-xl font-label-md text-label-md active:opacity-90 transition-opacity">
+    <span class="material-symbols-outlined">print</span>
+    Print Payslip
+  </a>
+
 </main>
 
 <!-- BottomNavBar -->

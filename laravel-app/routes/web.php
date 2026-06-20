@@ -65,8 +65,9 @@ Route::middleware(['auth', 'role:employee'])->group(function (): void {
     Route::get('/leave/history',  [LeaveController::class, 'history']);
 
     // Payroll — employee self-service (Phase 8)
-    Route::get('/my/payroll',                 [PayrollController::class, 'index'])->name('my.payroll.index');
-    Route::get('/my/payroll/{payrollRecord}', [PayrollController::class, 'show'])->name('my.payroll.show');
+    Route::get('/my/payroll',                        [PayrollController::class, 'index'])->name('my.payroll.index');
+    Route::get('/my/payroll/{payrollRecord}',         [PayrollController::class, 'show'])->name('my.payroll.show');
+    Route::get('/my/payroll/{payrollRecord}/print',   [PayrollController::class, 'printSlip'])->name('my.payroll.print');
 
     // Static views (Phase 1-4, preserved)
     Route::view('/payslip/detail',  'pages.payslip.detail');
@@ -97,12 +98,13 @@ Route::middleware(['auth', 'role:admin_hr,super_admin'])->group(function (): voi
 Route::middleware(['auth', 'role:finance,super_admin'])->group(function (): void {
     Route::view('/finance/dashboard', 'pages.finance.dashboard');
 
-    // Payroll management — create/calculate/approve/lock/pay restricted to finance + super_admin
+    // Payroll management — create/calculate/approve/lock/pay/export restricted to finance + super_admin
     Route::post('/payroll/periods',                                        [PayrollPeriodController::class, 'store'])->name('payroll.periods.store');
     Route::post('/payroll/periods/{payrollPeriod}/calculate',              [PayrollPeriodController::class, 'calculate'])->name('payroll.periods.calculate');
     Route::post('/payroll/periods/{payrollPeriod}/finance-approve',        [PayrollPeriodController::class, 'financeApprove'])->name('payroll.periods.finance-approve');
     Route::post('/payroll/periods/{payrollPeriod}/lock',                   [PayrollPeriodController::class, 'lock'])->name('payroll.periods.lock');
     Route::post('/payroll/periods/{payrollPeriod}/mark-paid',              [PayrollPeriodController::class, 'markPaid'])->name('payroll.periods.mark-paid');
+    Route::get('/payroll/periods/{payrollPeriod}/export',                  [PayrollPeriodController::class, 'export'])->name('payroll.periods.export');
 });
 
 // ── Payroll view — finance, super_admin, admin_hr (review) ───────────────────

@@ -169,6 +169,15 @@
     </form>
   @endif
 
+  {{-- Export CSV (finance + super_admin only) --}}
+  @if(in_array(auth()->user()->role, ['finance', 'super_admin']))
+    <a href="{{ route('payroll.periods.export', $payrollPeriod) }}"
+       class="flex items-center justify-center gap-2 w-full bg-surface-container border border-border text-on-surface py-3 rounded-xl font-label-md text-label-md active:opacity-70 transition-opacity">
+      <span class="material-symbols-outlined">download</span>
+      Export CSV
+    </a>
+  @endif
+
   {{-- Employee Records --}}
   @if($payrollPeriod->payrollRecords->count() > 0)
   <section class="flex flex-col gap-unit-sm">

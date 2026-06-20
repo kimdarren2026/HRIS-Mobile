@@ -10,6 +10,7 @@ use App\Services\PayrollCalculationService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\View\View;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class PayrollPeriodController extends Controller
 {
@@ -161,5 +162,39 @@ class PayrollPeriodController extends Controller
         );
 
         return redirect('/payroll/periods')->with('success', "Payroll '{$payrollPeriod->name}' marked as paid.");
+    }
+
+    public function export(PayrollPeriod $payrollPeriod): StreamedResponse
+    {
+        Gate::authorize('export', $payrollPeriod);
+
+        $payrollPeriod->load('payrollRecords.employee.user');
+
+        $filename = "payroll-period-{$payrollPeriod->id}.csv";
+
+        return response()->streamDownload(function () use ($payrollPeriod): void {
+            $out = fopen('php://output', 'w');
+
+            fputcsv($out, [
+                'Employee Name', 'Employee Number', 'Attendance Days', 'Leave Days',
+                'Basic Salary', 'Allowance', 'Deduction', 'Net Salary', 'Period Status',
+            ]);
+
+            foreach ($payrollPeriod->payrollRecords as $record) {
+                fputcsv($out, [
+                    $record->employee->user?->name ?? '',
+                    $record->employee->nik ?? '',
+                    $record->attendance_days,
+                    $record->leave_days,
+                    $record->basic_salary,
+                    $record->allowance,
+                    $record->deduction,
+                    $record->net_salary,
+                    $payrollPeriod->status,
+                ]);
+            }
+
+            fclose($out);
+        }, $filename, ['Content-Type' => 'text/csv']);
     }
 }

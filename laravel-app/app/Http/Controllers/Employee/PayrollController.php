@@ -37,4 +37,15 @@ class PayrollController extends Controller
 
         return view('payroll.my.show', compact('payrollRecord'));
     }
+
+    public function printSlip(PayrollRecord $payrollRecord): View
+    {
+        $payrollRecord->load('payrollPeriod');
+
+        Gate::authorize('print', $payrollRecord);
+
+        $payrollRecord->load(['employee.user', 'employee.position', 'employee.department']);
+
+        return view('payroll.my.print', compact('payrollRecord'));
+    }
 }
