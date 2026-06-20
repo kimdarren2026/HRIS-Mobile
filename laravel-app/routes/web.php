@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Employee\AttendanceController;
 use App\Http\Controllers\Employee\LeaveController;
 use App\Http\Controllers\Employee\PayrollController;
@@ -51,7 +52,7 @@ Route::middleware('auth')->group(function (): void {
 
 // ── Employee routes ──────────────────────────────────────────────────────────
 Route::middleware(['auth', 'role:employee'])->group(function (): void {
-    Route::view('/employee/dashboard', 'pages.employee.dashboard');
+    Route::get('/employee/dashboard', [DashboardController::class, 'employeeDashboard']);
 
     // Attendance — functional (Phase 5)
     Route::get('/attendance/checkin',         [AttendanceController::class, 'showCheckIn']);
@@ -80,7 +81,7 @@ Route::middleware(['auth', 'role:employee'])->group(function (): void {
 
 // ── HR / Super Admin routes ──────────────────────────────────────────────────
 Route::middleware(['auth', 'role:admin_hr,super_admin'])->group(function (): void {
-    Route::view('/admin/dashboard', 'pages.admin.dashboard');
+    Route::get('/admin/dashboard', [DashboardController::class, 'adminDashboard']);
 
     // Attendance approval — functional (Phase 5)
     Route::get('/hr/approval-queue',                           [AttendanceApprovalController::class, 'index']);
@@ -109,7 +110,7 @@ Route::middleware(['auth', 'role:admin_hr,super_admin'])->group(function (): voi
 
 // ── Finance / Super Admin routes ─────────────────────────────────────────────
 Route::middleware(['auth', 'role:finance,super_admin'])->group(function (): void {
-    Route::view('/finance/dashboard', 'pages.finance.dashboard');
+    Route::get('/finance/dashboard', [DashboardController::class, 'financeDashboard']);
 
     // Payroll management — create/calculate/approve/lock/pay/export restricted to finance + super_admin
     Route::post('/payroll/periods',                                        [PayrollPeriodController::class, 'store'])->name('payroll.periods.store');

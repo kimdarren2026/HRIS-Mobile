@@ -142,29 +142,26 @@
 <main class="pt-20 px-container-margin max-w-[390px] mx-auto pb-32">
 <!-- Greeting Section -->
 <section class="mb-unit-lg">
-<h2 class="font-headline-lg text-headline-lg text-on-surface">Hi, Finance</h2>
-<p class="font-body-md text-body-md text-on-surface-variant">Monday, June 15, 2026</p>
+<h2 class="font-headline-lg text-headline-lg text-on-surface">Hi, {{ auth()->user()->name }}</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">{{ now()->format('l, F d, Y') }}</p>
 </section>
 <!-- Summary Cards 2x2 Grid -->
 <section class="grid grid-cols-2 gap-card-gap mb-unit-lg">
 <div class="bg-surface border border-border p-unit-md rounded-xl shadow-sm">
-<p class="font-label-sm text-label-sm text-on-surface-variant mb-1">Payroll Period</p>
-<p class="font-headline-md text-headline-md text-primary">June 2026</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant mb-1">Latest Period</p>
+<p class="font-headline-md text-headline-md text-primary truncate">{{ $latestPeriods->first()?->name ?? 'N/A' }}</p>
 </div>
 <div class="bg-surface border border-border p-unit-md rounded-xl shadow-sm">
 <p class="font-label-sm text-label-sm text-on-surface-variant mb-1">Total Employees</p>
-<p class="font-headline-md text-headline-md text-primary">125</p>
+<p class="font-headline-md text-headline-md text-primary">{{ $totalEmployees }}</p>
 </div>
 <div class="bg-surface border border-border p-unit-md rounded-xl shadow-sm">
-<p class="font-label-sm text-label-sm text-on-surface-variant mb-1">Total Net Salary</p>
-<p class="font-headline-md text-headline-md text-primary">$685,400</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant mb-1">Pending Approval</p>
+<p class="font-headline-md text-headline-md text-warning">{{ $statusCounts['FINANCE_APPROVAL'] }}</p>
 </div>
 <div class="bg-surface border border-border p-unit-md rounded-xl shadow-sm">
-<p class="font-label-sm text-label-sm text-on-surface-variant mb-1">Payment Status</p>
-<div class="flex items-center gap-2">
-<p class="font-headline-md text-headline-md text-warning">Processing</p>
-</div>
-<p class="font-label-sm text-label-sm text-on-surface-variant mt-1">85% paid</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant mb-1">Paid Periods</p>
+<p class="font-headline-md text-headline-md text-success">{{ $statusCounts['PAID'] }}</p>
 </div>
 </section>
 <!-- Primary Action -->
@@ -254,78 +251,61 @@
 </div>
 </div>
 </section>
+<!-- Payroll Status Summary -->
+<section class="mb-unit-lg">
+<h3 class="font-label-md text-label-md text-on-surface-variant mb-3 uppercase tracking-widest">Status Summary</h3>
+<div class="bg-surface border border-border rounded-xl p-unit-md shadow-sm grid grid-cols-3 gap-3">
+@foreach ([['DRAFT','outline'],['CALCULATED','primary'],['HR_REVIEW','secondary'],['FINANCE_APPROVAL','warning'],['LOCKED','tertiary'],['PAID','success']] as [$status, $color])
+<div class="text-center">
+<p class="font-headline-md text-{{ $color }}">{{ $statusCounts[$status] }}</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant">{{ str_replace('_',' ', $status) }}</p>
+</div>
+@endforeach
+</div>
+</section>
 <!-- Recent Payroll Periods Section -->
 <section class="mb-unit-xl">
 <div class="flex justify-between items-center mb-4">
 <h3 class="font-label-md text-label-md text-on-surface-variant uppercase tracking-widest">Recent Payroll Periods</h3>
-<button class="text-primary font-label-md text-label-md hover:underline" onclick="window.location.href='/payroll/periods'">See All</button>
+<a class="text-primary font-label-md text-label-md hover:underline" href="/payroll/periods">See All</a>
 </div>
+@if ($latestPeriods->isEmpty())
+<p class="font-body-md text-body-md text-on-surface-variant text-center py-6">No payroll periods yet.</p>
+@else
 <div class="space-y-card-gap">
-<!-- May 2026 Payroll Card -->
-<div class="bg-surface border border-border rounded-xl p-unit-md shadow-sm active:bg-surface-container-low transition-colors">
+@foreach ($latestPeriods as $period)
+<div class="bg-surface border border-border rounded-xl p-unit-md shadow-sm">
 <div class="flex justify-between items-start mb-3">
 <div>
-<h4 class="font-headline-md text-headline-md text-on-surface">May 2026 Payroll</h4>
-<p class="font-body-md text-body-md text-on-surface-variant">May 01 - May 31, 2026</p>
+<h4 class="font-headline-md text-headline-md text-on-surface">{{ $period->name }}</h4>
+<p class="font-body-md text-body-md text-on-surface-variant">{{ $period->start_date->format('M d') }} - {{ $period->end_date->format('M d, Y') }}</p>
 </div>
-<span class="px-3 py-1 bg-success/10 text-success rounded-full font-status-badge text-status-badge">Paid</span>
+@php
+$badgeClass = match($period->status) {
+    'PAID'             => 'bg-success/10 text-success',
+    'LOCKED'           => 'bg-primary/10 text-primary',
+    'FINANCE_APPROVAL' => 'bg-warning/10 text-warning',
+    'HR_REVIEW'        => 'bg-secondary/10 text-secondary',
+    default            => 'bg-surface-container-high text-on-surface-variant',
+};
+@endphp
+<span class="px-3 py-1 {{ $badgeClass }} rounded-full font-status-badge text-status-badge">{{ str_replace('_', ' ', $period->status) }}</span>
 </div>
-<div class="grid grid-cols-2 gap-4 mb-4">
+<div class="grid grid-cols-2 gap-4 mb-3">
 <div>
-<p class="font-label-sm text-label-sm text-on-surface-variant">Employees</p>
-<p class="font-body-lg text-body-lg font-semibold">122</p>
-</div>
-<div>
-<p class="font-label-sm text-label-sm text-on-surface-variant">Amount</p>
-<p class="font-body-lg text-body-lg font-semibold text-primary">$670,200</p>
-</div>
-</div>
-<div class="mb-4">
-<div class="flex justify-between font-label-sm text-label-sm text-on-surface-variant mb-1">
-<span>Payment Progress</span>
-<span>100%</span>
-</div>
-<div class="w-full bg-surface-container-highest rounded-full h-2">
-<div class="bg-success h-2 rounded-full w-full"></div>
-</div>
-</div>
-<button class="w-full py-2 border border-primary text-primary font-label-md text-label-md rounded-lg active:scale-95 transition-transform" onclick="window.location.href='/payroll/periods'">
-                        View Details
-                    </button>
-</div>
-<!-- April 2026 Payroll Card -->
-<div class="bg-surface border border-border rounded-xl p-unit-md shadow-sm active:bg-surface-container-low transition-colors">
-<div class="flex justify-between items-start mb-3">
-<div>
-<h4 class="font-headline-md text-headline-md text-on-surface">April 2026 Payroll</h4>
-<p class="font-body-md text-body-md text-on-surface-variant">Apr 01 - Apr 30, 2026</p>
-</div>
-<span class="px-3 py-1 bg-success/10 text-success rounded-full font-status-badge text-status-badge">Paid</span>
-</div>
-<div class="grid grid-cols-2 gap-4 mb-4">
-<div>
-<p class="font-label-sm text-label-sm text-on-surface-variant">Employees</p>
-<p class="font-body-lg text-body-lg font-semibold">118</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Records</p>
+<p class="font-body-lg text-body-lg font-semibold">{{ $period->payrollRecords()->count() }}</p>
 </div>
 <div>
-<p class="font-label-sm text-label-sm text-on-surface-variant">Amount</p>
-<p class="font-body-lg text-body-lg font-semibold text-primary">$645,800</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Pay Date</p>
+<p class="font-body-lg text-body-lg font-semibold">{{ $period->pay_date?->format('M d, Y') ?? '—' }}</p>
 </div>
 </div>
-<div class="mb-4">
-<div class="flex justify-between font-label-sm text-label-sm text-on-surface-variant mb-1">
-<span>Payment Progress</span>
-<span>100%</span>
+<a class="block w-full py-2 text-center border border-primary text-primary font-label-md text-label-md rounded-lg active:scale-95 transition-transform" href="/payroll/periods/{{ $period->id }}">View Details</a>
 </div>
-<div class="w-full bg-surface-container-highest rounded-full h-2">
-<div class="bg-success h-2 rounded-full w-full"></div>
+@endforeach
 </div>
-</div>
-<button class="w-full py-2 border border-primary text-primary font-label-md text-label-md rounded-lg active:scale-95 transition-transform" onclick="window.location.href='/payroll/periods'">
-                        View Details
-                    </button>
-</div>
-</div>
+@endif
 </section>
 </main>
 <!-- BottomNavBar - Updated items -->

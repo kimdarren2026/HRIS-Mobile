@@ -137,30 +137,30 @@
 <main class="mt-20 px-container-margin space-y-6">
 <!-- Hero Section -->
 <section class="space-y-1">
-<h1 class="font-headline-md text-headline-md text-on-surface">Hi, HR Admin</h1>
-<p class="font-body-md text-body-md text-outline">Monday, June 15, 2026</p>
+<h1 class="font-headline-md text-headline-md text-on-surface">Hi, {{ auth()->user()->name }}</h1>
+<p class="font-body-md text-body-md text-outline">{{ now()->format('l, F d, Y') }}</p>
 </section>
 <!-- Summary Grid (2x2) -->
 <section class="grid grid-cols-2 gap-card-gap">
 <div class="bg-surface-container-lowest p-unit-md rounded-xl border border-border shadow-sm flex flex-col gap-1">
 <span class="material-symbols-outlined text-primary mb-2" data-icon="group">group</span>
 <span class="font-label-md text-label-md text-outline uppercase tracking-wider">Total Employees</span>
-<span class="font-headline-lg text-headline-lg text-on-surface">125</span>
+<span class="font-headline-lg text-headline-lg text-on-surface">{{ $totalEmployees }}</span>
 </div>
 <div class="bg-surface-container-lowest p-unit-md rounded-xl border border-border shadow-sm flex flex-col gap-1">
 <span class="material-symbols-outlined text-warning mb-2" data-icon="how_to_reg">how_to_reg</span>
 <span class="font-label-md text-label-md text-outline uppercase tracking-wider">Pending Attendance</span>
-<span class="font-headline-lg text-headline-lg text-on-surface">8</span>
+<span class="font-headline-lg text-headline-lg text-on-surface">{{ $pendingAttendance }}</span>
 </div>
 <div class="bg-surface-container-lowest p-unit-md rounded-xl border border-border shadow-sm flex flex-col gap-1">
 <span class="material-symbols-outlined text-tertiary mb-2" data-icon="event_busy">event_busy</span>
 <span class="font-label-md text-label-md text-outline uppercase tracking-wider">Leave Requests</span>
-<span class="font-headline-lg text-headline-lg text-on-surface">3</span>
+<span class="font-headline-lg text-headline-lg text-on-surface">{{ $pendingLeave }}</span>
 </div>
 <div class="bg-surface-container-lowest p-unit-md rounded-xl border border-border shadow-sm flex flex-col gap-1">
 <span class="material-symbols-outlined text-success mb-2" data-icon="payments">payments</span>
 <span class="font-label-md text-label-md text-outline uppercase tracking-wider">Payroll Period</span>
-<span class="font-body-md text-body-md font-bold text-on-surface truncate">June 2026</span>
+<span class="font-body-md text-body-md font-bold text-on-surface truncate">{{ $latestPeriod?->name ?? 'N/A' }}</span>
 </div>
 </section>
 <!-- Quick Actions -->
@@ -217,15 +217,15 @@
 <div class="grid grid-cols-3 gap-2 pt-2 border-t border-outline-variant">
 <div class="text-center">
 <p class="text-[10px] text-outline font-bold uppercase">Approved</p>
-<p class="font-headline-md text-success">118</p>
+<p class="font-headline-md text-success">{{ $approvedAttendance }}</p>
 </div>
 <div class="text-center border-x border-outline-variant">
 <p class="text-[10px] text-outline font-bold uppercase">Pending</p>
-<p class="font-headline-md text-warning">8</p>
+<p class="font-headline-md text-warning">{{ $pendingAttendance }}</p>
 </div>
 <div class="text-center">
 <p class="text-[10px] text-outline font-bold uppercase">Rejected</p>
-<p class="font-headline-md text-danger">2</p>
+<p class="font-headline-md text-danger">{{ $rejectedAttendance }}</p>
 </div>
 </div>
 </section>
@@ -241,21 +241,21 @@
 <div class="w-2 h-8 bg-warning rounded-full"></div>
 <span class="font-body-md font-medium">Pending HR Approval</span>
 </div>
-<span class="font-headline-md text-on-surface">3</span>
+<span class="font-headline-md text-on-surface">{{ $pendingLeave }}</span>
 </div>
 <div class="flex items-center justify-between p-3 bg-surface rounded-lg">
 <div class="flex items-center gap-3">
 <div class="w-2 h-8 bg-success rounded-full"></div>
 <span class="font-body-md font-medium">Approved</span>
 </div>
-<span class="font-headline-md text-on-surface">12</span>
+<span class="font-headline-md text-on-surface">{{ $approvedLeave }}</span>
 </div>
 <div class="flex items-center justify-between p-3 bg-surface rounded-lg">
 <div class="flex items-center gap-3">
 <div class="w-2 h-8 bg-danger rounded-full"></div>
 <span class="font-body-md font-medium">Rejected</span>
 </div>
-<span class="font-headline-md text-on-surface">1</span>
+<span class="font-headline-md text-on-surface">{{ $rejectedLeave }}</span>
 </div>
 </div>
 </section>
