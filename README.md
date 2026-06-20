@@ -4,7 +4,7 @@ Mobile-first HRIS demo built with Laravel. It covers attendance, leave, payroll,
 
 ## Current Status
 
-Phase 1-15: PASS
+Phase 1-16: PASS
 
 | Phase | Module | Status |
 | --- | --- | --- |
@@ -23,6 +23,7 @@ Phase 1-15: PASS
 | 13 | Demo seed data, documentation, manual QA guide | PASS |
 | 14 | Security hardening, error pages, role access audit | PASS |
 | 15 | Deployment readiness and environment setup guide | PASS |
+| 16 | Final UI polish and mobile responsiveness QA | PASS |
 
 ## Main Features
 
@@ -124,6 +125,12 @@ git diff --check
 - Manual QA: `docs/QA_MANUAL_TEST_GUIDE.md`
 - Deployment checklist: `docs/DEPLOYMENT_CHECKLIST.md`
 - Portfolio overview: `docs/PORTFOLIO_OVERVIEW.md`
+
+## Repository Notes
+
+- `laravel-app/` is the Laravel application used for development, testing, and demo deployment.
+- `docs/` contains project documentation, QA flows, portfolio notes, and deployment guidance.
+- `stitch/` folders contain UI design/export references only and are not edited during Laravel development.
 
 ## Project Structure
 
