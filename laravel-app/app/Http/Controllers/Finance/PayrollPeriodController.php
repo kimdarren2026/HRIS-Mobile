@@ -87,7 +87,11 @@ class PayrollPeriodController extends Controller
     {
         Gate::authorize('submitHrReview', $payrollPeriod);
 
-        $payrollPeriod->update(['status' => 'HR_REVIEW']);
+        $payrollPeriod->update([
+            'status'      => 'HR_REVIEW',
+            'reviewed_by' => auth()->id(),
+            'reviewed_at' => now(),
+        ]);
 
         AuditLogService::log(
             auth()->user(),
@@ -97,5 +101,65 @@ class PayrollPeriodController extends Controller
         );
 
         return redirect('/payroll/periods')->with('success', "Payroll '{$payrollPeriod->name}' submitted for HR review.");
+    }
+
+    public function financeApprove(PayrollPeriod $payrollPeriod): RedirectResponse
+    {
+        Gate::authorize('financeApprove', $payrollPeriod);
+
+        $payrollPeriod->update([
+            'status'      => 'FINANCE_APPROVAL',
+            'approved_by' => auth()->id(),
+            'approved_at' => now(),
+        ]);
+
+        AuditLogService::log(
+            auth()->user(),
+            'finance_approve_payroll',
+            'payroll',
+            "Payroll period '{$payrollPeriod->name}' approved by finance: " . auth()->user()->name . '.'
+        );
+
+        return redirect('/payroll/periods')->with('success', "Payroll '{$payrollPeriod->name}' approved by finance.");
+    }
+
+    public function lock(PayrollPeriod $payrollPeriod): RedirectResponse
+    {
+        Gate::authorize('lock', $payrollPeriod);
+
+        $payrollPeriod->update([
+            'status'    => 'LOCKED',
+            'locked_by' => auth()->id(),
+            'locked_at' => now(),
+        ]);
+
+        AuditLogService::log(
+            auth()->user(),
+            'lock_payroll',
+            'payroll',
+            "Payroll period '{$payrollPeriod->name}' locked by " . auth()->user()->name . '.'
+        );
+
+        return redirect('/payroll/periods')->with('success', "Payroll '{$payrollPeriod->name}' locked.");
+    }
+
+    public function markPaid(PayrollPeriod $payrollPeriod): RedirectResponse
+    {
+        Gate::authorize('markPaid', $payrollPeriod);
+
+        $payrollPeriod->update([
+            'status'  => 'PAID',
+            'paid_by' => auth()->id(),
+            'paid_at' => now(),
+        ]);
+
+        AuditLogService::log(
+            auth()->user(),
+            'mark_payroll_paid',
+            'payroll',
+            "Payroll period '{$payrollPeriod->name}' marked as paid by " . auth()->user()->name . '.'
+        );
+
+        return redirect('/payroll/periods')->with('success', "Payroll '{$payrollPeriod->name}' marked as paid.");
     }
 }

@@ -17,15 +17,27 @@ class PayrollPeriod extends Model
         'created_by',
         'calculated_by',
         'calculated_at',
+        'reviewed_by',
+        'reviewed_at',
+        'approved_by',
+        'approved_at',
+        'locked_by',
+        'locked_at',
+        'paid_by',
+        'paid_at',
     ];
 
     protected function casts(): array
     {
         return [
-            'start_date'     => 'date',
-            'end_date'       => 'date',
-            'pay_date'       => 'date',
-            'calculated_at'  => 'datetime',
+            'start_date'    => 'date',
+            'end_date'      => 'date',
+            'pay_date'      => 'date',
+            'calculated_at' => 'datetime',
+            'reviewed_at'   => 'datetime',
+            'approved_at'   => 'datetime',
+            'locked_at'     => 'datetime',
+            'paid_at'       => 'datetime',
         ];
     }
 

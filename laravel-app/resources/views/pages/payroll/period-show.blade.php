@@ -115,26 +115,58 @@
     </div>
   </div>
 
-  {{-- Actions --}}
-  @if(in_array(auth()->user()->role, ['finance', 'super_admin']))
-    @if($payrollPeriod->status === 'DRAFT')
-      <form method="POST" action="{{ route('payroll.periods.calculate', $payrollPeriod) }}"
-        onsubmit="return confirm('Run payroll calculation for {{ addslashes($payrollPeriod->name) }}?')">
-        @csrf
-        <button type="submit" class="w-full bg-primary text-white py-3.5 rounded-xl font-label-md text-label-md flex items-center justify-center gap-2 active:opacity-90">
-          <span class="material-symbols-outlined">calculate</span>
-          Run Calculation
-        </button>
-      </form>
-    @elseif($payrollPeriod->status === 'CALCULATED')
-      <form method="POST" action="{{ route('payroll.periods.submit-hr-review', $payrollPeriod) }}">
-        @csrf
-        <button type="submit" class="w-full bg-secondary text-white py-3.5 rounded-xl font-label-md text-label-md flex items-center justify-center gap-2 active:opacity-90">
-          <span class="material-symbols-outlined">send</span>
-          Submit for HR Review
-        </button>
-      </form>
-    @endif
+  {{-- Actions: one button shown based on status + role --}}
+  @php $role = auth()->user()->role; @endphp
+
+  @if($payrollPeriod->status === 'DRAFT' && in_array($role, ['finance', 'super_admin']))
+    <form method="POST" action="{{ route('payroll.periods.calculate', $payrollPeriod) }}"
+      onsubmit="return confirm('Run payroll calculation for {{ addslashes($payrollPeriod->name) }}?')">
+      @csrf
+      <button type="submit" class="w-full bg-primary text-white py-3.5 rounded-xl font-label-md text-label-md flex items-center justify-center gap-2 active:opacity-90">
+        <span class="material-symbols-outlined">calculate</span>
+        Run Calculation
+      </button>
+    </form>
+
+  @elseif($payrollPeriod->status === 'CALCULATED' && in_array($role, ['admin_hr', 'super_admin']))
+    <form method="POST" action="{{ route('payroll.periods.submit-hr-review', $payrollPeriod) }}"
+      onsubmit="return confirm('Submit {{ addslashes($payrollPeriod->name) }} for HR review?')">
+      @csrf
+      <button type="submit" class="w-full bg-secondary text-white py-3.5 rounded-xl font-label-md text-label-md flex items-center justify-center gap-2 active:opacity-90">
+        <span class="material-symbols-outlined">send</span>
+        Submit for HR Review
+      </button>
+    </form>
+
+  @elseif($payrollPeriod->status === 'HR_REVIEW' && in_array($role, ['finance', 'super_admin']))
+    <form method="POST" action="{{ route('payroll.periods.finance-approve', $payrollPeriod) }}"
+      onsubmit="return confirm('Approve {{ addslashes($payrollPeriod->name) }} for payment?')">
+      @csrf
+      <button type="submit" class="w-full bg-warning text-white py-3.5 rounded-xl font-label-md text-label-md flex items-center justify-center gap-2 active:opacity-90">
+        <span class="material-symbols-outlined">thumb_up</span>
+        Finance Approve
+      </button>
+    </form>
+
+  @elseif($payrollPeriod->status === 'FINANCE_APPROVAL' && in_array($role, ['finance', 'super_admin']))
+    <form method="POST" action="{{ route('payroll.periods.lock', $payrollPeriod) }}"
+      onsubmit="return confirm('Lock {{ addslashes($payrollPeriod->name) }}? This cannot be undone.')">
+      @csrf
+      <button type="submit" class="w-full bg-purple-600 text-white py-3.5 rounded-xl font-label-md text-label-md flex items-center justify-center gap-2 active:opacity-90">
+        <span class="material-symbols-outlined">lock</span>
+        Lock Payroll
+      </button>
+    </form>
+
+  @elseif($payrollPeriod->status === 'LOCKED' && in_array($role, ['finance', 'super_admin']))
+    <form method="POST" action="{{ route('payroll.periods.mark-paid', $payrollPeriod) }}"
+      onsubmit="return confirm('Mark {{ addslashes($payrollPeriod->name) }} as paid?')">
+      @csrf
+      <button type="submit" class="w-full bg-success text-white py-3.5 rounded-xl font-label-md text-label-md flex items-center justify-center gap-2 active:opacity-90">
+        <span class="material-symbols-outlined">payments</span>
+        Mark as Paid
+      </button>
+    </form>
   @endif
 
   {{-- Employee Records --}}

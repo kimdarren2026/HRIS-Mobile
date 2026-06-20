@@ -313,6 +313,199 @@ class PayrollPeriodTest extends TestCase
             ->assertForbidden();
     }
 
+    // ── Submit HR Review (CALCULATED → HR_REVIEW) ──────────────────────────────
+
+    public function test_admin_hr_can_submit_calculated_payroll_to_hr_review(): void
+    {
+        $period = PayrollPeriod::create([
+            'name'       => 'June 2026 Payroll',
+            'start_date' => '2026-06-01',
+            'end_date'   => '2026-06-30',
+            'status'     => 'CALCULATED',
+            'created_by' => $this->financeUser->id,
+        ]);
+
+        $this->actingAs($this->adminHrUser)
+            ->post("/payroll/periods/{$period->id}/submit-hr-review")
+            ->assertRedirect('/payroll/periods');
+
+        $period->refresh();
+        $this->assertEquals('HR_REVIEW', $period->status);
+        $this->assertEquals($this->adminHrUser->id, $period->reviewed_by);
+        $this->assertNotNull($period->reviewed_at);
+    }
+
+    public function test_employee_cannot_submit_payroll_to_hr_review(): void
+    {
+        $period = PayrollPeriod::create([
+            'name'       => 'June 2026 Payroll',
+            'start_date' => '2026-06-01',
+            'end_date'   => '2026-06-30',
+            'status'     => 'CALCULATED',
+            'created_by' => $this->financeUser->id,
+        ]);
+
+        $this->actingAs($this->employeeUser)
+            ->post("/payroll/periods/{$period->id}/submit-hr-review")
+            ->assertForbidden();
+    }
+
+    public function test_finance_cannot_submit_payroll_to_hr_review(): void
+    {
+        $period = PayrollPeriod::create([
+            'name'       => 'June 2026 Payroll',
+            'start_date' => '2026-06-01',
+            'end_date'   => '2026-06-30',
+            'status'     => 'CALCULATED',
+            'created_by' => $this->financeUser->id,
+        ]);
+
+        $this->actingAs($this->financeUser)
+            ->post("/payroll/periods/{$period->id}/submit-hr-review")
+            ->assertForbidden();
+    }
+
+    public function test_submit_hr_review_rejected_when_not_calculated(): void
+    {
+        $period = PayrollPeriod::create([
+            'name'       => 'June 2026 Payroll',
+            'start_date' => '2026-06-01',
+            'end_date'   => '2026-06-30',
+            'status'     => 'DRAFT',
+            'created_by' => $this->financeUser->id,
+        ]);
+
+        $this->actingAs($this->adminHrUser)
+            ->post("/payroll/periods/{$period->id}/submit-hr-review")
+            ->assertForbidden();
+    }
+
+    // ── Finance Approve (HR_REVIEW → FINANCE_APPROVAL) ─────────────────────────
+
+    public function test_finance_can_approve_hr_review_payroll(): void
+    {
+        $period = PayrollPeriod::create([
+            'name'       => 'June 2026 Payroll',
+            'start_date' => '2026-06-01',
+            'end_date'   => '2026-06-30',
+            'status'     => 'HR_REVIEW',
+            'created_by' => $this->financeUser->id,
+        ]);
+
+        $this->actingAs($this->financeUser)
+            ->post("/payroll/periods/{$period->id}/finance-approve")
+            ->assertRedirect('/payroll/periods');
+
+        $period->refresh();
+        $this->assertEquals('FINANCE_APPROVAL', $period->status);
+        $this->assertEquals($this->financeUser->id, $period->approved_by);
+        $this->assertNotNull($period->approved_at);
+    }
+
+    public function test_admin_hr_cannot_finance_approve_payroll(): void
+    {
+        $period = PayrollPeriod::create([
+            'name'       => 'June 2026 Payroll',
+            'start_date' => '2026-06-01',
+            'end_date'   => '2026-06-30',
+            'status'     => 'HR_REVIEW',
+            'created_by' => $this->financeUser->id,
+        ]);
+
+        $this->actingAs($this->adminHrUser)
+            ->post("/payroll/periods/{$period->id}/finance-approve")
+            ->assertForbidden();
+    }
+
+    public function test_finance_approve_rejected_when_not_hr_review(): void
+    {
+        $period = PayrollPeriod::create([
+            'name'       => 'June 2026 Payroll',
+            'start_date' => '2026-06-01',
+            'end_date'   => '2026-06-30',
+            'status'     => 'CALCULATED',
+            'created_by' => $this->financeUser->id,
+        ]);
+
+        $this->actingAs($this->financeUser)
+            ->post("/payroll/periods/{$period->id}/finance-approve")
+            ->assertForbidden();
+    }
+
+    // ── Lock (FINANCE_APPROVAL → LOCKED) ───────────────────────────────────────
+
+    public function test_finance_can_lock_finance_approval_payroll(): void
+    {
+        $period = PayrollPeriod::create([
+            'name'       => 'June 2026 Payroll',
+            'start_date' => '2026-06-01',
+            'end_date'   => '2026-06-30',
+            'status'     => 'FINANCE_APPROVAL',
+            'created_by' => $this->financeUser->id,
+        ]);
+
+        $this->actingAs($this->financeUser)
+            ->post("/payroll/periods/{$period->id}/lock")
+            ->assertRedirect('/payroll/periods');
+
+        $period->refresh();
+        $this->assertEquals('LOCKED', $period->status);
+        $this->assertEquals($this->financeUser->id, $period->locked_by);
+        $this->assertNotNull($period->locked_at);
+    }
+
+    public function test_lock_rejected_when_not_finance_approval(): void
+    {
+        $period = PayrollPeriod::create([
+            'name'       => 'June 2026 Payroll',
+            'start_date' => '2026-06-01',
+            'end_date'   => '2026-06-30',
+            'status'     => 'HR_REVIEW',
+            'created_by' => $this->financeUser->id,
+        ]);
+
+        $this->actingAs($this->financeUser)
+            ->post("/payroll/periods/{$period->id}/lock")
+            ->assertForbidden();
+    }
+
+    // ── Mark Paid (LOCKED → PAID) ───────────────────────────────────────────────
+
+    public function test_finance_can_mark_locked_payroll_as_paid(): void
+    {
+        $period = PayrollPeriod::create([
+            'name'       => 'June 2026 Payroll',
+            'start_date' => '2026-06-01',
+            'end_date'   => '2026-06-30',
+            'status'     => 'LOCKED',
+            'created_by' => $this->financeUser->id,
+        ]);
+
+        $this->actingAs($this->financeUser)
+            ->post("/payroll/periods/{$period->id}/mark-paid")
+            ->assertRedirect('/payroll/periods');
+
+        $period->refresh();
+        $this->assertEquals('PAID', $period->status);
+        $this->assertEquals($this->financeUser->id, $period->paid_by);
+        $this->assertNotNull($period->paid_at);
+    }
+
+    public function test_mark_paid_rejected_when_not_locked(): void
+    {
+        $period = PayrollPeriod::create([
+            'name'       => 'June 2026 Payroll',
+            'start_date' => '2026-06-01',
+            'end_date'   => '2026-06-30',
+            'status'     => 'FINANCE_APPROVAL',
+            'created_by' => $this->financeUser->id,
+        ]);
+
+        $this->actingAs($this->financeUser)
+            ->post("/payroll/periods/{$period->id}/mark-paid")
+            ->assertForbidden();
+    }
+
     // ── Phase 5/6 regression ───────────────────────────────────────────────────
 
     public function test_attendance_checkin_route_still_works(): void

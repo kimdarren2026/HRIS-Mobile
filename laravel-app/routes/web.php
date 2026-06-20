@@ -85,6 +85,9 @@ Route::middleware(['auth', 'role:admin_hr,super_admin'])->group(function (): voi
     Route::post('/hr/leave/{leaveRequest}/approve', [LeaveApprovalController::class, 'approve']);
     Route::post('/hr/leave/{leaveRequest}/reject',  [LeaveApprovalController::class, 'reject']);
 
+    // Payroll HR review — submit CALCULATED → HR_REVIEW (admin_hr + super_admin)
+    Route::post('/payroll/periods/{payrollPeriod}/submit-hr-review', [PayrollPeriodController::class, 'submitHrReview'])->name('payroll.periods.submit-hr-review');
+
     // Static views (Phase 1-4, preserved)
     Route::view('/hr/employees', 'pages.hr.employees');
     Route::view('/settings',     'pages.settings.index');
@@ -94,10 +97,12 @@ Route::middleware(['auth', 'role:admin_hr,super_admin'])->group(function (): voi
 Route::middleware(['auth', 'role:finance,super_admin'])->group(function (): void {
     Route::view('/finance/dashboard', 'pages.finance.dashboard');
 
-    // Payroll management — create/calculate restricted to finance + super_admin
-    Route::post('/payroll/periods',                                [PayrollPeriodController::class, 'store'])->name('payroll.periods.store');
-    Route::post('/payroll/periods/{payrollPeriod}/calculate',      [PayrollPeriodController::class, 'calculate'])->name('payroll.periods.calculate');
-    Route::post('/payroll/periods/{payrollPeriod}/submit-hr-review', [PayrollPeriodController::class, 'submitHrReview'])->name('payroll.periods.submit-hr-review');
+    // Payroll management — create/calculate/approve/lock/pay restricted to finance + super_admin
+    Route::post('/payroll/periods',                                        [PayrollPeriodController::class, 'store'])->name('payroll.periods.store');
+    Route::post('/payroll/periods/{payrollPeriod}/calculate',              [PayrollPeriodController::class, 'calculate'])->name('payroll.periods.calculate');
+    Route::post('/payroll/periods/{payrollPeriod}/finance-approve',        [PayrollPeriodController::class, 'financeApprove'])->name('payroll.periods.finance-approve');
+    Route::post('/payroll/periods/{payrollPeriod}/lock',                   [PayrollPeriodController::class, 'lock'])->name('payroll.periods.lock');
+    Route::post('/payroll/periods/{payrollPeriod}/mark-paid',              [PayrollPeriodController::class, 'markPaid'])->name('payroll.periods.mark-paid');
 });
 
 // ── Payroll view — finance, super_admin, admin_hr (review) ───────────────────
