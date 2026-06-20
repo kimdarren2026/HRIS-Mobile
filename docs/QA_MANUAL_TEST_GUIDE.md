@@ -128,7 +128,17 @@ password
 5. Login as Finance and open `/finance/dashboard`.
 6. Confirm payroll status counts and latest periods are shown.
 
-## 9. Regression Checks
+## 9. Mobile Responsiveness QA
+
+1. Open Chrome DevTools device toolbar.
+2. Test widths `375px`, `390px`, and `430px` on login, dashboards, attendance, leave, payroll, employee directory, profile, and error pages.
+3. Confirm fixed headers and bottom navigation stay centered within the mobile frame on desktop preview.
+4. Confirm cards, status badges, action buttons, and empty states do not overflow horizontally.
+5. Open `/payroll/periods` as Finance and Admin HR; confirm only the role-appropriate payroll action is visible.
+6. Open employee directory with filters that return no result; confirm the empty state and actions fit inside the mobile width.
+7. Open employee payslip detail and print view; confirm payroll tables remain readable on narrow screens.
+
+## 10. Regression Checks
 
 Run:
 

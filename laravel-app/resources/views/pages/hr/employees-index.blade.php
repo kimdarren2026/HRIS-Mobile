@@ -44,7 +44,7 @@ tailwind.config = {
 
 <header class="fixed top-0 left-1/2 -translate-x-1/2 w-full max-w-[390px] z-50 bg-surface border-b border-outline-variant shadow-sm flex justify-between items-center px-container-margin h-16">
   <div class="flex items-center gap-3">
-    <a href="{{ route('payroll.periods.index') }}" class="text-on-surface-variant hover:bg-surface-container-low transition-colors p-2 rounded-full active:scale-95 duration-150">
+    <a href="/admin/dashboard" class="text-on-surface-variant hover:bg-surface-container-low transition-colors p-2 rounded-full active:scale-95 duration-150">
       <span class="material-symbols-outlined">arrow_back</span>
     </a>
     <h1 class="font-headline-md text-headline-md font-bold text-primary">Employee Directory</h1>
@@ -137,9 +137,16 @@ tailwind.config = {
         </div>
       </a>
     @empty
-      <div class="text-center py-12 text-on-surface-variant">
-        <span class="material-symbols-outlined text-[48px] block mb-2">group_off</span>
-        <p class="font-body-md">No employees found.</p>
+      <div class="bg-surface-container-lowest border border-outline-variant rounded-2xl shadow-sm text-center py-10 px-4 text-on-surface-variant">
+        <span class="material-symbols-outlined text-[48px] block mb-2 opacity-50">group_off</span>
+        <p class="font-body-md text-on-surface font-semibold">No employees found</p>
+        <p class="font-label-sm text-on-surface-variant mt-1">Try clearing filters or add a new employee.</p>
+        <div class="flex justify-center gap-2 mt-4">
+          @if(request()->hasAny(['search','department_id','status']))
+            <a href="{{ route('employees.index') }}" class="px-3 py-2 rounded-xl border border-outline-variant text-primary font-label-md text-label-md">Clear</a>
+          @endif
+          <a href="{{ route('employees.create') }}" class="px-3 py-2 rounded-xl bg-primary text-on-primary font-label-md text-label-md">Add Employee</a>
+        </div>
       </div>
     @endforelse
   </div>

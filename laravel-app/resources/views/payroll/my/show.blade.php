@@ -46,7 +46,7 @@
     .safe-bottom { padding-bottom: env(safe-area-inset-bottom); }
 </style>
 </head>
-<body class="bg-surface text-on-surface overflow-x-hidden w-[390px] mx-auto min-h-screen relative shadow-2xl">
+<body class="bg-surface text-on-surface overflow-x-hidden w-full max-w-[390px] mx-auto min-h-screen relative shadow-2xl">
 
 @php
   $period = $payrollRecord->payrollPeriod;

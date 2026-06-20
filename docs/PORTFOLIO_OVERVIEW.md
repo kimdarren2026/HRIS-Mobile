@@ -1,6 +1,6 @@
 # Portfolio Overview
 
-HRIS Mobile App is a mobile-first Laravel HRIS portfolio project built from final Google Stitch screens and completed through Phase 15.
+HRIS Mobile App is a mobile-first Laravel HRIS portfolio project built from final Google Stitch screens and completed through Phase 16.
 
 ## Completed Phases
 
@@ -21,6 +21,7 @@ HRIS Mobile App is a mobile-first Laravel HRIS portfolio project built from fina
 | 13 | Demo Data Seeder + Project Documentation & Manual QA Guide | PASS |
 | 14 | Security Hardening + Error Pages + Final Role Access Audit | PASS |
 | 15 | Deployment Readiness + Environment Setup Guide | PASS |
+| 16 | Final UI Polish + Mobile Responsiveness QA | PASS |
 
 ## Main Features
 
@@ -38,6 +39,7 @@ HRIS Mobile App is a mobile-first Laravel HRIS portfolio project built from fina
 - Employee master data CRUD.
 - Dashboard summaries for Admin HR, Finance, and Employee.
 - Security hardening, role access tests, and custom error pages.
+- Final mobile UI polish for core demo pages and payslip print responsiveness.
 
 ## Role Matrix
 
@@ -108,7 +110,7 @@ php artisan test
 
 Expected: PASS.
 
-Last Phase 15 verification: full suite PASS before commit.
+Last Phase 16 verification: full suite PASS before commit.
 
 ## Deployment Readiness
 

@@ -43,7 +43,7 @@
     .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
 </style>
 </head>
-<body class="bg-surface text-on-surface overflow-x-hidden w-[390px] mx-auto min-h-screen relative shadow-2xl">
+<body class="bg-surface text-on-surface overflow-x-hidden w-full max-w-[390px] mx-auto min-h-screen relative shadow-2xl">
 
 <header class="fixed top-0 left-1/2 -translate-x-1/2 w-full max-w-[390px] z-50 bg-surface border-b border-border shadow-sm h-16 flex items-center px-container-margin gap-3">
   <a href="{{ route('payroll.periods.index') }}" class="text-primary p-1">

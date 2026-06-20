@@ -50,7 +50,7 @@
     .safe-bottom { padding-bottom: env(safe-area-inset-bottom); }
 </style>
 </head>
-<body class="bg-surface text-on-surface overflow-x-hidden w-[390px] mx-auto min-h-screen relative shadow-2xl">
+<body class="bg-surface text-on-surface overflow-x-hidden w-full max-w-[390px] mx-auto min-h-screen relative shadow-2xl">
 
 <!-- TopAppBar -->
 <header class="fixed top-0 left-1/2 -translate-x-1/2 w-full max-w-[390px] z-50 bg-surface border-b border-border shadow-sm h-16 flex justify-between items-center px-container-margin">

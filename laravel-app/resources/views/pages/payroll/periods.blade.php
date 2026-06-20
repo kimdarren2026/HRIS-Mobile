@@ -107,7 +107,7 @@
     .safe-bottom { padding-bottom: env(safe-area-inset-bottom); }
 </style>
 </head>
-<body class="bg-surface text-on-surface overflow-x-hidden w-[390px] mx-auto min-h-screen relative shadow-2xl">
+<body class="bg-surface text-on-surface overflow-x-hidden w-full max-w-[390px] mx-auto min-h-screen relative shadow-2xl">
 
 <!-- TopAppBar -->
 <header class="fixed top-0 left-1/2 -translate-x-1/2 w-full max-w-[390px] z-50 bg-surface border-b border-border shadow-sm h-16 flex justify-between items-center px-container-margin">
@@ -233,7 +233,7 @@
             default             => $period->status,
         };
         $canCalculate = in_array(auth()->user()->role, ['finance', 'super_admin']) && $period->status === 'DRAFT';
-        $canSubmitHR  = in_array(auth()->user()->role, ['finance', 'super_admin']) && $period->status === 'CALCULATED';
+        $canSubmitHR  = in_array(auth()->user()->role, ['admin_hr', 'super_admin']) && $period->status === 'CALCULATED';
       @endphp
       <div class="bg-white rounded-xl border border-border shadow-sm p-4 flex flex-col gap-4">
         <div class="flex justify-between items-start">
@@ -276,7 +276,7 @@
             <form method="POST" action="{{ route('payroll.periods.submit-hr-review', $period) }}" class="flex-1">
               @csrf
               <button type="submit" class="w-full bg-secondary text-white py-2 rounded-lg font-label-sm text-label-sm active:opacity-90">
-                Submit HR
+                Submit Review
               </button>
             </form>
           @endif

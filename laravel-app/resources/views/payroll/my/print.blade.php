@@ -34,6 +34,16 @@
     .header h1 { color: #000; }
     table thead th { color: #000; }
   }
+  @media (max-width: 640px) {
+    body { padding: 20px 12px; }
+    .no-print { flex-wrap: wrap; gap: 10px; }
+    .btn-print { width: 100%; }
+    .header { flex-direction: column; gap: 12px; }
+    .header .right { text-align: left; }
+    table { display: block; overflow-x: auto; white-space: nowrap; }
+    .net-salary-box { flex-direction: column; align-items: flex-start; gap: 8px; }
+    .net-salary-box .amount { font-size: 20px; }
+  }
 </style>
 </head>
 <body>
