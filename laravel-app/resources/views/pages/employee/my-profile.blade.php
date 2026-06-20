@@ -46,7 +46,15 @@ tailwind.config = {
 <body class="bg-surface text-on-surface min-h-screen flex flex-col items-center">
 
 <header class="fixed top-0 left-1/2 -translate-x-1/2 w-full max-w-[390px] z-50 flex justify-between items-center px-container-margin h-16 bg-surface border-b border-border shadow-sm">
-  <a href="/employee/dashboard" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container transition-colors active:scale-95">
+  @php
+  $dashboardUrl = match(auth()->user()->role) {
+      'finance'    => '/finance/dashboard',
+      'admin_hr'   => '/admin/dashboard',
+      'super_admin'=> '/admin/dashboard',
+      default      => '/employee/dashboard',
+  };
+  @endphp
+  <a href="{{ $dashboardUrl }}" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container transition-colors active:scale-95">
     <span class="material-symbols-outlined text-primary">arrow_back</span>
   </a>
   <h1 class="text-headline-md font-headline-md font-bold text-primary">My Profile</h1>
@@ -202,7 +210,7 @@ tailwind.config = {
 
 {{-- Bottom Nav --}}
 <nav class="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[390px] z-50 flex justify-around items-center px-2 py-3 bg-surface border-t border-border backdrop-blur-md shadow-lg h-20">
-  <a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 hover:bg-surface-container-high transition-all active:scale-90" href="/employee/dashboard">
+  <a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 hover:bg-surface-container-high transition-all active:scale-90" href="{{ $dashboardUrl }}">
     <span class="material-symbols-outlined">home</span>
     <span class="font-label-sm text-label-sm-mobile mt-1">Home</span>
   </a>

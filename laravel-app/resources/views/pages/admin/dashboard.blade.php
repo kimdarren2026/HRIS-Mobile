@@ -308,6 +308,34 @@
 </div>
 </div>
 </section>
+
+@if(auth()->user()->employee)
+<!-- Self-Service Section -->
+<section class="mx-container-margin bg-white border border-border rounded-xl shadow-[0px_1px_2px_0px_rgba(0,0,0,0.05)] p-4 flex flex-col gap-3 mb-2">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-[20px]">person</span>
+<h2 class="font-semibold text-on-surface" style="font-size:16px;line-height:24px;">My Self-Service</h2>
+</div>
+<div class="grid grid-cols-2 gap-3">
+<a href="/attendance/checkin" class="flex flex-col items-center gap-2 p-3 rounded-xl border border-outline-variant hover:bg-surface-container-low transition-colors active:scale-95">
+<span class="material-symbols-outlined text-primary">schedule</span>
+<span style="font-size:12px;font-weight:600;color:#464555;">My Attendance</span>
+</a>
+<a href="/leave/request" class="flex flex-col items-center gap-2 p-3 rounded-xl border border-outline-variant hover:bg-surface-container-low transition-colors active:scale-95">
+<span class="material-symbols-outlined text-primary">event_note</span>
+<span style="font-size:12px;font-weight:600;color:#464555;">My Leave</span>
+</a>
+<a href="/my/payroll" class="flex flex-col items-center gap-2 p-3 rounded-xl border border-outline-variant hover:bg-surface-container-low transition-colors active:scale-95">
+<span class="material-symbols-outlined text-primary">receipt_long</span>
+<span style="font-size:12px;font-weight:600;color:#464555;">My Payslip</span>
+</a>
+<a href="/my/profile" class="flex flex-col items-center gap-2 p-3 rounded-xl border border-outline-variant hover:bg-surface-container-low transition-colors active:scale-95">
+<span class="material-symbols-outlined text-primary">account_circle</span>
+<span style="font-size:12px;font-weight:600;color:#464555;">My Profile</span>
+</a>
+</div>
+</section>
+@endif
 </main>
 <!-- Bottom Navigation Bar -->
 <nav class="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[390px] z-50 bg-surface-container-lowest rounded-t-xl border-t border-outline-variant shadow-[0px_-1px_2px_0px_rgba(0,0,0,0.05)] flex justify-around items-center h-[72px] pb-safe px-2">

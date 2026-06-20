@@ -279,13 +279,13 @@ class EmployeeMasterDataTest extends TestCase
             ->assertForbidden();
     }
 
-    public function test_my_profile_returns_404_if_no_employee_record(): void
+    public function test_my_profile_returns_403_if_no_employee_record(): void
     {
         $userWithoutEmployee = User::factory()->create(['role' => 'employee', 'is_active' => true]);
 
         $this->actingAs($userWithoutEmployee)
             ->get(route('my.profile'))
-            ->assertNotFound();
+            ->assertForbidden();
     }
 
     // ── Policy: employee cannot view other employee via employees.show ─────────

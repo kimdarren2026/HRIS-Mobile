@@ -15,7 +15,8 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->redirectGuestsTo('/login');
         $middleware->alias([
-            'role' => RoleMiddleware::class,
+            'role'         => RoleMiddleware::class,
+            'has_employee' => \App\Http\Middleware\HasEmployee::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

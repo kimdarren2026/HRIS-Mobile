@@ -13,7 +13,6 @@ class LeaveRequestPolicy
             return true;
         }
 
-        return $user->role === 'employee'
-            && $user->employee?->id === $leaveRequest->employee_id;
+        return $user->employee?->id === $leaveRequest->employee_id;
     }
 }

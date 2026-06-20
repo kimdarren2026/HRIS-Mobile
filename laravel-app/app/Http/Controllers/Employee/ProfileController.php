@@ -11,7 +11,7 @@ class ProfileController extends Controller
     {
         $employee = auth()->user()->employee;
 
-        abort_unless($employee !== null, 404);
+        abort_unless($employee !== null, 403);
 
         $employee->load(['user', 'department', 'position']);
 

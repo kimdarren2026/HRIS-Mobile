@@ -52,7 +52,10 @@ class AuthRoleRoutingTest extends TestCase
             'is_active' => true,
         ]);
 
-        if (str_starts_with($path, '/leave/') || $path === '/my/profile') {
+        if (str_starts_with($path, '/leave/')
+            || str_starts_with($path, '/attendance/')
+            || str_starts_with($path, '/my/')
+        ) {
             Employee::factory()->create(['user_id' => $user->id]);
         }
 

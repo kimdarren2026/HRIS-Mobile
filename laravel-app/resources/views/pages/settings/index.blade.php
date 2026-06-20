@@ -1,14 +1,11 @@
 <!DOCTYPE html>
-
 <html class="light" lang="en"><head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>System Settings - HRIS Mobile App</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<!-- Tailwind Configuration -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
 <script id="tailwind-config">
       tailwind.config = {
         darkMode: "class",
@@ -125,12 +122,18 @@
 <span class="material-symbols-outlined text-primary">menu</span>
 </button>
 <h1 class="font-headline-md text-headline-md-mobile font-bold text-primary">System Settings</h1>
-<!-- TODO Phase 4: connect action -->
-<button class="p-2 rounded-full hover:bg-surface-container-low transition-colors active:scale-95 duration-150 relative">
-<span class="material-symbols-outlined text-primary">notifications</span>
-<span class="absolute top-2 right-2 w-2 h-2 bg-danger rounded-full"></span>
-</button>
+<div class="w-10"></div>
 </header>
+
+@if(session('success'))
+<div class="fixed top-16 left-1/2 -translate-x-1/2 w-full max-w-[390px] z-40 px-container-margin pt-2">
+    <div class="bg-success/10 border border-success/30 text-success rounded-lg px-4 py-3 font-body-md text-body-md flex items-center gap-2">
+        <span class="material-symbols-outlined text-[18px]" style="font-variation-settings:'FILL' 1;">check_circle</span>
+        {{ session('success') }}
+    </div>
+</div>
+@endif
+
 <!-- Main Content Area -->
 <main class="w-full max-w-[390px] mt-16 mb-20 px-container-margin flex flex-col gap-unit-md py-unit-md overflow-y-auto hide-scrollbar">
 <!-- Section 1: Office Location & Radius -->
@@ -139,48 +142,46 @@
 <span class="material-symbols-outlined text-[20px]">location_on</span>
 <h2 class="font-headline-md text-headline-md-mobile">Office Location &amp; Radius</h2>
 </div>
+@if($office)
 <div class="flex flex-col">
-<span class="font-label-md text-label-md text-on-surface-variant">Main Office</span>
-<p class="font-body-md text-body-md text-on-surface">123 Corporate Blvd, Suite 400, Innovation District</p>
+<span class="font-label-md text-label-md text-on-surface-variant">{{ $office->name }}</span>
+<p class="font-body-md text-body-md text-on-surface">Lat: {{ $office->latitude }}, Lng: {{ $office->longitude }}</p>
 <div class="mt-2 py-2 px-3 bg-surface-container-low rounded-lg flex justify-between items-center">
-<span class="font-body-md text-body-md">Default radius</span>
-<span class="font-status-badge text-status-badge text-primary bg-primary-container/20 px-2 py-1 rounded">100 meters</span>
+<span class="font-body-md text-body-md">Check-in radius</span>
+<span class="font-status-badge text-status-badge text-primary bg-primary-container/20 px-2 py-1 rounded">{{ $office->radius_meters }} meters</span>
 </div>
 </div>
-<!-- TODO Phase 4: connect action -->
-<button class="mt-2 border border-primary text-primary font-label-md text-label-md py-2.5 rounded-lg active:scale-95 transition-transform hover:bg-primary/5">
-                Manage Location
-            </button>
+<a href="{{ route('settings.locations.edit', $office) }}" class="mt-2 block text-center border border-primary text-primary font-label-md text-label-md py-2.5 rounded-lg active:scale-95 transition-transform hover:bg-primary/5">
+    Manage Location
+</a>
+@else
+<p class="font-body-md text-body-md text-on-surface-variant">No active office location configured.</p>
+@endif
 </section>
+
 <!-- Section 2: Leave Settings -->
 <section class="bg-white border border-border rounded-xl shadow-[0px_1px_2px_0px_rgba(0,0,0,0.05)] p-unit-md flex flex-col gap-unit-sm">
 <div class="flex items-center gap-2 text-primary">
 <span class="material-symbols-outlined text-[20px]">event_busy</span>
 <h2 class="font-headline-md text-headline-md-mobile">Leave Settings</h2>
 </div>
+@if($leaveTypes->isNotEmpty())
 <div class="grid grid-cols-2 gap-2">
+@foreach($leaveTypes as $leaveType)
 <div class="p-3 border border-outline-variant rounded-lg flex flex-col gap-1">
-<span class="font-label-sm text-label-sm text-outline">Annual</span>
-<span class="font-body-md text-body-md font-semibold">20 Days</span>
+<span class="font-label-sm text-label-sm text-outline">{{ $leaveType->name }}</span>
+<span class="font-body-md text-body-md font-semibold">{{ $leaveType->deducts_balance ? 'Balance tracked' : 'No quota' }}</span>
 </div>
-<div class="p-3 border border-outline-variant rounded-lg flex flex-col gap-1">
-<span class="font-label-sm text-label-sm text-outline">Sick</span>
-<span class="font-body-md text-body-md font-semibold">12 Days</span>
+@endforeach
 </div>
-<div class="p-3 border border-outline-variant rounded-lg flex flex-col gap-1">
-<span class="font-label-sm text-label-sm text-outline">Personal</span>
-<span class="font-body-md text-body-md font-semibold">5 Days</span>
-</div>
-<div class="p-3 border border-outline-variant rounded-lg flex flex-col gap-1">
-<span class="font-label-sm text-label-sm text-outline">Special</span>
-<span class="font-body-md text-body-md font-semibold">Various</span>
-</div>
-</div>
-<!-- TODO Phase 4: connect action -->
-<button class="mt-2 border border-primary text-primary font-label-md text-label-md py-2.5 rounded-lg active:scale-95 transition-transform hover:bg-primary/5">
-                Manage Leave Types
-            </button>
+@else
+<p class="font-body-md text-body-md text-on-surface-variant">No leave types configured.</p>
+@endif
+<a href="{{ route('settings.leave-types.index') }}" class="mt-2 block text-center border border-primary text-primary font-label-md text-label-md py-2.5 rounded-lg active:scale-95 transition-transform hover:bg-primary/5">
+    Manage Leave Types
+</a>
 </section>
+
 <!-- Section 3: Payroll Settings -->
 <section class="bg-white border border-border rounded-xl shadow-[0px_1px_2px_0px_rgba(0,0,0,0.05)] p-unit-md flex flex-col gap-unit-sm">
 <div class="flex items-center gap-2 text-primary">
@@ -193,13 +194,21 @@
 <div class="absolute -left-5 w-4 h-4 rounded-full bg-success ring-4 ring-white"></div>
 <span class="font-body-md text-body-md font-medium">Payroll workflow</span>
 </div>
-<div class="flex flex-wrap gap-1.5 mt-1"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase bg-surface-container-high text-outline">Draft</span><span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase bg-surface-container-high text-outline">Calculated</span><span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase bg-primary-container/20 text-primary">HR Review</span><span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase bg-surface-container-high text-outline">Finance Approval</span><span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase bg-surface-container-high text-outline">Locked</span><span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase bg-surface-container-high text-outline">Paid</span></div>
+<div class="flex flex-wrap gap-1.5 mt-1">
+<span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase bg-surface-container-high text-outline">Draft</span>
+<span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase bg-surface-container-high text-outline">Calculated</span>
+<span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase bg-primary-container/20 text-primary">HR Review</span>
+<span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase bg-surface-container-high text-outline">Finance Approval</span>
+<span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase bg-surface-container-high text-outline">Locked</span>
+<span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase bg-surface-container-high text-outline">Paid</span>
 </div>
-<!-- TODO Phase 4: connect action -->
-<button class="mt-2 border border-primary text-primary font-label-md text-label-md py-2.5 rounded-lg active:scale-95 transition-transform hover:bg-primary/5">
-                Manage Payroll Rules
-            </button>
+</div>
+<div class="mt-2 p-3 bg-surface-container-low rounded-lg flex items-center gap-2 text-on-surface-variant">
+<span class="material-symbols-outlined text-[16px]">info</span>
+<span class="font-body-md text-body-md">Payroll rules are managed by system configuration</span>
+</div>
 </section>
+
 <!-- Section 4: User & Role Access -->
 <section class="bg-white border border-border rounded-xl shadow-[0px_1px_2px_0px_rgba(0,0,0,0.05)] p-unit-md flex flex-col gap-unit-sm">
 <div class="flex items-center gap-2 text-primary">
@@ -214,7 +223,7 @@
 </div>
 <span class="font-body-md text-body-md">Employee</span>
 </div>
-<span class="font-label-sm text-label-sm text-outline">245 users</span>
+<span class="font-label-sm text-label-sm text-outline">Self-service</span>
 </li>
 <li class="flex justify-between items-center py-2 border-b border-outline-variant/30">
 <div class="flex items-center gap-3">
@@ -223,7 +232,7 @@
 </div>
 <span class="font-body-md text-body-md">Admin HR</span>
 </div>
-<span class="font-label-sm text-label-sm text-outline">12 users</span>
+<span class="font-label-sm text-label-sm text-outline">HR + self-service</span>
 </li>
 <li class="flex justify-between items-center py-2 border-b border-outline-variant/30">
 <div class="flex items-center gap-3">
@@ -232,7 +241,7 @@
 </div>
 <span class="font-body-md text-body-md">Finance</span>
 </div>
-<span class="font-label-sm text-label-sm text-outline">5 users</span>
+<span class="font-label-sm text-label-sm text-outline">Finance + self-service</span>
 </li>
 <li class="flex justify-between items-center py-2">
 <div class="flex items-center gap-3">
@@ -241,14 +250,15 @@
 </div>
 <span class="font-body-md text-body-md font-semibold">Super Admin</span>
 </div>
-<span class="font-label-sm text-label-sm text-outline">2 users</span>
+<span class="font-label-sm text-label-sm text-outline">Full access</span>
 </li>
 </ul>
-<!-- TODO Phase 4: connect action -->
-<button class="mt-2 border border-primary text-primary font-label-md text-label-md py-2.5 rounded-lg active:scale-95 transition-transform hover:bg-primary/5">
-                Manage Roles
-            </button>
+<div class="mt-2 p-3 bg-surface-container-low rounded-lg flex items-center gap-2 text-on-surface-variant">
+<span class="material-symbols-outlined text-[16px]">info</span>
+<span class="font-body-md text-body-md">Role management is handled by system administration</span>
+</div>
 </section>
+
 <!-- Section 5: Notification Settings -->
 <section class="bg-white border border-border rounded-xl shadow-[0px_1px_2px_0px_rgba(0,0,0,0.05)] p-unit-md flex flex-col gap-unit-sm">
 <div class="flex items-center gap-2 text-primary">
@@ -282,6 +292,7 @@
 </label>
 </div>
 </section>
+
 <!-- Section 6: Security Settings -->
 <section class="bg-white border border-border rounded-xl shadow-[0px_1px_2px_0px_rgba(0,0,0,0.05)] p-unit-md flex flex-col gap-unit-sm">
 <div class="flex items-center gap-2 text-primary">
@@ -332,13 +343,14 @@
 </div>
 </section>
 </main>
+
 <!-- Bottom Navigation Bar -->
 <nav class="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[390px] z-50 h-18 pb-safe bg-surface/80 backdrop-blur-md border-t border-outline-variant flex justify-around items-center mx-auto py-2">
 <a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-all active:scale-90 duration-200" href="/admin/dashboard">
 <span class="material-symbols-outlined">home</span>
 <span class="font-label-sm text-label-sm mt-1">Home</span>
 </a>
-<a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-all active:scale-90 duration-200" href="/hr/employees">
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-all active:scale-90 duration-200" href="/employees">
 <span class="material-symbols-outlined">group</span>
 <span class="font-label-sm text-label-sm mt-1">Employees</span>
 </a>
@@ -350,37 +362,9 @@
 <span class="material-symbols-outlined">assessment</span>
 <span class="font-label-sm text-label-sm mt-1">Reports</span>
 </a>
-<a class="flex flex-col items-center justify-center text-primary bg-primary-container/20 rounded-xl px-3 py-1 active:scale-90 duration-200" href="/profile">
-<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">person</span>
-<span class="font-label-sm text-label-sm mt-1">Profile</span>
+<a class="flex flex-col items-center justify-center text-primary bg-primary-container/20 rounded-xl px-3 py-1 active:scale-90 duration-200" href="/settings">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">settings</span>
+<span class="font-label-sm text-label-sm mt-1">Settings</span>
 </a>
 </nav>
-<script>
-        // Simple toggle interaction for switches
-        document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
-            checkbox.addEventListener('change', function() {
-                const parent = this.closest('label');
-                if (this.checked) {
-                    console.log('Enabled');
-                } else {
-                    console.log('Disabled');
-                }
-            });
-        });
-
-        // Active state navigation logic simulation
-        const navItems = document.querySelectorAll('nav a');
-        navItems.forEach(item => {
-            item.addEventListener('click', (e) => {
-                navItems.forEach(i => {
-                    i.classList.remove('text-primary', 'bg-primary-container/20', 'rounded-xl', 'px-3', 'py-1');
-                    i.classList.add('text-on-surface-variant');
-                    i.querySelector('.material-symbols-outlined').style.fontVariationSettings = "'FILL' 0";
-                });
-                item.classList.add('text-primary', 'bg-primary-container/20', 'rounded-xl', 'px-3', 'py-1');
-                item.classList.remove('text-on-surface-variant');
-                item.querySelector('.material-symbols-outlined').style.fontVariationSettings = "'FILL' 1";
-            });
-        });
-    </script>
 </body></html>

@@ -10,6 +10,9 @@ use App\Http\Controllers\Finance\PayrollPeriodController;
 use App\Http\Controllers\HR\AttendanceApprovalController;
 use App\Http\Controllers\HR\EmployeeController as HREmployeeController;
 use App\Http\Controllers\HR\LeaveApprovalController;
+use App\Http\Controllers\Settings\LeaveTypeSettingsController;
+use App\Http\Controllers\Settings\OfficeLocationController;
+use App\Http\Controllers\Settings\SettingsController;
 use Illuminate\Support\Facades\Route;
 
 // ── Preview (design reference, no auth) ────────────────────────────────────
@@ -50,10 +53,16 @@ Route::middleware('auth')->group(function (): void {
         ->name('leave.attachment');
 });
 
-// ── Employee routes ──────────────────────────────────────────────────────────
+// ── Employee-only routes ─────────────────────────────────────────────────────
 Route::middleware(['auth', 'role:employee'])->group(function (): void {
     Route::get('/employee/dashboard', [DashboardController::class, 'employeeDashboard']);
 
+    // Static views (Phase 1-4, preserved)
+    Route::view('/payslip/detail', 'pages.payslip.detail');
+});
+
+// ── Self-service routes (all roles + must have linked employee record) ────────
+Route::middleware(['auth', 'role:employee,admin_hr,finance,super_admin', 'has_employee'])->group(function (): void {
     // Attendance — functional (Phase 5)
     Route::get('/attendance/checkin',         [AttendanceController::class, 'showCheckIn']);
     Route::get('/attendance/checkin-outside', [AttendanceController::class, 'showCheckIn']);
@@ -68,15 +77,12 @@ Route::middleware(['auth', 'role:employee'])->group(function (): void {
     Route::get('/leave/history',  [LeaveController::class, 'history']);
 
     // Payroll — employee self-service (Phase 8)
-    Route::get('/my/payroll',                        [PayrollController::class, 'index'])->name('my.payroll.index');
-    Route::get('/my/payroll/{payrollRecord}',         [PayrollController::class, 'show'])->name('my.payroll.show');
-    Route::get('/my/payroll/{payrollRecord}/print',   [PayrollController::class, 'printSlip'])->name('my.payroll.print');
+    Route::get('/my/payroll',                       [PayrollController::class, 'index'])->name('my.payroll.index');
+    Route::get('/my/payroll/{payrollRecord}',        [PayrollController::class, 'show'])->name('my.payroll.show');
+    Route::get('/my/payroll/{payrollRecord}/print',  [PayrollController::class, 'printSlip'])->name('my.payroll.print');
 
     // Employee self-profile (Phase 11)
     Route::get('/my/profile', [ProfileController::class, 'show'])->name('my.profile');
-
-    // Static views (Phase 1-4, preserved)
-    Route::view('/payslip/detail',  'pages.payslip.detail');
 });
 
 // ── HR / Super Admin routes ──────────────────────────────────────────────────
@@ -103,9 +109,19 @@ Route::middleware(['auth', 'role:admin_hr,super_admin'])->group(function (): voi
     Route::get('/employees/{employee}/edit', [HREmployeeController::class, 'edit'])->name('employees.edit');
     Route::put('/employees/{employee}',      [HREmployeeController::class, 'update'])->name('employees.update');
 
+    // System settings (Phase 19)
+    Route::get('/settings', [SettingsController::class, 'index'])->name('settings.index');
+    Route::get('/settings/locations/{officeLocation}/edit', [OfficeLocationController::class, 'edit'])->name('settings.locations.edit');
+    Route::put('/settings/locations/{officeLocation}',      [OfficeLocationController::class, 'update'])->name('settings.locations.update');
+    Route::get('/settings/leave-types',                    [LeaveTypeSettingsController::class, 'index'])->name('settings.leave-types.index');
+    Route::get('/settings/leave-types/create',             [LeaveTypeSettingsController::class, 'create'])->name('settings.leave-types.create');
+    Route::post('/settings/leave-types',                   [LeaveTypeSettingsController::class, 'store'])->name('settings.leave-types.store');
+    Route::get('/settings/leave-types/{leaveType}/edit',   [LeaveTypeSettingsController::class, 'edit'])->name('settings.leave-types.edit');
+    Route::put('/settings/leave-types/{leaveType}',        [LeaveTypeSettingsController::class, 'update'])->name('settings.leave-types.update');
+    Route::delete('/settings/leave-types/{leaveType}',     [LeaveTypeSettingsController::class, 'destroy'])->name('settings.leave-types.destroy');
+
     // Static views (Phase 1-4, preserved)
     Route::view('/hr/employees', 'pages.hr.employees');
-    Route::view('/settings',     'pages.settings.index');
 });
 
 // ── Finance / Super Admin routes ─────────────────────────────────────────────
@@ -123,8 +139,8 @@ Route::middleware(['auth', 'role:finance,super_admin'])->group(function (): void
 
 // ── Payroll view — finance, super_admin, admin_hr (review) ───────────────────
 Route::middleware(['auth', 'role:admin_hr,finance,super_admin'])->group(function (): void {
-    Route::get('/payroll/periods',                [PayrollPeriodController::class, 'index'])->name('payroll.periods.index');
-    Route::get('/payroll/periods/{payrollPeriod}', [PayrollPeriodController::class, 'show'])->name('payroll.periods.show');
+    Route::get('/payroll/periods',                  [PayrollPeriodController::class, 'index'])->name('payroll.periods.index');
+    Route::get('/payroll/periods/{payrollPeriod}',  [PayrollPeriodController::class, 'show'])->name('payroll.periods.show');
 });
 
 // ── HR + Finance + Super Admin ───────────────────────────────────────────────
@@ -135,10 +151,11 @@ Route::middleware(['auth', 'role:admin_hr,finance,super_admin'])->group(function
 // ── All authenticated users ───────────────────────────────────────────────────
 Route::middleware(['auth', 'role:employee,admin_hr,finance,super_admin'])->group(function (): void {
     Route::get('/profile', function () {
-        if (auth()->user()->role === 'employee') {
+        $user = auth()->user();
+        // Any user with a linked employee record sees their own profile
+        if ($user->employee) {
             return redirect()->route('my.profile');
         }
-
         return view('pages.profile.show');
     });
 });
