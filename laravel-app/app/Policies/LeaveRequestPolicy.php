@@ -1,0 +1,19 @@
+<?php
+
+namespace App\Policies;
+
+use App\Models\LeaveRequest;
+use App\Models\User;
+
+class LeaveRequestPolicy
+{
+    public function viewAttachment(User $user, LeaveRequest $leaveRequest): bool
+    {
+        if (in_array($user->role, ['admin_hr', 'super_admin'], true)) {
+            return true;
+        }
+
+        return $user->role === 'employee'
+            && $user->employee?->id === $leaveRequest->employee_id;
+    }
+}

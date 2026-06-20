@@ -134,31 +134,33 @@
 <!-- Tabs Section -->
 <div class="bg-surface sticky top-16 z-40">
 <div class="flex border-b border-outline-variant">
-<!-- Attendance Tab (Active) -->
-<button class="relative flex-1 flex items-center justify-center py-4 text-primary font-bold transition-colors">
+<button id="tab-btn-attendance" onclick="switchTab('attendance')"
+    class="relative flex-1 flex items-center justify-center py-4 text-primary font-bold transition-colors">
 <div class="flex items-center gap-2">
 <span class="font-label-md text-label-md">Attendance</span>
-<span class="bg-primary-container text-on-primary-container px-2 py-0.5 rounded-full text-[10px] font-bold">3</span>
+<span class="bg-primary-container text-on-primary-container px-2 py-0.5 rounded-full text-[10px] font-bold">{{ $pending->total() }}</span>
 </div>
 <div class="active-tab-indicator w-full"></div>
 </button>
-<!-- Leave Tab (Inactive) -->
-<button class="relative flex-1 flex items-center justify-center py-4 text-on-surface-variant hover:bg-surface-container-low transition-colors">
+<button id="tab-btn-leave" onclick="switchTab('leave')"
+    class="relative flex-1 flex items-center justify-center py-4 text-on-surface-variant hover:bg-surface-container-low transition-colors">
 <div class="flex items-center gap-2">
 <span class="font-label-md text-label-md">Leave</span>
-<span class="bg-surface-container-highest text-on-surface-variant px-2 py-0.5 rounded-full text-[10px] font-bold">5</span>
+<span class="bg-surface-container-highest text-on-surface-variant px-2 py-0.5 rounded-full text-[10px] font-bold">{{ $leavePending->total() }}</span>
 </div>
 </button>
 </div>
 </div>
-<!-- Approval List Content -->
-<div class="p-container-margin flex flex-col gap-unit-lg">
 
+{{-- Flash --}}
 @if(session('success'))
-<div class="bg-success/10 border border-success/30 text-success rounded-lg px-4 py-3 font-body-md text-body-md flex items-center gap-2">
+<div class="mx-container-margin mt-unit-md bg-success/10 border border-success/30 text-success rounded-lg px-4 py-3 font-body-md text-body-md flex items-center gap-2">
 <span class="material-symbols-outlined text-[18px]">check_circle</span> {{ session('success') }}
 </div>
 @endif
+
+<!-- Attendance Tab Content -->
+<div id="tab-attendance" class="p-container-margin flex flex-col gap-unit-lg">
 
 @forelse($pending as $record)
 <div class="bg-surface border border-outline-variant rounded-xl shadow-sm overflow-hidden flex flex-col gap-unit-md p-unit-md">
@@ -195,8 +197,6 @@ Check-in {{ $record->check_in_time?->format('d M Y, h:i A') }}
 </a>
 @endif
 </div>
-
-{{-- Approve form --}}
 <form method="POST" action="/hr/attendance/{{ $record->id }}/approve" class="flex gap-3 pt-2 flex-col">
 @csrf
 <input type="text" name="approval_note" placeholder="Optional note for employee..." maxlength="1000"
@@ -206,23 +206,16 @@ Check-in {{ $record->check_in_time?->format('d M Y, h:i A') }}
     class="flex-1 bg-success text-on-primary py-3 rounded-lg font-label-md flex items-center justify-center gap-2 active:scale-95 transition-transform">
 <span class="material-symbols-outlined text-[18px]">check_circle</span> Approve
 </button>
-
-{{-- Reject toggle --}}
-<button type="button" onclick="toggleReject({{ $record->id }})"
+<button type="button" onclick="toggleReject('att-{{ $record->id }}')"
     class="flex-1 border-2 border-danger text-danger py-3 rounded-lg font-label-md flex items-center justify-center gap-2 active:scale-95 transition-transform">
 <span class="material-symbols-outlined text-[18px]">block</span> Reject
 </button>
 </div>
 </form>
-
-{{-- Reject form (hidden by default) --}}
-<form id="reject-form-{{ $record->id }}" method="POST" action="/hr/attendance/{{ $record->id }}/reject" class="hidden flex-col gap-2">
+<form id="reject-form-att-{{ $record->id }}" method="POST" action="/hr/attendance/{{ $record->id }}/reject" class="hidden flex-col gap-2">
 @csrf
-@if($errors->has('approval_note'))
-<p class="text-error font-label-sm text-label-sm">{{ $errors->first('approval_note') }}</p>
-@endif
-<textarea name="approval_note" rows="3" maxlength="1000" required minlength="10" placeholder="Alasan penolakan (wajib, min 10 karakter)..."
-    class="w-full border border-danger rounded-lg px-3 py-2 font-body-md text-body-md text-on-surface bg-surface focus:border-error focus:ring-1 focus:ring-error outline-none resize-none placeholder:text-outline">{{ old('approval_note') }}</textarea>
+<textarea name="approval_note" rows="3" maxlength="1000" required minlength="10" placeholder="Rejection reason (required, min 10 characters)..."
+    class="w-full border border-danger rounded-lg px-3 py-2 font-body-md text-body-md text-on-surface bg-surface focus:border-error focus:ring-1 focus:ring-error outline-none resize-none placeholder:text-outline"></textarea>
 <button type="submit"
     class="w-full bg-danger text-on-error py-3 rounded-lg font-label-md flex items-center justify-center gap-2 active:scale-95 transition-transform">
 <span class="material-symbols-outlined text-[18px]">cancel</span> Confirm Rejection
@@ -232,23 +225,138 @@ Check-in {{ $record->check_in_time?->format('d M Y, h:i A') }}
 @empty
 <div class="flex flex-col items-center justify-center py-unit-xl opacity-40 select-none">
 <span class="material-symbols-outlined text-[64px]">rule</span>
-<p class="font-label-md mt-2 text-on-surface-variant">Tidak ada presensi pending review.</p>
+<p class="font-label-md mt-2 text-on-surface-variant">No attendance pending review.</p>
 </div>
 @endforelse
 
-@if(method_exists($pending, 'hasPages') && $pending->hasPages())
+@if($pending->hasPages())
 <div class="pb-4">{{ $pending->links() }}</div>
+@endif
+
+</div>
+
+<!-- Leave Tab Content -->
+<div id="tab-leave" class="hidden p-container-margin flex flex-col gap-unit-lg">
+
+@forelse($leavePending as $leave)
+@php
+    $days = (int) $leave->total_days;
+    $dateRange = $leave->start_date->isSameDay($leave->end_date)
+        ? $leave->start_date->format('d M Y')
+        : $leave->start_date->format('d M') . ' – ' . $leave->end_date->format('d M Y');
+@endphp
+<div class="bg-surface border border-outline-variant rounded-xl shadow-sm overflow-hidden flex flex-col gap-unit-md p-unit-md">
+<div class="flex items-start justify-between">
+<div class="flex gap-3">
+<div class="w-12 h-12 rounded-full bg-primary-container flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-on-primary-container">person</span>
+</div>
+<div>
+<h3 class="font-headline-md text-[16px] font-bold text-on-surface">{{ $leave->employee->user->name ?? '—' }}</h3>
+<p class="font-body-md text-on-surface-variant">
+{{ $leave->employee->department->name ?? '—' }} &bull; {{ $leave->created_at->diffForHumans() }}
+</p>
+</div>
+</div>
+<div class="bg-warning/10 text-warning px-3 py-1 rounded-full font-status-badge text-status-badge shrink-0">
+Pending HR
+</div>
+</div>
+<div class="bg-surface-container-low p-3 rounded-lg border border-outline-variant/30 flex flex-col gap-1">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-[18px]">event_note</span>
+<span class="font-label-md text-label-md text-on-surface-variant">
+{{ $leave->leaveType->name }} &bull; {{ $dateRange }} &bull; {{ $days }} {{ $days === 1 ? 'day' : 'days' }}
+</span>
+</div>
+<p class="font-body-md text-on-surface-variant italic leading-relaxed">"{{ $leave->reason }}"</p>
+@if($leave->attachment_path)
+<a href="/leave/attachment/{{ $leave->id }}" target="_blank"
+   class="inline-flex items-center gap-1 mt-1 text-primary font-label-sm text-label-sm hover:underline">
+<span class="material-symbols-outlined text-[14px]">attach_file</span> Lihat Dokumen
+</a>
+@endif
+</div>
+<form method="POST" action="/hr/leave/{{ $leave->id }}/approve" class="flex gap-3 pt-2 flex-col">
+@csrf
+<input type="text" name="approval_note" placeholder="Optional note for employee..." maxlength="1000"
+    class="w-full border border-outline-variant rounded-lg px-3 py-2 font-body-md text-body-md text-on-surface bg-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none placeholder:text-outline">
+<div class="flex gap-3">
+<button type="submit"
+    class="flex-1 bg-success text-on-primary py-3 rounded-lg font-label-md flex items-center justify-center gap-2 active:scale-95 transition-transform">
+<span class="material-symbols-outlined text-[18px]">check_circle</span> Approve
+</button>
+<button type="button" onclick="toggleReject('leave-{{ $leave->id }}')"
+    class="flex-1 border-2 border-danger text-danger py-3 rounded-lg font-label-md flex items-center justify-center gap-2 active:scale-95 transition-transform">
+<span class="material-symbols-outlined text-[18px]">block</span> Reject
+</button>
+</div>
+</form>
+<form id="reject-form-leave-{{ $leave->id }}" method="POST" action="/hr/leave/{{ $leave->id }}/reject" class="hidden flex-col gap-2">
+@csrf
+<textarea name="approval_note" rows="3" maxlength="1000" required minlength="10" placeholder="Rejection reason (required, min 10 characters)..."
+    class="w-full border border-danger rounded-lg px-3 py-2 font-body-md text-body-md text-on-surface bg-surface focus:border-error focus:ring-1 focus:ring-error outline-none resize-none placeholder:text-outline"></textarea>
+<button type="submit"
+    class="w-full bg-danger text-on-error py-3 rounded-lg font-label-md flex items-center justify-center gap-2 active:scale-95 transition-transform">
+<span class="material-symbols-outlined text-[18px]">cancel</span> Confirm Rejection
+</button>
+</form>
+</div>
+@empty
+<div class="flex flex-col items-center justify-center py-unit-xl opacity-40 select-none">
+<span class="material-symbols-outlined text-[64px]">event_busy</span>
+<p class="font-label-md mt-2 text-on-surface-variant">No leave requests pending.</p>
+</div>
+@endforelse
+
+@if($leavePending->hasPages())
+<div class="pb-4">{{ $leavePending->links() }}</div>
 @endif
 
 </div>
 </main>
 
 <script>
-function toggleReject(id) {
-    const f = document.getElementById('reject-form-' + id);
+function toggleReject(key) {
+    const f = document.getElementById('reject-form-' + key);
     if (!f) return;
     f.classList.toggle('hidden');
     f.classList.toggle('flex');
+}
+
+function switchTab(tab) {
+    const attPane = document.getElementById('tab-attendance');
+    const leavePane = document.getElementById('tab-leave');
+    const attBtn = document.getElementById('tab-btn-attendance');
+    const leaveBtn = document.getElementById('tab-btn-leave');
+
+    if (tab === 'attendance') {
+        attPane.classList.remove('hidden');
+        leavePane.classList.add('hidden');
+        attBtn.classList.add('text-primary', 'font-bold');
+        attBtn.classList.remove('text-on-surface-variant');
+        leaveBtn.classList.remove('text-primary', 'font-bold');
+        leaveBtn.classList.add('text-on-surface-variant');
+        if (!attBtn.querySelector('.active-tab-indicator')) {
+            const ind = document.createElement('div');
+            ind.className = 'active-tab-indicator w-full';
+            attBtn.appendChild(ind);
+        }
+        leaveBtn.querySelector('.active-tab-indicator')?.remove();
+    } else {
+        leavePane.classList.remove('hidden');
+        attPane.classList.add('hidden');
+        leaveBtn.classList.add('text-primary', 'font-bold');
+        leaveBtn.classList.remove('text-on-surface-variant');
+        attBtn.classList.remove('text-primary', 'font-bold');
+        attBtn.classList.add('text-on-surface-variant');
+        if (!leaveBtn.querySelector('.active-tab-indicator')) {
+            const ind = document.createElement('div');
+            ind.className = 'active-tab-indicator w-full';
+            leaveBtn.appendChild(ind);
+        }
+        attBtn.querySelector('.active-tab-indicator')?.remove();
+    }
 }
 </script>
 <!-- BottomNavBar -->
@@ -280,32 +388,9 @@ function toggleReject(id) {
 </button>
 </nav>
 <script>
-    // Simple interactive micro-interactions for buttons
     document.querySelectorAll('button').forEach(button => {
-        button.addEventListener('touchstart', function() {
-            this.classList.add('opacity-80');
-        });
-        button.addEventListener('touchend', function() {
-            this.classList.remove('opacity-80');
-        });
-    });
-    
-    // Tab switching logic (visual only for this prototype)
-    const tabs = document.querySelectorAll('.flex.border-b button');
-    tabs.forEach(tab => {
-        tab.addEventListener('click', () => {
-            tabs.forEach(t => {
-                t.classList.remove('text-primary', 'font-bold');
-                t.classList.add('text-on-surface-variant');
-                const indicator = t.querySelector('.active-tab-indicator');
-                if(indicator) indicator.remove();
-            });
-            tab.classList.add('text-primary', 'font-bold');
-            tab.classList.remove('text-on-surface-variant');
-            const indicator = document.createElement('div');
-            indicator.className = 'active-tab-indicator w-full';
-            tab.appendChild(indicator);
-        });
+        button.addEventListener('touchstart', function() { this.classList.add('opacity-80'); });
+        button.addEventListener('touchend', function() { this.classList.remove('opacity-80'); });
     });
 </script>
 </body></html>

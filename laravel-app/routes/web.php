@@ -2,7 +2,9 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Employee\AttendanceController;
+use App\Http\Controllers\Employee\LeaveController;
 use App\Http\Controllers\HR\AttendanceApprovalController;
+use App\Http\Controllers\HR\LeaveApprovalController;
 use Illuminate\Support\Facades\Route;
 
 // ── Preview (design reference, no auth) ────────────────────────────────────
@@ -36,9 +38,11 @@ Route::post('/logout', [AuthController::class, 'logout'])
     ->middleware('auth')
     ->name('logout');
 
-// ── Protected selfie (auth only; policy in controller) ──────────────────────
+// ── Protected selfie + leave attachment (auth only; policy in controller) ────
 Route::middleware('auth')->group(function (): void {
     Route::get('/attendance/photo/{attendanceRecord}', [AttendanceController::class, 'photo']);
+    Route::get('/leave/attachment/{leaveRequest}', [LeaveController::class, 'attachment'])
+        ->name('leave.attachment');
 });
 
 // ── Employee routes ──────────────────────────────────────────────────────────
@@ -52,9 +56,13 @@ Route::middleware(['auth', 'role:employee'])->group(function (): void {
         ->middleware('throttle:10,1');
     Route::get('/attendance/history', [AttendanceController::class, 'history']);
 
+    // Leave — functional (Phase 6)
+    Route::get('/leave/request',  [LeaveController::class, 'showRequest']);
+    Route::post('/leave/request', [LeaveController::class, 'store'])
+        ->middleware('throttle:10,1');
+    Route::get('/leave/history',  [LeaveController::class, 'history']);
+
     // Static views (Phase 1-4, preserved)
-    Route::view('/leave/request',   'pages.leave.request');
-    Route::view('/leave/history',   'pages.leave.history');
     Route::view('/payslip/detail',  'pages.payslip.detail');
 });
 
@@ -66,6 +74,10 @@ Route::middleware(['auth', 'role:admin_hr,super_admin'])->group(function (): voi
     Route::get('/hr/approval-queue',                           [AttendanceApprovalController::class, 'index']);
     Route::post('/hr/attendance/{attendanceRecord}/approve',   [AttendanceApprovalController::class, 'approve']);
     Route::post('/hr/attendance/{attendanceRecord}/reject',    [AttendanceApprovalController::class, 'reject']);
+
+    // Leave approval — functional (Phase 6)
+    Route::post('/hr/leave/{leaveRequest}/approve', [LeaveApprovalController::class, 'approve']);
+    Route::post('/hr/leave/{leaveRequest}/reject',  [LeaveApprovalController::class, 'reject']);
 
     // Static views (Phase 1-4, preserved)
     Route::view('/hr/employees', 'pages.hr.employees');

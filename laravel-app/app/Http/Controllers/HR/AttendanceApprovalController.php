@@ -4,6 +4,7 @@ namespace App\Http\Controllers\HR;
 
 use App\Http\Controllers\Controller;
 use App\Models\AttendanceRecord;
+use App\Models\LeaveRequest;
 use App\Services\AuditLogService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -18,7 +19,12 @@ class AttendanceApprovalController extends Controller
             ->orderByDesc('check_in_time')
             ->paginate(20);
 
-        return view('pages.hr.approval-queue', compact('pending'));
+        $leavePending = LeaveRequest::with(['employee.user', 'employee.department', 'leaveType'])
+            ->where('status', 'PENDING_HR')
+            ->orderByDesc('created_at')
+            ->paginate(20);
+
+        return view('pages.hr.approval-queue', compact('pending', 'leavePending'));
     }
 
     public function approve(Request $request, AttendanceRecord $attendanceRecord): RedirectResponse

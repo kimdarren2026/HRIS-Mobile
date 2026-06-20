@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Employee;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
@@ -50,6 +51,10 @@ class AuthRoleRoutingTest extends TestCase
             'role' => $role,
             'is_active' => true,
         ]);
+
+        if (str_starts_with($path, '/leave/')) {
+            Employee::factory()->create(['user_id' => $user->id]);
+        }
 
         $response = $this->actingAs($user)->get($path);
 
