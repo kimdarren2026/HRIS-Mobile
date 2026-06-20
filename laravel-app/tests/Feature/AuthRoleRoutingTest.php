@@ -118,6 +118,7 @@ class AuthRoleRoutingTest extends TestCase
             ['admin_hr', '/admin/dashboard'],
             ['admin_hr', '/hr/approval-queue'],
             ['admin_hr', '/hr/employees'],
+            ['admin_hr', '/employees'],
             ['admin_hr', '/reports'],
             ['admin_hr', '/settings'],
             ['admin_hr', '/profile'],
@@ -128,6 +129,7 @@ class AuthRoleRoutingTest extends TestCase
             ['super_admin', '/admin/dashboard'],
             ['super_admin', '/hr/approval-queue'],
             ['super_admin', '/hr/employees'],
+            ['super_admin', '/employees'],
             ['super_admin', '/finance/dashboard'],
             ['super_admin', '/payroll/periods'],
             ['super_admin', '/reports'],
@@ -141,10 +143,12 @@ class AuthRoleRoutingTest extends TestCase
         return [
             ['employee', '/admin/dashboard'],
             ['employee', '/finance/dashboard'],
+            ['employee', '/employees'],
             ['admin_hr', '/employee/dashboard'],
             ['admin_hr', '/finance/dashboard'],
             ['finance', '/employee/dashboard'],
             ['finance', '/hr/employees'],
+            ['finance', '/employees'],
             ['super_admin', '/employee/dashboard'],
         ];
     }

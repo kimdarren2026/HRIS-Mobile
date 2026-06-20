@@ -4,8 +4,10 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Employee\AttendanceController;
 use App\Http\Controllers\Employee\LeaveController;
 use App\Http\Controllers\Employee\PayrollController;
+use App\Http\Controllers\Employee\ProfileController;
 use App\Http\Controllers\Finance\PayrollPeriodController;
 use App\Http\Controllers\HR\AttendanceApprovalController;
+use App\Http\Controllers\HR\EmployeeController as HREmployeeController;
 use App\Http\Controllers\HR\LeaveApprovalController;
 use Illuminate\Support\Facades\Route;
 
@@ -69,6 +71,9 @@ Route::middleware(['auth', 'role:employee'])->group(function (): void {
     Route::get('/my/payroll/{payrollRecord}',         [PayrollController::class, 'show'])->name('my.payroll.show');
     Route::get('/my/payroll/{payrollRecord}/print',   [PayrollController::class, 'printSlip'])->name('my.payroll.print');
 
+    // Employee self-profile (Phase 11)
+    Route::get('/my/profile', [ProfileController::class, 'show'])->name('my.profile');
+
     // Static views (Phase 1-4, preserved)
     Route::view('/payslip/detail',  'pages.payslip.detail');
 });
@@ -88,6 +93,14 @@ Route::middleware(['auth', 'role:admin_hr,super_admin'])->group(function (): voi
 
     // Payroll HR review — submit CALCULATED → HR_REVIEW (admin_hr + super_admin)
     Route::post('/payroll/periods/{payrollPeriod}/submit-hr-review', [PayrollPeriodController::class, 'submitHrReview'])->name('payroll.periods.submit-hr-review');
+
+    // Employee master data (Phase 11)
+    Route::get('/employees',                 [HREmployeeController::class, 'index'])->name('employees.index');
+    Route::get('/employees/create',          [HREmployeeController::class, 'create'])->name('employees.create');
+    Route::post('/employees',                [HREmployeeController::class, 'store'])->name('employees.store');
+    Route::get('/employees/{employee}',      [HREmployeeController::class, 'show'])->name('employees.show');
+    Route::get('/employees/{employee}/edit', [HREmployeeController::class, 'edit'])->name('employees.edit');
+    Route::put('/employees/{employee}',      [HREmployeeController::class, 'update'])->name('employees.update');
 
     // Static views (Phase 1-4, preserved)
     Route::view('/hr/employees', 'pages.hr.employees');
