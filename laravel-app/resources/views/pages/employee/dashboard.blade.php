@@ -263,7 +263,7 @@
 <p class="font-body-md text-body-md text-on-background font-semibold">Net Pay</p>
 <p class="font-headline-md text-headline-md text-on-background">Ready to View</p>
 </div>
-<button class="text-primary font-label-md text-label-md flex items-center gap-1 hover:underline active:opacity-70 transition-opacity" onclick="window.location.href='/payslip/detail'">
+<button class="text-primary font-label-md text-label-md flex items-center gap-1 hover:underline active:opacity-70 transition-opacity" onclick="window.location.href='/my/payroll'">
                     View Details
                     <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
 </button>
@@ -286,7 +286,7 @@
 <span class="material-symbols-outlined">event_note</span>
 <span class="font-label-sm text-label-sm mt-0.5">Leave</span>
 </a>
-<a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 hover:bg-surface-container-highest rounded-full active:scale-90 transition-all duration-200" href="/payslip/detail">
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 hover:bg-surface-container-highest rounded-full active:scale-90 transition-all duration-200" href="/my/payroll">
 <span class="material-symbols-outlined">payments</span>
 <span class="font-label-sm text-label-sm mt-0.5">Payslip</span>
 </a>

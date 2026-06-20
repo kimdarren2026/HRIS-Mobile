@@ -3,6 +3,7 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Employee\AttendanceController;
 use App\Http\Controllers\Employee\LeaveController;
+use App\Http\Controllers\Employee\PayrollController;
 use App\Http\Controllers\Finance\PayrollPeriodController;
 use App\Http\Controllers\HR\AttendanceApprovalController;
 use App\Http\Controllers\HR\LeaveApprovalController;
@@ -62,6 +63,10 @@ Route::middleware(['auth', 'role:employee'])->group(function (): void {
     Route::post('/leave/request', [LeaveController::class, 'store'])
         ->middleware('throttle:10,1');
     Route::get('/leave/history',  [LeaveController::class, 'history']);
+
+    // Payroll — employee self-service (Phase 8)
+    Route::get('/my/payroll',                 [PayrollController::class, 'index'])->name('my.payroll.index');
+    Route::get('/my/payroll/{payrollRecord}', [PayrollController::class, 'show'])->name('my.payroll.show');
 
     // Static views (Phase 1-4, preserved)
     Route::view('/payslip/detail',  'pages.payslip.detail');
