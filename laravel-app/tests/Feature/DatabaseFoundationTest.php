@@ -113,4 +113,31 @@ class DatabaseFoundationTest extends TestCase
         $this->expectException(RuntimeException::class);
         $auditLog->update(['description' => 'Should not update.']);
     }
+
+    public function test_database_seeder_is_idempotent_for_demo_data(): void
+    {
+        $this->seed();
+        $this->seed();
+
+        $this->assertSame(4, User::count());
+        $this->assertSame(4, Employee::count());
+        $this->assertSame(3, Department::count());
+        $this->assertSame(1, OfficeLocation::count());
+        $this->assertSame(4, LeaveType::count());
+        $this->assertSame(16, \App\Models\LeaveBalance::count());
+        $this->assertSame(1, AttendanceRecord::count());
+        $this->assertSame(2, LeaveRequest::count());
+        $this->assertSame(2, PayrollPeriod::count());
+        $this->assertSame(1, PayrollRecord::count());
+        $this->assertSame(1, Payslip::count());
+
+        $this->assertDatabaseHas('payroll_periods', [
+            'name' => 'Demo Payroll June 2026',
+            'status' => 'PAID',
+        ]);
+        $this->assertDatabaseHas('leave_requests', [
+            'reason' => 'Demo pending family event leave.',
+            'status' => 'PENDING_HR',
+        ]);
+    }
 }
