@@ -341,6 +341,17 @@
 </main>
 <!-- BottomNavBar -->
 <nav class="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[390px] z-50 bg-surface/80 dark:bg-surface-dim/80 backdrop-blur-md border-t border-outline-variant dark:border-outline flex justify-around items-center h-[72px] pb-safe px-unit-sm shadow-sm">
+@php($role = auth()->user()->role)
+@if($role === 'finance')
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant px-3 py-1.5 hover:bg-surface-container dark:hover:bg-surface-container-high transition-all active:scale-90 duration-200" href="/finance/dashboard">
+<span class="material-symbols-outlined">home</span>
+<span class="font-label-md text-label-md">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant px-3 py-1.5 hover:bg-surface-container dark:hover:bg-surface-container-high transition-all active:scale-90 duration-200" href="/payroll/periods">
+<span class="material-symbols-outlined">payments</span>
+<span class="font-label-md text-label-md">Payroll</span>
+</a>
+@else
 <a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant px-3 py-1.5 hover:bg-surface-container dark:hover:bg-surface-container-high transition-all active:scale-90 duration-200" href="/admin/dashboard">
 <span class="material-symbols-outlined">home</span>
 <span class="font-label-md text-label-md">Home</span>
@@ -353,6 +364,7 @@
 <span class="material-symbols-outlined">rule</span>
 <span class="font-label-md text-label-md">Approvals</span>
 </a>
+@endif
 <a class="flex flex-col items-center justify-center bg-secondary-container dark:bg-secondary text-on-secondary-container dark:text-on-secondary rounded-xl px-3 py-1.5 active:scale-90 duration-200" href="/reports">
 <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">assessment</span>
 <span class="font-label-md text-label-md">Reports</span>

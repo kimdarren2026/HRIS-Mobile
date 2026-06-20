@@ -214,7 +214,7 @@
         <span class="material-symbols-outlined mb-1">payments</span>
         <span class="font-label-sm text-label-sm">Payslip</span>
     </a>
-    <a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 hover:bg-surface-container-high active:scale-90 transition-all duration-200" href="/profile">
+    <a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 hover:bg-surface-container-high active:scale-90 transition-all duration-200" href="{{ route('my.profile') }}">
         <span class="material-symbols-outlined mb-1">person</span>
         <span class="font-label-sm text-label-sm">Profile</span>
     </a>

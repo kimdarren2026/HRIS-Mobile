@@ -134,7 +134,13 @@ Route::middleware(['auth', 'role:admin_hr,finance,super_admin'])->group(function
 
 // ── All authenticated users ───────────────────────────────────────────────────
 Route::middleware(['auth', 'role:employee,admin_hr,finance,super_admin'])->group(function (): void {
-    Route::view('/profile', 'pages.profile.show');
+    Route::get('/profile', function () {
+        if (auth()->user()->role === 'employee') {
+            return redirect()->route('my.profile');
+        }
+
+        return view('pages.profile.show');
+    });
 });
 
 // ── Design preview (unauthenticated) ────────────────────────────────────────

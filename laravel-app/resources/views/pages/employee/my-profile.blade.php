@@ -86,6 +86,17 @@ tailwind.config = {
     </div>
   </section>
 
+  {{-- HR-managed Profile Notice --}}
+  <section class="bg-surface-container-low rounded-xl border border-border p-unit-md flex gap-3 shadow-sm">
+    <div class="w-9 h-9 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0">
+      <span class="material-symbols-outlined text-[20px]">admin_panel_settings</span>
+    </div>
+    <div class="flex flex-col gap-1">
+      <p class="font-label-md text-label-md text-on-surface">Profile updates are managed by HR</p>
+      <p class="font-body-md text-body-md text-on-surface-variant">Contact HR to update personal or payroll-related data</p>
+    </div>
+  </section>
+
   {{-- General Information --}}
   <section class="flex flex-col gap-unit-md">
     <h3 class="font-label-md text-label-md text-outline uppercase tracking-widest pl-1">General Information</h3>

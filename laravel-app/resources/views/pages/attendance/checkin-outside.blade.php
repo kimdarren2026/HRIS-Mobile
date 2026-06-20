@@ -243,7 +243,7 @@ Submit for HR Review
 <span class="font-label-sm text-label-sm mt-1">Payslip</span>
 </button>
 <!-- Inactive: Profile -->
-<button class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 hover:bg-surface-container-high rounded-lg transition-all duration-200" onclick="window.location.href='/profile'">
+<button class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 hover:bg-surface-container-high rounded-lg transition-all duration-200" onclick="window.location.href='{{ route('my.profile') }}'">
 <span class="material-symbols-outlined" data-icon="person">person</span>
 <span class="font-label-sm text-label-sm mt-1">Profile</span>
 </button>

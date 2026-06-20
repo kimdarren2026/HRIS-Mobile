@@ -271,7 +271,7 @@ $badgeLabel = match($record->status) {
 <span class="font-label-sm text-label-sm mt-1">Payslip</span>
 </a>
 <!-- Inactive: Profile -->
-<a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 active:scale-90 transition-all duration-200 cursor-pointer hover:bg-surface-container-high rounded-lg" href="/profile">
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 active:scale-90 transition-all duration-200 cursor-pointer hover:bg-surface-container-high rounded-lg" href="{{ route('my.profile') }}">
 <span class="material-symbols-outlined text-[24px]">person</span>
 <span class="font-label-sm text-label-sm mt-1">Profile</span>
 </a>

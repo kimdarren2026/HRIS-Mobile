@@ -267,11 +267,15 @@
 </section>
 <!-- Action Buttons -->
 <section class="flex flex-col gap-unit-md pt-unit-md">
-<!-- TODO Phase 4: connect action -->
-<button class="w-full h-14 bg-primary text-white font-semibold rounded-xl shadow-lg active:scale-95 transition-transform duration-150 flex items-center justify-center gap-2">
-<span class="material-symbols-outlined text-[20px]">edit</span>
-                Edit Profile
-            </button>
+<div class="w-full rounded-xl border border-border bg-surface-container-low p-unit-md flex gap-3">
+<div class="w-9 h-9 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-[20px]">admin_panel_settings</span>
+</div>
+<div>
+<p class="font-label-md text-label-md text-on-surface">Profile updates are managed by HR</p>
+<p class="font-body-md text-body-md text-on-surface-variant mt-1">Contact HR to update personal or payroll-related data</p>
+</div>
+</div>
 <form action="{{ route('logout') }}" method="POST">
 @csrf
 <button class="w-full h-12 text-danger font-semibold rounded-xl active:opacity-70 transition-opacity flex items-center justify-center gap-2" type="submit">
@@ -282,32 +286,47 @@
 </section>
 </main>
 <!-- Bottom Navigation Bar -->
+@php($role = auth()->user()->role)
 <nav class="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[390px] z-50 flex justify-around items-center px-2 py-3 bg-surface border-t border-border backdrop-blur-md shadow-lg h-20">
-<!-- Home -->
-<a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 hover:bg-surface-container-high transition-all active:scale-90" href="/employee/dashboard">
+@if($role === 'finance')
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-3 py-1 hover:bg-surface-container-high transition-all active:scale-90" href="/finance/dashboard">
 <span class="material-symbols-outlined" data-icon="home">home</span>
 <span class="font-label-sm text-label-sm-mobile mt-1">Home</span>
 </a>
-<!-- Attendance -->
-<a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 hover:bg-surface-container-high transition-all active:scale-90" href="/attendance/checkin">
-<span class="material-symbols-outlined" data-icon="schedule">schedule</span>
-<span class="font-label-sm text-label-sm-mobile mt-1">Attendance</span>
-</a>
-<!-- Leave -->
-<a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 hover:bg-surface-container-high transition-all active:scale-90" href="/leave/history">
-<span class="material-symbols-outlined" data-icon="event_note">event_note</span>
-<span class="font-label-sm text-label-sm-mobile mt-1">Leave</span>
-</a>
-<!-- Payslip -->
-<a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 hover:bg-surface-container-high transition-all active:scale-90" href="/payslip/detail">
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-3 py-1 hover:bg-surface-container-high transition-all active:scale-90" href="/payroll/periods">
 <span class="material-symbols-outlined" data-icon="payments">payments</span>
-<span class="font-label-sm text-label-sm-mobile mt-1">Payslip</span>
+<span class="font-label-sm text-label-sm-mobile mt-1">Payroll</span>
 </a>
-<!-- Profile (Active) -->
-<a class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-full px-4 py-1 active:scale-90 transition-all" href="/profile">
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-3 py-1 hover:bg-surface-container-high transition-all active:scale-90" href="/reports">
+<span class="material-symbols-outlined" data-icon="assessment">assessment</span>
+<span class="font-label-sm text-label-sm-mobile mt-1">Reports</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-full px-3 py-1 active:scale-90 transition-all" href="/profile">
 <span class="material-symbols-outlined" data-icon="person" style="font-variation-settings: 'FILL' 1;">person</span>
 <span class="font-label-sm text-label-sm-mobile mt-1">Profile</span>
 </a>
+@else
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-3 py-1 hover:bg-surface-container-high transition-all active:scale-90" href="/admin/dashboard">
+<span class="material-symbols-outlined" data-icon="home">home</span>
+<span class="font-label-sm text-label-sm-mobile mt-1">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-3 py-1 hover:bg-surface-container-high transition-all active:scale-90" href="/hr/employees">
+<span class="material-symbols-outlined" data-icon="groups">groups</span>
+<span class="font-label-sm text-label-sm-mobile mt-1">Employees</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-3 py-1 hover:bg-surface-container-high transition-all active:scale-90" href="/hr/approval-queue">
+<span class="material-symbols-outlined" data-icon="rule">rule</span>
+<span class="font-label-sm text-label-sm-mobile mt-1">Approvals</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-3 py-1 hover:bg-surface-container-high transition-all active:scale-90" href="/reports">
+<span class="material-symbols-outlined" data-icon="assessment">assessment</span>
+<span class="font-label-sm text-label-sm-mobile mt-1">Reports</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-full px-3 py-1 active:scale-90 transition-all" href="/profile">
+<span class="material-symbols-outlined" data-icon="person" style="font-variation-settings: 'FILL' 1;">person</span>
+<span class="font-label-sm text-label-sm-mobile mt-1">Profile</span>
+</a>
+@endif
 </nav>
 <!-- Interaction Script -->
 <script>

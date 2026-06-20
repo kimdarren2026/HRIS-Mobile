@@ -313,10 +313,12 @@
 
 <!-- BottomNavBar -->
 <nav class="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[390px] z-50 bg-surface/80 backdrop-blur-md border-t border-border shadow-lg flex justify-around items-center h-18 pb-safe px-unit-xs">
-  <a class="flex flex-col items-center justify-center text-on-surface-variant transition-transform active:scale-95 duration-150 py-2" href="/finance/dashboard">
+  @php($role = auth()->user()->role)
+  <a class="flex flex-col items-center justify-center text-on-surface-variant transition-transform active:scale-95 duration-150 py-2" href="{{ $role === 'finance' ? '/finance/dashboard' : '/admin/dashboard' }}">
     <span class="material-symbols-outlined">home</span>
     <span class="font-label-sm text-label-sm">Home</span>
   </a>
+  @if(in_array($role, ['admin_hr', 'super_admin']))
   <a class="flex flex-col items-center justify-center text-on-surface-variant transition-transform active:scale-95 duration-150 py-2" href="/hr/employees">
     <span class="material-symbols-outlined">badge</span>
     <span class="font-label-sm text-label-sm">Employees</span>
@@ -325,10 +327,17 @@
     <span class="material-symbols-outlined">fact_check</span>
     <span class="font-label-sm text-label-sm">Approvals</span>
   </a>
+  @endif
   <a class="flex flex-col items-center justify-center text-primary bg-secondary-fixed rounded-xl px-3 py-1 transition-transform active:scale-95 duration-150" href="/payroll/periods">
     <span class="material-symbols-outlined">receipt_long</span>
     <span class="font-label-sm text-label-sm">Payroll</span>
   </a>
+  @if($role === 'finance')
+  <a class="flex flex-col items-center justify-center text-on-surface-variant transition-transform active:scale-95 duration-150 py-2" href="/reports">
+    <span class="material-symbols-outlined">assessment</span>
+    <span class="font-label-sm text-label-sm">Reports</span>
+  </a>
+  @endif
   <a class="flex flex-col items-center justify-center text-on-surface-variant transition-transform active:scale-95 duration-150 py-2" href="/profile">
     <span class="material-symbols-outlined">person</span>
     <span class="font-label-sm text-label-sm">Profile</span>
