@@ -56,6 +56,19 @@ class ProductionNavigationProfileTest extends TestCase
             ->assertDontSee('/hr/employees', false);
     }
 
+    public function test_finance_dashboard_shows_attendance_link_when_employee_is_linked(): void
+    {
+        $finance = User::factory()->create(['role' => 'finance', 'is_active' => true]);
+        Employee::factory()->create(['user_id' => $finance->id]);
+
+        $this->actingAs($finance)
+            ->get('/finance/dashboard')
+            ->assertOk()
+            ->assertSee('/attendance/checkin', false)
+            ->assertDontSee('/hr/approval-queue', false)
+            ->assertDontSee('/hr/employees', false);
+    }
+
     public function test_finance_shared_pages_do_not_render_hr_or_attendance_nav_links(): void
     {
         $finance = User::factory()->create(['role' => 'finance', 'is_active' => true]);
@@ -70,11 +83,19 @@ class ProductionNavigationProfileTest extends TestCase
         }
     }
 
-    public function test_finance_direct_access_to_employee_and_hr_routes_still_returns_403(): void
+    public function test_finance_without_employee_cannot_access_attendance_self_service(): void
     {
         $finance = User::factory()->create(['role' => 'finance', 'is_active' => true]);
 
         $this->actingAs($finance)->get('/attendance/checkin')->assertForbidden();
+    }
+
+    public function test_finance_with_employee_can_access_attendance_but_not_hr_routes(): void
+    {
+        $finance = User::factory()->create(['role' => 'finance', 'is_active' => true]);
+        Employee::factory()->create(['user_id' => $finance->id]);
+
+        $this->actingAs($finance)->get('/attendance/checkin')->assertOk();
         $this->actingAs($finance)->get('/hr/approval-queue')->assertForbidden();
     }
 }

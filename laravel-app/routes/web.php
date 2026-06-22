@@ -63,8 +63,8 @@ Route::middleware(['auth', 'role:employee'])->group(function (): void {
     Route::view('/payslip/detail', 'pages.payslip.detail');
 });
 
-// ── Self-service routes (all roles + must have linked employee record) ────────
-Route::middleware(['auth', 'role:employee,admin_hr,finance,super_admin', 'has_employee'])->group(function (): void {
+// ── Self-service routes (authenticated users with linked employee record) ──────
+Route::middleware(['auth', 'has_employee'])->group(function (): void {
     // Attendance — functional (Phase 5)
     Route::get('/attendance/checkin',         [AttendanceController::class, 'showCheckIn']);
     Route::get('/attendance/checkin-outside', [AttendanceController::class, 'showCheckIn']);

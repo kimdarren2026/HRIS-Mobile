@@ -91,6 +91,25 @@ class Phase20AttendanceAuditTest extends TestCase
         $this->assertSame('APPROVED', $record->status);
     }
 
+    public function test_finance_checkin_ignores_employee_id_input_and_uses_own_employee(): void
+    {
+        $otherEmployee = Employee::factory()->create();
+
+        $this->actingAs($this->financeUser)->post('/attendance/check-in', [
+            ...$this->coordsWithin(),
+            'employee_id' => $otherEmployee->id,
+            'photo' => $this->photo(),
+        ])->assertRedirect('/attendance/history');
+
+        $this->assertDatabaseHas('attendance_records', [
+            'employee_id' => $this->financeEmployee->id,
+            'status' => 'APPROVED',
+        ]);
+        $this->assertDatabaseMissing('attendance_records', [
+            'employee_id' => $otherEmployee->id,
+        ]);
+    }
+
     public function test_finance_approved_attendance_does_not_appear_in_hr_queue(): void
     {
         AttendanceRecord::create([
