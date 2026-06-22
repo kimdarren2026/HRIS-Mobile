@@ -8,6 +8,7 @@ use App\Models\PayrollPeriod;
 use App\Services\AuditLogService;
 use App\Services\PayrollCalculationService;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\View\View;
 use Symfony\Component\HttpFoundation\StreamedResponse;
@@ -144,14 +145,19 @@ class PayrollPeriodController extends Controller
         return redirect('/payroll/periods')->with('success', "Payroll '{$payrollPeriod->name}' locked.");
     }
 
-    public function markPaid(PayrollPeriod $payrollPeriod): RedirectResponse
+    public function markPaid(Request $request, PayrollPeriod $payrollPeriod): RedirectResponse
     {
         Gate::authorize('markPaid', $payrollPeriod);
 
+        $data = $request->validate([
+            'payment_reference' => ['nullable', 'string', 'max:100'],
+        ]);
+
         $payrollPeriod->update([
-            'status'  => 'PAID',
-            'paid_by' => auth()->id(),
-            'paid_at' => now(),
+            'status'            => 'PAID',
+            'paid_by'           => auth()->id(),
+            'paid_at'           => now(),
+            'payment_reference' => $data['payment_reference'] ?? null,
         ]);
 
         AuditLogService::log(

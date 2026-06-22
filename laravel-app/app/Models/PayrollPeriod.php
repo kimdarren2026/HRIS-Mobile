@@ -25,6 +25,7 @@ class PayrollPeriod extends Model
         'locked_at',
         'paid_by',
         'paid_at',
+        'payment_reference',
     ];
 
     protected function casts(): array

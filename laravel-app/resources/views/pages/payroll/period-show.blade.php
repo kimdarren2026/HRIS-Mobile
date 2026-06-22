@@ -159,14 +159,39 @@
     </form>
 
   @elseif($payrollPeriod->status === 'LOCKED' && in_array($role, ['finance', 'super_admin']))
+    <div class="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 font-body-md text-body-md text-amber-800 flex items-start gap-2">
+      <span class="material-symbols-outlined text-[18px] mt-0.5 flex-shrink-0">info</span>
+      <span><strong>Note:</strong> "Mark as Paid" records payment status in this system only. It does <strong>not</strong> initiate a real bank transfer or disburse funds.</span>
+    </div>
     <form method="POST" action="{{ route('payroll.periods.mark-paid', $payrollPeriod) }}"
-      onsubmit="return confirm('Mark {{ addslashes($payrollPeriod->name) }} as paid?')">
+      onsubmit="return confirm('Mark {{ addslashes($payrollPeriod->name) }} as paid? This records payment status only.')">
       @csrf
-      <button type="submit" class="w-full bg-success text-white py-3.5 rounded-xl font-label-md text-label-md flex items-center justify-center gap-2 active:opacity-90">
-        <span class="material-symbols-outlined">payments</span>
-        Mark as Paid
-      </button>
+      <div class="flex flex-col gap-unit-sm">
+        <label class="font-label-md text-label-md text-on-surface-variant">Payment Reference (optional)</label>
+        <input type="text" name="payment_reference" maxlength="100" placeholder="e.g. TRF-20260622-001"
+          class="w-full border border-border rounded-xl px-4 py-3 font-body-md text-body-md bg-white focus:outline-none focus:ring-2 focus:ring-primary">
+        <button type="submit" class="w-full bg-success text-white py-3.5 rounded-xl font-label-md text-label-md flex items-center justify-center gap-2 active:opacity-90">
+          <span class="material-symbols-outlined">payments</span>
+          Mark as Paid
+        </button>
+      </div>
     </form>
+  @endif
+
+  @if($payrollPeriod->status === 'PAID')
+    <div class="bg-green-50 border border-green-200 rounded-xl p-4 flex flex-col gap-2">
+      <div class="flex items-center gap-2">
+        <span class="material-symbols-outlined text-success">check_circle</span>
+        <p class="font-label-md text-label-md text-green-800">Payment Recorded</p>
+      </div>
+      @if($payrollPeriod->paid_at)
+        <p class="font-label-sm text-label-sm text-on-surface-variant">Recorded: {{ $payrollPeriod->paid_at->format('M d, Y H:i') }}</p>
+      @endif
+      @if($payrollPeriod->payment_reference)
+        <p class="font-label-sm text-label-sm text-on-surface-variant">Reference: {{ $payrollPeriod->payment_reference }}</p>
+      @endif
+      <p class="font-label-sm text-label-sm text-amber-700">This is a payment record only. No real bank transfer was initiated.</p>
+    </div>
   @endif
 
   {{-- Export CSV (finance + super_admin only) --}}

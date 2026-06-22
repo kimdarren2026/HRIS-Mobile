@@ -6,6 +6,7 @@ use App\Http\Controllers\Employee\AttendanceController;
 use App\Http\Controllers\Employee\LeaveController;
 use App\Http\Controllers\Employee\PayrollController;
 use App\Http\Controllers\Employee\ProfileController;
+use App\Http\Controllers\Finance\ExpenseController;
 use App\Http\Controllers\Finance\PayrollPeriodController;
 use App\Http\Controllers\HR\AttendanceApprovalController;
 use App\Http\Controllers\HR\EmployeeController as HREmployeeController;
@@ -135,6 +136,11 @@ Route::middleware(['auth', 'role:finance,super_admin'])->group(function (): void
     Route::post('/payroll/periods/{payrollPeriod}/lock',                   [PayrollPeriodController::class, 'lock'])->name('payroll.periods.lock');
     Route::post('/payroll/periods/{payrollPeriod}/mark-paid',              [PayrollPeriodController::class, 'markPaid'])->name('payroll.periods.mark-paid');
     Route::get('/payroll/periods/{payrollPeriod}/export',                  [PayrollPeriodController::class, 'export'])->name('payroll.periods.export');
+
+    // Finance Expenses — approve/mark-paid/reject restricted to finance+super_admin (Phase 20)
+    Route::post('/finance/expenses/{expense}/approve',   [ExpenseController::class, 'approve'])->name('finance.expenses.approve');
+    Route::post('/finance/expenses/{expense}/reject',    [ExpenseController::class, 'reject'])->name('finance.expenses.reject');
+    Route::post('/finance/expenses/{expense}/mark-paid', [ExpenseController::class, 'markPaid'])->name('finance.expenses.mark-paid');
 });
 
 // ── Payroll view — finance, super_admin, admin_hr (review) ───────────────────
@@ -146,6 +152,16 @@ Route::middleware(['auth', 'role:admin_hr,finance,super_admin'])->group(function
 // ── HR + Finance + Super Admin ───────────────────────────────────────────────
 Route::middleware(['auth', 'role:admin_hr,finance,super_admin'])->group(function (): void {
     Route::view('/reports', 'pages.reports.index');
+
+    // Finance Expenses — read/create/edit/submit accessible to admin_hr+finance+super_admin (Phase 20)
+    Route::get('/finance/expenses',                        [ExpenseController::class, 'index'])->name('finance.expenses.index');
+    Route::get('/finance/expenses/create',                 [ExpenseController::class, 'create'])->name('finance.expenses.create');
+    Route::post('/finance/expenses',                       [ExpenseController::class, 'store'])->name('finance.expenses.store');
+    Route::get('/finance/expenses/{expense}',              [ExpenseController::class, 'show'])->name('finance.expenses.show');
+    Route::get('/finance/expenses/{expense}/edit',         [ExpenseController::class, 'edit'])->name('finance.expenses.edit');
+    Route::put('/finance/expenses/{expense}',              [ExpenseController::class, 'update'])->name('finance.expenses.update');
+    Route::post('/finance/expenses/{expense}/submit',      [ExpenseController::class, 'submit'])->name('finance.expenses.submit');
+    Route::get('/finance/expenses/{expense}/receipt',      [ExpenseController::class, 'receipt'])->name('finance.expenses.receipt');
 });
 
 // ── All authenticated users ───────────────────────────────────────────────────
