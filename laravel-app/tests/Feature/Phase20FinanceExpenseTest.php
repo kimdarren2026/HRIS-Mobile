@@ -18,6 +18,7 @@ class Phase20FinanceExpenseTest extends TestCase
     use RefreshDatabase;
 
     private User $financeUser;
+    private User $financeUser2;   // acts as maker (creator) so financeUser can be checker
     private User $superAdminUser;
     private User $adminHrUser;
     private User $employeeUser;
@@ -41,6 +42,7 @@ class Phase20FinanceExpenseTest extends TestCase
         ];
 
         $this->financeUser    = User::factory()->create(['role' => 'finance',     'is_active' => true]);
+        $this->financeUser2   = User::factory()->create(['role' => 'finance',     'is_active' => true]);
         $this->superAdminUser = User::factory()->create(['role' => 'super_admin', 'is_active' => true]);
         $this->adminHrUser    = User::factory()->create(['role' => 'admin_hr',    'is_active' => true]);
         $this->employeeUser   = User::factory()->create(['role' => 'employee',    'is_active' => true]);
@@ -59,6 +61,10 @@ class Phase20FinanceExpenseTest extends TestCase
         ], $overrides);
     }
 
+    /**
+     * Create an expense where financeUser2 is the maker (creator).
+     * This lets financeUser act as checker (approver/payer) without violating maker-checker.
+     */
     private function makeExpense(string $status = 'DRAFT', array $overrides = []): CompanyExpense
     {
         return CompanyExpense::create(array_merge([
@@ -69,7 +75,7 @@ class Phase20FinanceExpenseTest extends TestCase
             'expense_date'   => '2026-06-20',
             'recipient_name' => 'Vendor X',
             'status'         => $status,
-            'created_by'     => $this->financeUser->id,
+            'created_by'     => $this->financeUser2->id,   // maker = financeUser2
         ], $overrides));
     }
 
@@ -208,13 +214,13 @@ class Phase20FinanceExpenseTest extends TestCase
             ->assertForbidden();
     }
 
-    // ── Approve expense ────────────────────────────────────────────────────────
+    // ── Approve expense (financeUser = checker, financeUser2 = maker) ──────────
 
     public function test_finance_can_approve_submitted_expense(): void
     {
-        $expense = $this->makeExpense('SUBMITTED');
+        $expense = $this->makeExpense('SUBMITTED'); // created_by = financeUser2
 
-        $this->actingAs($this->financeUser)
+        $this->actingAs($this->financeUser) // different user → maker-checker satisfied
             ->post("/finance/expenses/{$expense->id}/approve")
             ->assertRedirect();
 
@@ -226,9 +232,9 @@ class Phase20FinanceExpenseTest extends TestCase
 
     public function test_super_admin_can_approve_submitted_expense(): void
     {
-        $expense = $this->makeExpense('SUBMITTED');
+        $expense = $this->makeExpense('SUBMITTED'); // created_by = financeUser2
 
-        $this->actingAs($this->superAdminUser)
+        $this->actingAs($this->superAdminUser) // different user → OK
             ->post("/finance/expenses/{$expense->id}/approve")
             ->assertRedirect();
 
@@ -259,9 +265,9 @@ class Phase20FinanceExpenseTest extends TestCase
 
     public function test_finance_can_reject_submitted_expense(): void
     {
-        $expense = $this->makeExpense('SUBMITTED');
+        $expense = $this->makeExpense('SUBMITTED'); // created_by = financeUser2
 
-        $this->actingAs($this->financeUser)
+        $this->actingAs($this->financeUser) // different user → OK
             ->post("/finance/expenses/{$expense->id}/reject", [
                 'rejection_note' => 'Insufficient documentation provided',
             ])
@@ -290,13 +296,13 @@ class Phase20FinanceExpenseTest extends TestCase
             ->assertForbidden();
     }
 
-    // ── Mark as paid ───────────────────────────────────────────────────────────
+    // ── Mark as paid (financeUser = checker, financeUser2 = maker) ────────────
 
     public function test_finance_can_mark_approved_expense_as_paid(): void
     {
-        $expense = $this->makeExpense('APPROVED');
+        $expense = $this->makeExpense('APPROVED'); // created_by = financeUser2
 
-        $this->actingAs($this->financeUser)
+        $this->actingAs($this->financeUser) // different user → maker-checker satisfied
             ->post("/finance/expenses/{$expense->id}/mark-paid", [
                 'payment_reference' => 'TRF-20260622-001',
             ])
@@ -311,9 +317,9 @@ class Phase20FinanceExpenseTest extends TestCase
 
     public function test_mark_paid_without_payment_reference_is_allowed(): void
     {
-        $expense = $this->makeExpense('APPROVED');
+        $expense = $this->makeExpense('APPROVED'); // created_by = financeUser2
 
-        $this->actingAs($this->financeUser)
+        $this->actingAs($this->financeUser) // different user → maker-checker satisfied
             ->post("/finance/expenses/{$expense->id}/mark-paid", [])
             ->assertRedirect();
 
@@ -429,28 +435,26 @@ class Phase20FinanceExpenseTest extends TestCase
             ->assertSessionHasErrors('receipt');
     }
 
-    // ── Full workflow ──────────────────────────────────────────────────────────
+    // ── Full workflow (financeUser creates, financeUser2 approves+pays) ────────
 
     public function test_full_expense_workflow_draft_to_paid(): void
     {
-        // Create
+        // Create & submit by financeUser (maker)
         $this->actingAs($this->financeUser)
             ->post('/finance/expenses', $this->validPayload());
         $expense = CompanyExpense::first();
         $this->assertSame('DRAFT', $expense->status);
 
-        // Submit
         $this->actingAs($this->financeUser)
             ->post("/finance/expenses/{$expense->id}/submit");
         $this->assertSame('SUBMITTED', $expense->fresh()->status);
 
-        // Approve
-        $this->actingAs($this->financeUser)
+        // Approve & mark paid by financeUser2 (checker — different from maker)
+        $this->actingAs($this->financeUser2)
             ->post("/finance/expenses/{$expense->id}/approve");
         $this->assertSame('APPROVED', $expense->fresh()->status);
 
-        // Mark paid
-        $this->actingAs($this->financeUser)
+        $this->actingAs($this->financeUser2)
             ->post("/finance/expenses/{$expense->id}/mark-paid", ['payment_reference' => 'REF-001']);
         $fresh = $expense->fresh();
         $this->assertSame('PAID', $fresh->status);

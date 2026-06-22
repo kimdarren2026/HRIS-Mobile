@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Settings;
 
 use App\Http\Controllers\Controller;
 use App\Models\LeaveType;
+use App\Services\AuditLogService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -30,7 +31,19 @@ class LeaveTypeSettingsController extends Controller
         ]);
 
         $data['deducts_balance'] = $request->boolean('deducts_balance');
-        LeaveType::create($data);
+        $leaveType = LeaveType::create($data);
+
+        AuditLogService::log(
+            auth()->user(),
+            'create_leave_type',
+            'settings',
+            "Leave type '{$leaveType->name}' created.",
+            null,
+            LeaveType::class,
+            $leaveType->id,
+            null,
+            ['name' => $leaveType->name, 'deducts_balance' => $leaveType->deducts_balance],
+        );
 
         return redirect()->route('settings.leave-types.index')->with('success', 'Leave type created.');
     }
@@ -47,8 +60,21 @@ class LeaveTypeSettingsController extends Controller
             'deducts_balance' => ['sometimes', 'boolean'],
         ]);
 
+        $old = $leaveType->only(['name', 'deducts_balance']);
         $data['deducts_balance'] = $request->boolean('deducts_balance');
         $leaveType->update($data);
+
+        AuditLogService::log(
+            auth()->user(),
+            'update_leave_type',
+            'settings',
+            "Leave type '{$leaveType->name}' updated.",
+            null,
+            LeaveType::class,
+            $leaveType->id,
+            $old,
+            ['name' => $leaveType->name, 'deducts_balance' => $leaveType->deducts_balance],
+        );
 
         return redirect()->route('settings.leave-types.index')->with('success', 'Leave type updated.');
     }
@@ -59,7 +85,20 @@ class LeaveTypeSettingsController extends Controller
             return back()->withErrors(['general' => 'Cannot delete: leave type has existing requests or balances.']);
         }
 
+        $snapshot = $leaveType->only(['id', 'name', 'deducts_balance']);
         $leaveType->delete();
+
+        AuditLogService::log(
+            auth()->user(),
+            'delete_leave_type',
+            'settings',
+            "Leave type '{$snapshot['name']}' deleted.",
+            null,
+            LeaveType::class,
+            $snapshot['id'],
+            $snapshot,
+            null,
+        );
 
         return redirect()->route('settings.leave-types.index')->with('success', 'Leave type deleted.');
     }

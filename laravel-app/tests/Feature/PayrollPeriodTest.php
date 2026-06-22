@@ -482,13 +482,16 @@ class PayrollPeriodTest extends TestCase
         ]);
 
         $this->actingAs($this->financeUser)
-            ->post("/payroll/periods/{$period->id}/mark-paid")
+            ->post("/payroll/periods/{$period->id}/mark-paid", [
+                'payment_reference' => 'PAY-20260630-001',
+            ])
             ->assertRedirect('/payroll/periods');
 
         $period->refresh();
         $this->assertEquals('PAID', $period->status);
         $this->assertEquals($this->financeUser->id, $period->paid_by);
         $this->assertNotNull($period->paid_at);
+        $this->assertEquals('PAY-20260630-001', $period->payment_reference);
     }
 
     public function test_mark_paid_rejected_when_not_locked(): void

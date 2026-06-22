@@ -149,22 +149,32 @@ class PayrollPeriodController extends Controller
     {
         Gate::authorize('markPaid', $payrollPeriod);
 
+        // Guard: prevent re-paying (policy enforces LOCKED status, but be explicit)
+        abort_if($payrollPeriod->status === 'PAID', 422, 'Payroll period has already been marked as paid.');
+
         $data = $request->validate([
-            'payment_reference' => ['nullable', 'string', 'max:100'],
+            'payment_reference' => ['required', 'string', 'max:100'],
         ]);
+
+        $old = $payrollPeriod->only(['status']);
 
         $payrollPeriod->update([
             'status'            => 'PAID',
             'paid_by'           => auth()->id(),
             'paid_at'           => now(),
-            'payment_reference' => $data['payment_reference'] ?? null,
+            'payment_reference' => $data['payment_reference'],
         ]);
 
         AuditLogService::log(
             auth()->user(),
             'mark_payroll_paid',
             'payroll',
-            "Payroll period '{$payrollPeriod->name}' marked as paid by " . auth()->user()->name . '.'
+            "Payroll period '{$payrollPeriod->name}' marked as paid. Ref: {$data['payment_reference']}.",
+            null,
+            \App\Models\PayrollPeriod::class,
+            $payrollPeriod->id,
+            $old,
+            ['status' => 'PAID', 'paid_by' => auth()->id(), 'payment_reference' => $data['payment_reference']],
         );
 
         return redirect('/payroll/periods')->with('success', "Payroll '{$payrollPeriod->name}' marked as paid.");

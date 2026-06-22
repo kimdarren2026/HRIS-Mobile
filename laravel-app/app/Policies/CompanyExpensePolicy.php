@@ -58,18 +58,27 @@ class CompanyExpensePolicy
         return $user->role === 'admin_hr' && $expense->created_by === $user->id;
     }
 
+    // Maker-checker: the creator may not approve their own expense.
     public function approve(User $user, CompanyExpense $expense): bool
     {
-        return $this->isFinance($user) && $expense->status === 'SUBMITTED';
+        return $this->isFinance($user)
+            && $expense->status === 'SUBMITTED'
+            && $user->id !== $expense->created_by;
     }
 
+    // Maker-checker: the creator may not reject their own expense.
     public function reject(User $user, CompanyExpense $expense): bool
     {
-        return $this->isFinance($user) && $expense->status === 'SUBMITTED';
+        return $this->isFinance($user)
+            && $expense->status === 'SUBMITTED'
+            && $user->id !== $expense->created_by;
     }
 
+    // Maker-checker: the original creator may never mark their own expense paid.
     public function markPaid(User $user, CompanyExpense $expense): bool
     {
-        return $this->isFinance($user) && $expense->status === 'APPROVED';
+        return $this->isFinance($user)
+            && $expense->status === 'APPROVED'
+            && $user->id !== $expense->created_by;
     }
 }

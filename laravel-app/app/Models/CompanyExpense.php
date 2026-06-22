@@ -40,6 +40,8 @@ class CompanyExpense extends Model
         'created_by',
         'approved_by',
         'approved_at',
+        'rejected_by',
+        'rejected_at',
         'paid_by',
         'paid_at',
         'payment_reference',
@@ -52,6 +54,7 @@ class CompanyExpense extends Model
             'expense_date' => 'date',
             'amount'       => 'decimal:2',
             'approved_at'  => 'datetime',
+            'rejected_at'  => 'datetime',
             'paid_at'      => 'datetime',
         ];
     }
@@ -64,6 +67,11 @@ class CompanyExpense extends Model
     public function approver(): BelongsTo
     {
         return $this->belongsTo(User::class, 'approved_by');
+    }
+
+    public function rejecter(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'rejected_by');
     }
 
     public function payer(): BelongsTo

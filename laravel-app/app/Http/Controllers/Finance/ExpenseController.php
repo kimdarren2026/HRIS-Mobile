@@ -95,8 +95,17 @@ class ExpenseController extends Controller
             'created_by'     => auth()->id(),
         ]);
 
-        AuditLogService::log(auth()->user(), 'create_expense', 'expense',
-            "Expense #{$expense->expense_number} created by " . auth()->user()->name . '.');
+        AuditLogService::log(
+            auth()->user(),
+            'create_expense',
+            'expense',
+            "Expense #{$expense->expense_number} created.",
+            null,
+            CompanyExpense::class,
+            $expense->id,
+            null,
+            ['expense_number' => $expense->expense_number, 'title' => $expense->title, 'amount' => (string) $expense->amount, 'status' => 'DRAFT'],
+        );
 
         return redirect()->route('finance.expenses.show', $expense)
             ->with('success', "Expense '{$expense->title}' created.");
@@ -106,7 +115,7 @@ class ExpenseController extends Controller
     {
         Gate::authorize('view', $expense);
 
-        $expense->load(['creator', 'approver', 'payer', 'employee.user']);
+        $expense->load(['creator', 'approver', 'rejecter', 'payer', 'employee.user']);
 
         return view('pages.finance.expenses.show', compact('expense'));
     }
@@ -136,6 +145,8 @@ class ExpenseController extends Controller
             'receipt'        => ['nullable', 'file', 'mimes:jpg,jpeg,png,pdf', 'max:5120'],
         ]);
 
+        $old = $expense->only(['title', 'amount', 'category', 'status']);
+
         $receiptPath = $expense->receipt_path;
         if ($request->hasFile('receipt')) {
             $ext         = strtolower($request->file('receipt')->getClientOriginalExtension() ?: 'pdf');
@@ -155,10 +166,21 @@ class ExpenseController extends Controller
             'receipt_path'   => $receiptPath,
             'status'         => 'DRAFT',
             'rejection_note' => null,
+            'rejected_by'    => null,
+            'rejected_at'    => null,
         ]);
 
-        AuditLogService::log(auth()->user(), 'update_expense', 'expense',
-            "Expense #{$expense->expense_number} updated by " . auth()->user()->name . '.');
+        AuditLogService::log(
+            auth()->user(),
+            'update_expense',
+            'expense',
+            "Expense #{$expense->expense_number} updated.",
+            null,
+            CompanyExpense::class,
+            $expense->id,
+            ['title' => $old['title'], 'amount' => (string) $old['amount'], 'status' => $old['status']],
+            ['title' => $expense->title, 'amount' => (string) $expense->amount, 'status' => 'DRAFT'],
+        );
 
         return redirect()->route('finance.expenses.show', $expense)
             ->with('success', "Expense '{$expense->title}' updated.");
@@ -168,10 +190,20 @@ class ExpenseController extends Controller
     {
         Gate::authorize('submit', $expense);
 
+        $old = $expense->only(['status']);
         $expense->update(['status' => 'SUBMITTED']);
 
-        AuditLogService::log(auth()->user(), 'submit_expense', 'expense',
-            "Expense #{$expense->expense_number} submitted by " . auth()->user()->name . '.');
+        AuditLogService::log(
+            auth()->user(),
+            'submit_expense',
+            'expense',
+            "Expense #{$expense->expense_number} submitted for approval.",
+            null,
+            CompanyExpense::class,
+            $expense->id,
+            $old,
+            ['status' => 'SUBMITTED'],
+        );
 
         return redirect()->route('finance.expenses.show', $expense)
             ->with('success', 'Expense submitted for approval.');
@@ -181,14 +213,25 @@ class ExpenseController extends Controller
     {
         Gate::authorize('approve', $expense);
 
+        $old = $expense->only(['status', 'approved_by']);
+
         $expense->update([
             'status'      => 'APPROVED',
             'approved_by' => auth()->id(),
             'approved_at' => now(),
         ]);
 
-        AuditLogService::log(auth()->user(), 'approve_expense', 'expense',
-            "Expense #{$expense->expense_number} approved by " . auth()->user()->name . '.');
+        AuditLogService::log(
+            auth()->user(),
+            'approve_expense',
+            'expense',
+            "Expense #{$expense->expense_number} approved.",
+            null,
+            CompanyExpense::class,
+            $expense->id,
+            $old,
+            ['status' => 'APPROVED', 'approved_by' => auth()->id()],
+        );
 
         return redirect()->route('finance.expenses.show', $expense)
             ->with('success', 'Expense approved.');
@@ -202,13 +245,26 @@ class ExpenseController extends Controller
             'rejection_note' => ['required', 'string', 'min:10', 'max:1000'],
         ]);
 
+        $old = $expense->only(['status']);
+
         $expense->update([
             'status'         => 'REJECTED',
             'rejection_note' => $request->rejection_note,
+            'rejected_by'    => auth()->id(),
+            'rejected_at'    => now(),
         ]);
 
-        AuditLogService::log(auth()->user(), 'reject_expense', 'expense',
-            "Expense #{$expense->expense_number} rejected by " . auth()->user()->name . '.');
+        AuditLogService::log(
+            auth()->user(),
+            'reject_expense',
+            'expense',
+            "Expense #{$expense->expense_number} rejected.",
+            null,
+            CompanyExpense::class,
+            $expense->id,
+            $old,
+            ['status' => 'REJECTED', 'rejected_by' => auth()->id()],
+        );
 
         return redirect()->route('finance.expenses.show', $expense)
             ->with('success', 'Expense rejected.');
@@ -218,9 +274,15 @@ class ExpenseController extends Controller
     {
         Gate::authorize('markPaid', $expense);
 
+        // Guard: prevent re-paying an already-paid expense (policy checks status=APPROVED,
+        // but explicit guard ensures idempotency if called directly)
+        abort_if($expense->status === 'PAID', 422, 'Expense has already been marked as paid.');
+
         $data = $request->validate([
             'payment_reference' => ['nullable', 'string', 'max:100'],
         ]);
+
+        $old = $expense->only(['status']);
 
         $expense->update([
             'status'            => 'PAID',
@@ -229,9 +291,17 @@ class ExpenseController extends Controller
             'payment_reference' => $data['payment_reference'] ?? null,
         ]);
 
-        AuditLogService::log(auth()->user(), 'mark_expense_paid', 'expense',
-            "Expense #{$expense->expense_number} marked as paid by " . auth()->user()->name
-            . '. Ref: ' . ($data['payment_reference'] ?? 'none') . '.');
+        AuditLogService::log(
+            auth()->user(),
+            'mark_expense_paid',
+            'expense',
+            "Expense #{$expense->expense_number} marked as paid. Ref: " . ($data['payment_reference'] ?? 'none') . '.',
+            null,
+            CompanyExpense::class,
+            $expense->id,
+            $old,
+            ['status' => 'PAID', 'paid_by' => auth()->id(), 'payment_reference' => $data['payment_reference'] ?? null],
+        );
 
         return redirect()->route('finance.expenses.show', $expense)
             ->with('success', 'Expense marked as paid. This records payment status only — no real bank transfer was initiated.');

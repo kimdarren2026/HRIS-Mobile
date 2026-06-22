@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AuditLogController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Employee\AttendanceController;
@@ -174,6 +175,12 @@ Route::middleware(['auth', 'role:employee,admin_hr,finance,super_admin'])->group
         }
         return view('pages.profile.show');
     });
+});
+
+// ── Audit Log — super_admin only ─────────────────────────────────────────────
+Route::middleware(['auth', 'role:super_admin'])->group(function (): void {
+    Route::get('/audit-logs',            [AuditLogController::class, 'index'])->name('audit-logs.index');
+    Route::get('/audit-logs/{auditLog}', [AuditLogController::class, 'show'])->name('audit-logs.show');
 });
 
 // ── Design preview (unauthenticated) ────────────────────────────────────────
