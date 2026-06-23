@@ -12,6 +12,7 @@ use App\Http\Controllers\Finance\PayrollPeriodController;
 use App\Http\Controllers\HR\AttendanceApprovalController;
 use App\Http\Controllers\HR\EmployeeController as HREmployeeController;
 use App\Http\Controllers\HR\LeaveApprovalController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\Settings\LeaveTypeSettingsController;
 use App\Http\Controllers\Settings\OfficeLocationController;
 use App\Http\Controllers\Settings\SettingsController;
@@ -167,6 +168,11 @@ Route::middleware(['auth', 'role:admin_hr,finance,super_admin'])->group(function
 
 // ── All authenticated users ───────────────────────────────────────────────────
 Route::middleware(['auth', 'role:employee,admin_hr,finance,super_admin'])->group(function (): void {
+    Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
+    Route::patch('/notifications/read-all', [NotificationController::class, 'readAll'])->name('notifications.read-all');
+    Route::get('/notifications/{notification}', [NotificationController::class, 'show'])->name('notifications.show');
+    Route::patch('/notifications/{notification}/read', [NotificationController::class, 'markRead'])->name('notifications.read');
+
     Route::get('/profile', function () {
         $user = auth()->user();
         // Any user with a linked employee record sees their own profile

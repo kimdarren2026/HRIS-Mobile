@@ -134,10 +134,9 @@
 <span class="material-symbols-outlined text-primary">arrow_back</span>
 </button>
 <h1 class="text-headline-md font-headline-md font-bold text-primary">Employee Profile</h1>
-<!-- TODO Phase 4: connect action -->
-<button aria-label="Notifications" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container transition-colors active:scale-95">
-<span class="material-symbols-outlined text-primary">notifications</span>
-</button>
+	@include('partials.notification-bell', [
+	    'class' => 'relative w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container transition-colors active:scale-95 text-primary',
+	])
 </header>
 <!-- Main Content Canvas -->
 <main class="w-full max-w-[390px] pt-16 pb-28 px-container-margin overflow-y-auto overflow-x-hidden flex flex-col gap-unit-lg">

@@ -124,11 +124,10 @@
 </button>
 <h1 class="font-headline-md text-headline-md font-bold text-primary">HR Approval Queue</h1>
 </div>
-<!-- TODO Phase 4: connect action -->
-<button class="relative w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container-low transition-colors active:scale-95 duration-150">
-<span class="material-symbols-outlined text-on-surface-variant">notifications</span>
-<span class="absolute top-2 right-2 w-2 h-2 bg-danger rounded-full"></span>
-</button>
+	@include('partials.notification-bell', [
+	    'class' => 'relative w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container-low transition-colors active:scale-95 duration-150 text-on-surface-variant',
+	    'badgeClass' => 'absolute -top-1 -right-1 min-w-5 h-5 px-1 rounded-full bg-danger text-white text-[10px] font-bold flex items-center justify-center',
+	])
 </header>
 <main class="pt-16 max-w-[390px] mx-auto min-h-screen">
 <!-- Tabs Section -->

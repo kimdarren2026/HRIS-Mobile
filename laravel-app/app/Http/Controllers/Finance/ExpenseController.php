@@ -5,7 +5,9 @@ namespace App\Http\Controllers\Finance;
 use App\Http\Controllers\Controller;
 use App\Models\CompanyExpense;
 use App\Models\Employee;
+use App\Models\User;
 use App\Services\AuditLogService;
+use App\Services\NotificationService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -16,6 +18,8 @@ use Illuminate\View\View;
 
 class ExpenseController extends Controller
 {
+    public function __construct(private readonly NotificationService $notifications) {}
+
     public function index(Request $request): View
     {
         Gate::authorize('viewAny', CompanyExpense::class);
@@ -205,6 +209,21 @@ class ExpenseController extends Controller
             ['status' => 'SUBMITTED'],
         );
 
+        User::query()
+            ->where('is_active', true)
+            ->whereIn('role', ['finance', 'super_admin'])
+            ->where('id', '!=', $expense->created_by)
+            ->get()
+            ->filter(fn (User $user) => Gate::forUser($user)->allows('approve', $expense))
+            ->each(fn (User $user) => $this->notifications->create(
+                $user,
+                'Expense needs approval',
+                'A company expense is waiting for finance review.',
+                'expense',
+                route('finance.expenses.show', $expense, false),
+                $expense,
+            ));
+
         return redirect()->route('finance.expenses.show', $expense)
             ->with('success', 'Expense submitted for approval.');
     }
@@ -232,6 +251,18 @@ class ExpenseController extends Controller
             $old,
             ['status' => 'APPROVED', 'approved_by' => auth()->id()],
         );
+
+        $expense->loadMissing('creator');
+        if ($expense->creator) {
+            $this->notifications->create(
+                $expense->creator,
+                'Expense approved',
+                'Your company expense has been approved.',
+                'expense',
+                route('finance.expenses.show', $expense, false),
+                $expense,
+            );
+        }
 
         return redirect()->route('finance.expenses.show', $expense)
             ->with('success', 'Expense approved.');
@@ -265,6 +296,18 @@ class ExpenseController extends Controller
             $old,
             ['status' => 'REJECTED', 'rejected_by' => auth()->id()],
         );
+
+        $expense->loadMissing('creator');
+        if ($expense->creator) {
+            $this->notifications->create(
+                $expense->creator,
+                'Expense rejected',
+                'Your company expense has been rejected.',
+                'expense',
+                route('finance.expenses.show', $expense, false),
+                $expense,
+            );
+        }
 
         return redirect()->route('finance.expenses.show', $expense)
             ->with('success', 'Expense rejected.');
@@ -302,6 +345,18 @@ class ExpenseController extends Controller
             $old,
             ['status' => 'PAID', 'paid_by' => auth()->id(), 'payment_reference' => $data['payment_reference'] ?? null],
         );
+
+        $expense->loadMissing('creator');
+        if ($expense->creator) {
+            $this->notifications->create(
+                $expense->creator,
+                'Expense paid',
+                'Your company expense has been marked as paid.',
+                'expense',
+                route('finance.expenses.show', $expense, false),
+                $expense,
+            );
+        }
 
         return redirect()->route('finance.expenses.show', $expense)
             ->with('success', 'Expense marked as paid. This records payment status only — no real bank transfer was initiated.');

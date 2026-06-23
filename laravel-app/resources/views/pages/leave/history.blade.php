@@ -74,9 +74,9 @@
         <span class="material-symbols-outlined text-headline-md font-headline-md">menu</span>
     </button>
     <div class="text-headline-md font-headline-md font-bold text-primary whitespace-nowrap truncate">HRIS Mobile App</div>
-    <button class="text-on-surface-variant hover:bg-surface-container active:scale-95 transition-transform duration-150 p-2 rounded-full flex items-center justify-center">
-        <span class="material-symbols-outlined text-headline-md font-headline-md">notifications</span>
-    </button>
+	    @include('partials.notification-bell', [
+	        'class' => 'relative text-on-surface-variant hover:bg-surface-container active:scale-95 transition-transform duration-150 p-2 rounded-full flex items-center justify-center',
+	    ])
 </header>
 
 <main class="flex-grow pt-[88px] px-container-margin pb-unit-xl">

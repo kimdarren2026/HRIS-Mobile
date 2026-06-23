@@ -119,9 +119,11 @@
 <span class="material-symbols-outlined text-primary cursor-pointer hover:bg-surface-container p-2 rounded-full transition-colors active:scale-95 duration-150">menu</span>
 <span class="text-headline-md font-headline-md font-bold text-primary">HRIS Mobile App</span>
 </div>
-<div>
-<span class="material-symbols-outlined text-primary cursor-pointer hover:bg-surface-container p-2 rounded-full transition-colors active:scale-95 duration-150">notifications</span>
-</div>
+	<div>
+	@include('partials.notification-bell', [
+	    'class' => 'relative text-primary cursor-pointer hover:bg-surface-container p-2 rounded-full transition-colors active:scale-95 duration-150 inline-flex',
+	])
+	</div>
 </header>
 <!-- Main Content Area -->
 <main class="md:ml-0 md:pt-20 px-container-margin pt-unit-md pb-unit-lg max-w-[390px] mx-auto relative">

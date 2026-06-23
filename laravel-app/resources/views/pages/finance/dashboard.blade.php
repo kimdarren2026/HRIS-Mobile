@@ -133,11 +133,10 @@
 <span class="material-symbols-outlined">menu</span>
 </button>
 <h1 class="font-headline-md text-headline-md font-bold text-primary">HRIS Mobile App</h1>
-<!-- TODO Phase 4: connect action -->
-<button class="text-primary active:scale-95 duration-100 p-2 rounded-full hover:bg-surface-container transition-colors relative">
-<span class="material-symbols-outlined">notifications</span>
-<span class="absolute top-2 right-2 w-2 h-2 bg-danger rounded-full border-2 border-surface"></span>
-</button>
+	@include('partials.notification-bell', [
+	    'class' => 'relative text-primary active:scale-95 duration-100 p-2 rounded-full hover:bg-surface-container transition-colors',
+	    'badgeClass' => 'absolute -top-1 -right-1 min-w-5 h-5 px-1 rounded-full bg-danger text-white text-[10px] font-bold flex items-center justify-center',
+	])
 </header>
 <main class="pt-20 px-container-margin max-w-[390px] mx-auto pb-32">
 <!-- Greeting Section -->
@@ -350,12 +349,13 @@ $badgeClass = match($period->status) {
 <span class="material-symbols-outlined">assessment</span>
 <span class="font-label-md text-label-md">Reports</span>
 </a>
-<!-- TODO Phase 4: connect action -->
-<a class="flex flex-col items-center justify-center text-on-surface-variant px-2 py-1 hover:text-primary active:scale-90 transition-transform duration-200 relative" href="#">
-<span class="material-symbols-outlined">notifications</span>
-<span class="absolute top-1 right-3 w-1.5 h-1.5 bg-danger rounded-full"></span>
-<span class="font-label-md text-label-md">Notifications</span>
-</a>
+	<a class="flex flex-col items-center justify-center text-on-surface-variant px-2 py-1 hover:text-primary active:scale-90 transition-transform duration-200 relative" href="{{ route('notifications.index') }}">
+	<span class="material-symbols-outlined">notifications</span>
+	@if(($unreadNotificationCount ?? 0) > 0)
+	<span class="absolute -top-1 right-1 min-w-5 h-5 px-1 rounded-full bg-danger text-white text-[10px] font-bold flex items-center justify-center">{{ $unreadNotificationCount > 99 ? '99+' : $unreadNotificationCount }}</span>
+	@endif
+	<span class="font-label-md text-label-md">Notifications</span>
+	</a>
 <a class="flex flex-col items-center justify-center text-on-surface-variant px-2 py-1 hover:text-primary active:scale-90 transition-transform duration-200" href="/profile">
 <span class="material-symbols-outlined">account_circle</span>
 <span class="font-label-md text-label-md">Profile</span>

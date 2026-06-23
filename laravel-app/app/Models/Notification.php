@@ -13,6 +13,8 @@ class Notification extends Model
         'title',
         'message',
         'type',
+        'category',
+        'action_url',
         'reference_type',
         'reference_id',
         'is_read',
@@ -33,5 +35,10 @@ class Notification extends Model
     public function reference(): MorphTo
     {
         return $this->morphTo(__FUNCTION__, 'reference_type', 'reference_id');
+    }
+
+    public function safeActionUrl(): ?string
+    {
+        return app(\App\Services\NotificationService::class)->safeActionUrl($this->action_url);
     }
 }

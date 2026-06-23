@@ -6,12 +6,16 @@ use App\Http\Controllers\Controller;
 use App\Models\LeaveRequest;
 use App\Services\AuditLogService;
 use App\Services\LeaveService;
+use App\Services\NotificationService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 
 class LeaveApprovalController extends Controller
 {
-    public function __construct(private readonly LeaveService $leaveService) {}
+    public function __construct(
+        private readonly LeaveService $leaveService,
+        private readonly NotificationService $notifications,
+    ) {}
 
     public function approve(Request $request, LeaveRequest $leaveRequest): RedirectResponse
     {
@@ -25,6 +29,18 @@ class LeaveApprovalController extends Controller
             'leave',
             "Leave #{$leaveRequest->id} approved by " . auth()->user()->name . '.'
         );
+
+        $leaveRequest->loadMissing('employee.user');
+        if ($leaveRequest->employee?->user) {
+            $this->notifications->create(
+                $leaveRequest->employee->user,
+                'Leave approved',
+                'Your leave request has been approved.',
+                'leave',
+                '/leave/history',
+                $leaveRequest,
+            );
+        }
 
         return back()->with('success', 'Leave request approved.');
     }
@@ -49,6 +65,18 @@ class LeaveApprovalController extends Controller
             "Leave #{$leaveRequest->id} rejected by " . auth()->user()->name
                 . '. Note: ' . $request->approval_note
         );
+
+        $leaveRequest->loadMissing('employee.user');
+        if ($leaveRequest->employee?->user) {
+            $this->notifications->create(
+                $leaveRequest->employee->user,
+                'Leave rejected',
+                'Your leave request has been rejected.',
+                'leave',
+                '/leave/history',
+                $leaveRequest,
+            );
+        }
 
         return back()->with('success', 'Leave request rejected.');
     }

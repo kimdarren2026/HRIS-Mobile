@@ -128,11 +128,10 @@
 <div class="flex flex-col items-center">
 <span class="font-headline-lg text-headline-lg text-primary tracking-tight">HRIS Mobile App</span>
 </div>
-<!-- TODO Phase 4: connect action -->
-<button class="material-symbols-outlined text-primary p-2 active:opacity-80 transition-opacity hover:bg-surface-container rounded-full relative" data-icon="notifications">
-            notifications
-            <span class="absolute top-2 right-2 w-2 h-2 bg-error rounded-full"></span>
-</button>
+	@include('partials.notification-bell', [
+	    'class' => 'relative text-primary p-2 active:opacity-80 transition-opacity hover:bg-surface-container rounded-full',
+	    'badgeClass' => 'absolute -top-1 -right-1 min-w-5 h-5 px-1 rounded-full bg-error text-white text-[10px] font-bold flex items-center justify-center',
+	])
 </header>
 <main class="mt-20 px-container-margin space-y-6">
 <!-- Hero Section -->

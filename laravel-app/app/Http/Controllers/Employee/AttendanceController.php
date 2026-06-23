@@ -7,6 +7,7 @@ use App\Http\Requests\AttendanceCheckInRequest;
 use App\Models\AttendanceRecord;
 use App\Services\AttendanceService;
 use App\Services\AuditLogService;
+use App\Services\NotificationService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -14,7 +15,10 @@ use Illuminate\View\View;
 
 class AttendanceController extends Controller
 {
-    public function __construct(private readonly AttendanceService $attendanceService) {}
+    public function __construct(
+        private readonly AttendanceService $attendanceService,
+        private readonly NotificationService $notifications,
+    ) {}
 
     public function showCheckIn(): View
     {
@@ -78,7 +82,7 @@ class AttendanceController extends Controller
 
         $status = $withinRadius ? 'APPROVED' : 'PENDING_REVIEW';
 
-        AttendanceRecord::create([
+        $attendanceRecord = AttendanceRecord::create([
             'employee_id'          => $employee->id,
             'attendance_date'      => today(),
             'check_in_time'        => now(),
@@ -88,6 +92,17 @@ class AttendanceController extends Controller
             'status'               => $status,
             'out_of_radius_reason' => $withinRadius ? null : $request->reason,
         ]);
+
+        if (! $withinRadius) {
+            $this->notifications->notifyRoles(
+                ['admin_hr', 'super_admin'],
+                'Attendance needs review',
+                'An attendance check-in outside the office radius is waiting for HR review.',
+                'attendance',
+                '/hr/approval-queue',
+                $attendanceRecord,
+            );
+        }
 
         AuditLogService::log(
             $user,

@@ -9,6 +9,7 @@ use App\Models\LeaveRequest;
 use App\Models\LeaveType;
 use App\Services\AuditLogService;
 use App\Services\LeaveService;
+use App\Services\NotificationService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Gate;
 use Symfony\Component\HttpFoundation\Response;
@@ -17,7 +18,10 @@ use Illuminate\View\View;
 
 class LeaveController extends Controller
 {
-    public function __construct(private readonly LeaveService $leaveService) {}
+    public function __construct(
+        private readonly LeaveService $leaveService,
+        private readonly NotificationService $notifications,
+    ) {}
 
     public function showRequest(): View
     {
@@ -50,6 +54,15 @@ class LeaveController extends Controller
             'create_leave_request',
             'leave',
             "Leave request #{$leaveRequest->id} submitted by " . auth()->user()->name . '.'
+        );
+
+        $this->notifications->notifyRoles(
+            ['admin_hr', 'super_admin'],
+            'Leave request needs review',
+            'A leave request is waiting for HR review.',
+            'leave',
+            '/hr/approval-queue',
+            $leaveRequest,
         );
 
         return redirect('/leave/history')->with('success', 'Leave request submitted successfully.');

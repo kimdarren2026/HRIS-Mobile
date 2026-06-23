@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\StorePayrollPeriodRequest;
 use App\Models\PayrollPeriod;
 use App\Services\AuditLogService;
+use App\Services\NotificationService;
 use App\Services\PayrollCalculationService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -15,7 +16,10 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class PayrollPeriodController extends Controller
 {
-    public function __construct(private readonly PayrollCalculationService $calculationService) {}
+    public function __construct(
+        private readonly PayrollCalculationService $calculationService,
+        private readonly NotificationService $notifications,
+    ) {}
 
     public function index(): View
     {
@@ -176,6 +180,20 @@ class PayrollPeriodController extends Controller
             $old,
             ['status' => 'PAID', 'paid_by' => auth()->id(), 'payment_reference' => $data['payment_reference']],
         );
+
+        $payrollPeriod->loadMissing('payrollRecords.employee.user');
+        foreach ($payrollPeriod->payrollRecords as $record) {
+            if ($record->employee?->user) {
+                $this->notifications->create(
+                    $record->employee->user,
+                    'Payslip available',
+                    "Your payslip for {$payrollPeriod->name} is available.",
+                    'payroll',
+                    route('my.payroll.show', $record, false),
+                    $record,
+                );
+            }
+        }
 
         return redirect('/payroll/periods')->with('success', "Payroll '{$payrollPeriod->name}' marked as paid.");
     }

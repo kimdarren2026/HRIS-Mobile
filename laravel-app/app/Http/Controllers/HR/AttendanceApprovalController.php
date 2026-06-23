@@ -6,12 +6,15 @@ use App\Http\Controllers\Controller;
 use App\Models\AttendanceRecord;
 use App\Models\LeaveRequest;
 use App\Services\AuditLogService;
+use App\Services\NotificationService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class AttendanceApprovalController extends Controller
 {
+    public function __construct(private readonly NotificationService $notifications) {}
+
     public function index(): View
     {
         $pending = AttendanceRecord::with(['employee.user', 'employee.department'])
@@ -45,6 +48,18 @@ class AttendanceApprovalController extends Controller
             "Attendance #{$attendanceRecord->id} approved by " . auth()->user()->name . '.'
         );
 
+        $attendanceRecord->loadMissing('employee.user');
+        if ($attendanceRecord->employee?->user) {
+            $this->notifications->create(
+                $attendanceRecord->employee->user,
+                'Attendance approved',
+                'Your attendance submission has been approved.',
+                'attendance',
+                '/attendance/history',
+                $attendanceRecord,
+            );
+        }
+
         return back()->with('success', 'Presensi berhasil disetujui.');
     }
 
@@ -74,6 +89,18 @@ class AttendanceApprovalController extends Controller
             "Attendance #{$attendanceRecord->id} rejected by " . auth()->user()->name
                 . '. Note: ' . $request->approval_note
         );
+
+        $attendanceRecord->loadMissing('employee.user');
+        if ($attendanceRecord->employee?->user) {
+            $this->notifications->create(
+                $attendanceRecord->employee->user,
+                'Attendance rejected',
+                'Your attendance submission has been rejected.',
+                'attendance',
+                '/attendance/history',
+                $attendanceRecord,
+            );
+        }
 
         return back()->with('success', 'Presensi berhasil ditolak.');
     }

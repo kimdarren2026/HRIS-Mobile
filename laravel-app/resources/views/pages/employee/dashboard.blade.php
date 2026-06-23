@@ -185,11 +185,10 @@
 <h1 class="font-headline-md text-headline-md text-on-background">Hi, {{ auth()->user()->name }}</h1>
 </div>
 </div>
-<!-- TODO Phase 4: connect action -->
-<button class="relative p-2 text-on-surface-variant hover:bg-surface-container rounded-full transition-colors">
-<span class="material-symbols-outlined">notifications</span>
-<span class="absolute top-2 right-2 w-2 h-2 bg-danger rounded-full border border-background"></span>
-</button>
+	@include('partials.notification-bell', [
+	    'class' => 'relative p-2 text-on-surface-variant hover:bg-surface-container rounded-full transition-colors',
+	    'badgeClass' => 'absolute -top-1 -right-1 min-w-5 h-5 px-1 rounded-full bg-danger text-white text-[10px] font-bold flex items-center justify-center',
+	])
 </header>
 <!-- Main Content -->
 <main class="px-container-margin flex flex-col gap-unit-lg">
