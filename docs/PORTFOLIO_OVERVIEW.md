@@ -1,6 +1,16 @@
 # Portfolio Overview
 
-HRIS Mobile App is a mobile-first Laravel HRIS portfolio project built from final Google Stitch screens and completed through Phase 16.
+HRIS Mobile App is a mobile-first Laravel HRIS portfolio project built from final Google Stitch screens and completed through Phase 21, plus verified post-phase fixes for finance self-service attendance and functional in-app notifications.
+
+## Verified Status
+
+- Phase 1-21: PASS
+- Finance self-service attendance fix: PASS
+- Functional in-app notifications: PASS
+- Current verified test result: 415 tests, 818 assertions
+- Latest main commit: `72775ef Implement functional in-app notifications`
+- GitHub audit result: SAFE
+- Repository audit: no ABSENSI MOBILE contamination, no secrets or runtime files tracked
 
 ## Completed Phases
 
@@ -22,6 +32,21 @@ HRIS Mobile App is a mobile-first Laravel HRIS portfolio project built from fina
 | 14 | Security Hardening + Error Pages + Final Role Access Audit | PASS |
 | 15 | Deployment Readiness + Environment Setup Guide | PASS |
 | 16 | Final UI Polish + Mobile Responsiveness QA | PASS |
+| 17 | Repository Cleanup + Ignored Metadata Files | PASS |
+| 18 | Production Navigation + Profile Routing Fixes | PASS |
+| 19 | Finance/Admin HR Self-Service + Office Location Settings + Leave Type Settings | PASS |
+| 20 | Attendance Role Audit + Payroll Payment Reference + Company Expense Workflow | PASS |
+| 21 | Audit Trail + Finance Maker-Checker + Payroll Payment Hardening + Super Admin Audit UI | PASS |
+
+## Post-Phase Improvements
+
+- Finance can access personal attendance when linked to an employee record.
+- Finance remains forbidden from HR attendance approval.
+- Admin HR and Finance users with linked employee records can access supported self-service routes.
+- In-app notification center is available for employee, finance, admin_hr, and super_admin users.
+- Each user only sees and updates their own notifications.
+- Notifications cover attendance, leave, payroll, and expense workflows.
+- Notifications are in-app only. Email, SMS, WhatsApp, Firebase, and browser push notifications are not implemented.
 
 ## Main Features
 
@@ -33,10 +58,15 @@ HRIS Mobile App is a mobile-first Laravel HRIS portfolio project built from fina
 - Employee leave request with protected private attachment.
 - HR leave approval and rejection.
 - Payroll period creation, calculation, HR review, finance approval, lock, and paid status.
+- Mark Paid records application state and payment reference only. No real bank transfer integration exists.
 - Employee payroll and payslip self-service.
 - Payslip print view.
 - Finance CSV export.
 - Employee master data CRUD.
+- Functional office location and leave type settings.
+- Company expense/disbursement workflow with finance maker-checker controls.
+- Append-only audit trail with Super Admin-only audit log UI.
+- In-app notification list/detail, unread bell count, mark one as read, and mark all as read.
 - Dashboard summaries for Admin HR, Finance, and Employee.
 - Security hardening, role access tests, and custom error pages.
 - Final mobile UI polish for core demo pages and payslip print responsiveness.
@@ -46,14 +76,17 @@ HRIS Mobile App is a mobile-first Laravel HRIS portfolio project built from fina
 | Capability | Employee | Admin HR | Finance | Super Admin |
 | --- | --- | --- | --- | --- |
 | Employee dashboard | Yes | No | No | No |
-| Attendance check-in/history | Yes | No | No | No |
-| Leave request/history | Yes | No | No | No |
-| View own payroll/payslip | Yes | No | No | No |
+| Attendance check-in/history | Yes | Yes, if linked employee | Yes, if linked employee | Yes, if linked employee |
+| Leave request/history | Yes | Yes, if linked employee | Yes, if linked employee | Yes, if linked employee |
+| View own payroll/payslip | Yes | Yes, if linked employee | Yes, if linked employee | Yes, if linked employee |
 | Attendance approval queue | No | Yes | No | Yes |
 | Leave approval | No | Yes | No | Yes |
 | Employee master data | No | Yes | No | Yes |
 | Payroll period view | No | Yes | Yes | Yes |
 | Payroll calculate/approve/lock/pay/export | No | Limited HR review | Yes | Yes |
+| Company expense workflow | No | Create/view own permitted HR submissions | Yes | Yes |
+| Notification center | Yes | Yes | Yes | Yes |
+| Audit log UI | No | No | No | Yes |
 | Reports page | No | Yes | Yes | Yes |
 | Dashboard summary | Own dashboard | Admin dashboard | Finance dashboard | Admin dashboard |
 
@@ -85,7 +118,10 @@ password
 - `/hr/approval-queue`
 - `/employees`
 - `/finance/dashboard`
+- `/finance/expenses`
 - `/payroll/periods`
+- `/notifications`
+- `/audit-logs`
 - `/reports`
 - `/profile`
 - `/preview`
@@ -94,10 +130,11 @@ password
 
 1. Login as Employee and show dashboard, attendance, leave request, payroll, payslip print.
 2. Login as Admin HR and show approval queue, leave/attendance approval, employee master data.
-3. Login as Finance and show payroll periods, calculation workflow, CSV export, finance dashboard.
-4. Login as Super Admin and show cross-admin access.
-5. Show protected access: employee cannot access HR/Finance pages.
-6. Show error pages for forbidden and not-found cases.
+3. Login as Finance and show payroll periods, payment reference, company expenses, CSV export, finance dashboard, and personal attendance when linked to an employee record.
+4. Login as Super Admin and show cross-admin access plus audit logs.
+5. Show protected access: employee cannot access HR/Finance pages, finance cannot access HR attendance approval, and users cannot view other users' notifications.
+6. Show in-app notifications for attendance, leave, payroll, and expense workflows.
+7. Show error pages for forbidden and not-found cases.
 
 ## Test Status
 
@@ -108,9 +145,9 @@ cd laravel-app
 php artisan test
 ```
 
-Expected: PASS.
+Expected: PASS, currently verified at 415 tests and 818 assertions.
 
-Last Phase 16 verification: full suite PASS before commit.
+Latest verified main commit: `72775ef Implement functional in-app notifications`.
 
 ## Deployment Readiness
 

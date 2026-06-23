@@ -86,7 +86,9 @@ password
 15. Click `Lock Payroll`.
 16. Expected: status becomes `LOCKED`.
 17. Click `Mark as Paid`.
-18. Expected: status becomes `PAID`.
+18. Enter a payment reference when prompted.
+19. Expected: status becomes `PAID` and the payment reference is recorded.
+20. Note: Mark Paid records application state and payment reference only. No real bank transfer integration exists.
 
 ## 5. Employee Payslip View and Print
 
@@ -128,7 +130,31 @@ password
 5. Login as Finance and open `/finance/dashboard`.
 6. Confirm payroll status counts and latest periods are shown.
 
-## 9. Mobile Responsiveness QA
+## 9. In-App Notifications
+
+1. Login as Employee and submit outside-radius attendance.
+2. Login as Admin HR and open `/notifications`.
+3. Expected: HR sees an attendance review notification.
+4. Approve or reject the attendance from `/hr/approval-queue`.
+5. Login as the original Employee and open `/notifications`.
+6. Expected: Employee sees the attendance decision notification.
+7. Submit a leave request as Employee.
+8. Expected: Admin HR/Super Admin receive an in-app leave review notification.
+9. Mark one notification as read, then use Mark all as read.
+10. Expected: unread count updates and only the signed-in user's notifications are visible.
+11. Login as another role and try a direct URL to a different user's notification.
+12. Expected: not found response, not data exposure.
+13. Note: notifications are in-app only. Email, SMS, WhatsApp, Firebase, and browser push notifications are not implemented.
+
+## 10. Finance Self-Service and Approval Boundary
+
+1. Login as Finance with a linked employee record.
+2. Open `/attendance/checkin` and `/attendance/history`.
+3. Expected: personal attendance self-service loads.
+4. Open `/hr/approval-queue`.
+5. Expected: forbidden response.
+
+## 11. Mobile Responsiveness QA
 
 1. Open Chrome DevTools device toolbar.
 2. Test widths `375px`, `390px`, and `430px` on login, dashboards, attendance, leave, payroll, employee directory, profile, and error pages.
@@ -138,7 +164,7 @@ password
 6. Open employee directory with filters that return no result; confirm the empty state and actions fit inside the mobile width.
 7. Open employee payslip detail and print view; confirm payroll tables remain readable on narrow screens.
 
-## 10. Regression Checks
+## 12. Regression Checks
 
 Run:
 
@@ -151,7 +177,7 @@ git diff --check
 Expected:
 
 ```text
-PASS
+PASS, currently verified at 415 tests and 818 assertions
 ```
 
 ## Notes
@@ -159,3 +185,4 @@ PASS
 - Do not use real NIK, bank account, or personal data in demo testing.
 - Seeded files and uploads use Laravel local/private storage where implemented.
 - `stitch/` is a design source folder and should not be edited during Laravel QA.
+- Do not expose payroll, bank account, attachment, selfie, password, token, or private notification data in portfolio screenshots or handoff notes.

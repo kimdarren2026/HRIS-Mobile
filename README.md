@@ -1,10 +1,17 @@
 # HRIS Mobile App
 
-Mobile-first HRIS demo built with Laravel. It covers attendance, leave, payroll, payslip, employee master data, dashboard summaries, role-based access, protected file access, and final deployment-readiness documentation.
+Mobile-first HRIS demo built with Laravel. It covers attendance, leave, payroll, payslip, employee master data, company expenses, audit trails, in-app notifications, dashboard summaries, role-based access, protected file access, and deployment handoff documentation.
 
 ## Current Status
 
-Phase 1-16: PASS
+Phase 1-21: PASS
+
+- Finance self-service attendance fix: PASS
+- Functional in-app notifications: PASS
+- Current verified test result: 415 tests, 818 assertions
+- Latest main commit: `72775ef Implement functional in-app notifications`
+- GitHub audit result: SAFE
+- Repository audit: no ABSENSI MOBILE contamination, no secrets or runtime files tracked
 
 | Phase | Module | Status |
 | --- | --- | --- |
@@ -24,6 +31,21 @@ Phase 1-16: PASS
 | 14 | Security hardening, error pages, role access audit | PASS |
 | 15 | Deployment readiness and environment setup guide | PASS |
 | 16 | Final UI polish and mobile responsiveness QA | PASS |
+| 17 | Repository cleanup and ignored metadata files | PASS |
+| 18 | Production navigation and profile routing fixes | PASS |
+| 19 | Finance/Admin HR self-service access, office location settings, leave type settings | PASS |
+| 20 | Attendance role audit, payroll payment reference, company expense workflow | PASS |
+| 21 | Audit trail, finance maker-checker controls, payroll payment hardening, Super Admin audit UI | PASS |
+
+## Post-Phase Improvements
+
+- Finance and Admin HR users with linked employee records can use personal self-service routes.
+- Finance users can access their own attendance check-in/history when linked to an employee record.
+- Finance users remain forbidden from HR attendance approval.
+- In-app notification center is available to employee, finance, admin_hr, and super_admin users.
+- Each user only sees and updates their own notifications.
+- Notifications cover attendance, leave, payroll, and expense workflows.
+- Notification action links are internal in-app links only.
 
 ## Main Features
 
@@ -34,11 +56,17 @@ Phase 1-16: PASS
 - Leave request with validated protected attachment storage.
 - HR leave approval and rejection.
 - Payroll period create, calculate, HR review, finance approval, lock, mark paid.
+- Mark Paid records application state and payment reference only. No real bank transfer integration exists.
 - Employee payroll and payslip self-service.
 - Payslip print view and finance CSV export.
 - Employee master data list, create, view, and update.
+- Functional office location and leave type settings for Admin HR/Super Admin.
+- Company expense/disbursement workflow with finance maker-checker controls.
+- Super Admin-only audit log UI and append-only audit trail for key workflow changes.
+- In-app notification center with unread count, mark-one-read, and mark-all-read behavior.
 - Dashboard summaries for employee, HR/admin, and finance roles.
 - Protected access for attendance photos and leave attachments.
+- Notifications are in-app only. Email, SMS, WhatsApp, Firebase, and browser push notifications are not implemented.
 
 ## Demo Accounts
 
@@ -110,9 +138,16 @@ Do not run `php artisan migrate:fresh` on existing data. It drops tables and des
 - `APP_DEBUG=false` for production.
 - `APP_ENV=production` for production.
 - Private attendance and leave files use Laravel local/private storage; do not expose private upload folders through public symlinks.
+- Do not expose payroll, bank account, attachment, selfie, password, token, or private notification data in public logs or documentation.
 - Browser camera/GPS APIs require HTTPS in real deployments, except localhost development.
 
 ## Testing
+
+Current verified baseline:
+
+```text
+415 tests, 818 assertions
+```
 
 ```bash
 cd laravel-app
@@ -131,6 +166,7 @@ git diff --check
 - `laravel-app/` is the Laravel application used for development, testing, and demo deployment.
 - `docs/` contains project documentation, QA flows, portfolio notes, and deployment guidance.
 - `stitch/` folders contain UI design/export references only and are not edited during Laravel development.
+- Metadata and runtime files are ignored; do not track `.env`, logs, caches, private uploads, `vendor/`, `node_modules/`, or local IDE/agent folders.
 
 ## Project Structure
 

@@ -2,6 +2,16 @@
 
 Use this before deploying HRIS Mobile App to any shared demo, staging, or production environment.
 
+## Verified Baseline
+
+- Latest main commit: `72775ef Implement functional in-app notifications`
+- Current verified test result: 415 tests, 818 assertions
+- Phase 1-21: PASS
+- Finance self-service attendance fix: PASS
+- Functional in-app notifications: PASS
+- GitHub audit result: SAFE
+- Repository audit: no ABSENSI MOBILE contamination, no secrets or runtime files tracked
+
 ## Pre-Deployment
 
 - Confirm branch and commit to deploy.
@@ -16,6 +26,8 @@ php artisan test
 - Back up private uploaded files from `storage/app/private`.
 - Confirm no real secrets are committed.
 - Confirm `.env` exists on the server and is not tracked by Git.
+- Confirm runtime files remain untracked: logs, caches, SQLite demo databases, private uploads, `vendor/`, `node_modules/`, and public build artifacts.
+- Confirm notification delivery expectations are clear: notifications are in-app only.
 
 ## Environment
 
@@ -90,6 +102,14 @@ php artisan migrate:fresh
 
 `migrate:fresh` drops all tables and destroys existing data.
 
+## Payment and Notification Boundaries
+
+- Mark Paid records application state and payment reference only.
+- No real bank transfer integration exists.
+- In-app notifications cover attendance, leave, payroll, and expense workflows.
+- No email, SMS, WhatsApp, Firebase, or browser push notification integration exists.
+- Do not expose payroll amounts, bank accounts, private attachments, attendance selfies, passwords, tokens, or private notification details in logs, screenshots, tickets, or public portfolio material.
+
 ## Storage
 
 - Ensure write permissions for:
@@ -136,9 +156,18 @@ php artisan view:cache
 - `/login` loads.
 - Demo role routing works if demo data is seeded.
 - Employee attendance page prompts for camera/location.
+- Finance users with linked employee records can access personal attendance.
+- Finance users remain forbidden from HR attendance approval.
 - Leave attachment access is protected.
+- Office location and leave type settings work for Admin HR/Super Admin.
 - Payroll CSV export works for Finance/Super Admin only.
+- Payroll Mark Paid requires/records a payment reference and does not initiate bank transfer.
 - Employee payslip access does not expose other employees.
+- Company expense submit/approve/reject/paid workflow follows finance maker-checker controls.
+- Audit log UI is accessible to Super Admin only.
+- `/notifications` loads for Employee, Admin HR, Finance, and Super Admin.
+- Users cannot view or mark another user's notification.
+- Notification unread count, mark one as read, and mark all as read work.
 - Admin/Finance/Employee dashboards load.
 - Error pages render for forbidden/not found/server error cases.
 
