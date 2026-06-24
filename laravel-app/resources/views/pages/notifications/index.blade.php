@@ -71,11 +71,7 @@
 <main class="flex-grow pt-[72px] px-container-margin pb-unit-xl">
 
     {{-- Flash --}}
-    @if(session('success'))
-    <div class="mt-unit-md bg-success/10 border border-success/30 text-success rounded-lg px-4 py-3 font-body-md text-body-md flex items-center gap-2">
-        <span class="material-symbols-outlined text-[18px]">check_circle</span> {{ session('success') }}
-    </div>
-    @endif
+    <x-flash-message class="mt-unit-md !mb-0" />
 
     <div class="mt-unit-md flex flex-col gap-card-gap">
         @forelse($notifications as $notification)
