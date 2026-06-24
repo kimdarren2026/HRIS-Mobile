@@ -152,11 +152,7 @@
 </div>
 
 {{-- Flash --}}
-@if(session('success'))
-<div class="mx-container-margin mt-unit-md bg-success/10 border border-success/30 text-success rounded-lg px-4 py-3 font-body-md text-body-md flex items-center gap-2">
-<span class="material-symbols-outlined text-[18px]">check_circle</span> {{ session('success') }}
-</div>
-@endif
+<x-flash-message class="mx-container-margin mt-unit-md !mb-0" />
 
 <!-- Attendance Tab Content -->
 <div id="tab-attendance" class="p-container-margin flex flex-col gap-unit-lg">

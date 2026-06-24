@@ -118,11 +118,7 @@
 <main class="pt-20 px-container-margin flex flex-col gap-unit-lg">
 
     {{-- Success / Error flash --}}
-    @if(session('success'))
-    <div class="bg-success/10 border border-success/30 text-success rounded-lg px-4 py-3 font-body-md text-body-md flex items-center gap-2">
-        <span class="material-symbols-outlined text-[18px]">check_circle</span> {{ session('success') }}
-    </div>
-    @endif
+    <x-flash-message class="!mb-0" />
 
     @if($errors->any())
     <div class="bg-error-container border border-error/30 text-error rounded-lg px-4 py-3 font-body-md text-body-md">

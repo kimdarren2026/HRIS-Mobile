@@ -161,11 +161,7 @@
                 Custom Range
             </button>
 </div>
-@if(session('success'))
-<div class="mb-unit-md bg-success/10 border border-success/30 text-success rounded-lg px-4 py-3 font-body-md text-body-md flex items-center gap-2">
-<span class="material-symbols-outlined text-[18px]">check_circle</span> {{ session('success') }}
-</div>
-@endif
+<x-flash-message />
 <!-- Attendance Log (Dynamic Cards) -->
 <div class="flex flex-col gap-unit-md">
 @forelse($records as $record)
