@@ -87,11 +87,7 @@
     </div>
 
     {{-- Flash --}}
-    @if(session('success'))
-    <div class="bg-success/10 border border-success/30 text-success rounded-lg px-4 py-3 font-body-md text-body-md flex items-center gap-2 mb-unit-md">
-        <span class="material-symbols-outlined text-[18px]">check_circle</span> {{ session('success') }}
-    </div>
-    @endif
+    <x-flash-message />
 
     {{-- Filter Chips --}}
     <div class="flex overflow-x-auto gap-unit-sm mb-unit-lg pb-2 no-scrollbar -mx-container-margin px-container-margin">
