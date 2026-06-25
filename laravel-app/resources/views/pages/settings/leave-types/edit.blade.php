@@ -38,11 +38,7 @@ tailwind.config = {
 </header>
 
 <main class="w-full max-w-[390px] mt-16 mb-8 px-4 py-4">
-  @if($errors->any())
-  <div class="mb-4 bg-red-50 border border-red-200 text-error rounded-lg px-4 py-3 text-body-md">
-    @foreach($errors->all() as $e)<p>{{ $e }}</p>@endforeach
-  </div>
-  @endif
+  <x-validation-errors variant="settings" />
 
   <form method="POST" action="{{ route('settings.leave-types.update', $leaveType) }}" class="flex flex-col gap-4">
     @csrf
