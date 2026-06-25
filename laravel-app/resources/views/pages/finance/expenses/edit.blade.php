@@ -54,15 +54,7 @@
 
 <main class="pt-20 pb-28 px-container-margin flex flex-col gap-unit-lg">
 
-  @if($errors->any())
-    <div class="bg-red-50 border border-red-200 text-red-700 rounded-xl px-4 py-3 font-body-md text-body-md">
-      <ul class="list-disc pl-4 space-y-1">
-        @foreach($errors->all() as $error)
-          <li>{{ $error }}</li>
-        @endforeach
-      </ul>
-    </div>
-  @endif
+  <x-validation-errors variant="finance" />
 
   <form method="POST" action="{{ route('finance.expenses.update', $expense) }}" enctype="multipart/form-data" class="flex flex-col gap-unit-md">
     @csrf
