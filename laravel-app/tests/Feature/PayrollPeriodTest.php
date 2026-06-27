@@ -484,6 +484,7 @@ class PayrollPeriodTest extends TestCase
         $this->actingAs($this->financeUser)
             ->post("/payroll/periods/{$period->id}/mark-paid", [
                 'payment_reference' => 'PAY-20260630-001',
+                'payment_date'      => '2026-06-30',
             ])
             ->assertRedirect('/payroll/periods');
 
@@ -492,6 +493,7 @@ class PayrollPeriodTest extends TestCase
         $this->assertEquals($this->financeUser->id, $period->paid_by);
         $this->assertNotNull($period->paid_at);
         $this->assertEquals('PAY-20260630-001', $period->payment_reference);
+        $this->assertEquals('2026-06-30', $period->payment_date->toDateString());
     }
 
     public function test_mark_paid_rejected_when_not_locked(): void
@@ -524,5 +526,220 @@ class PayrollPeriodTest extends TestCase
     public function test_hr_approval_queue_still_works(): void
     {
         $this->actingAs($this->adminHrUser)->get('/hr/approval-queue')->assertOk();
+    }
+
+    // ── Phase 28: Payment validation ───────────────────────────────────────────
+
+    public function test_mark_paid_fails_without_payment_reference(): void
+    {
+        $period = PayrollPeriod::create([
+            'name'       => 'June 2026 Payroll',
+            'start_date' => '2026-06-01',
+            'end_date'   => '2026-06-30',
+            'status'     => 'LOCKED',
+            'created_by' => $this->financeUser->id,
+        ]);
+
+        $this->actingAs($this->financeUser)
+            ->post("/payroll/periods/{$period->id}/mark-paid", [
+                'payment_date' => '2026-06-30',
+            ])
+            ->assertSessionHasErrors('payment_reference');
+
+        $period->refresh();
+        $this->assertEquals('LOCKED', $period->status);
+    }
+
+    public function test_mark_paid_fails_without_payment_date(): void
+    {
+        $period = PayrollPeriod::create([
+            'name'       => 'June 2026 Payroll',
+            'start_date' => '2026-06-01',
+            'end_date'   => '2026-06-30',
+            'status'     => 'LOCKED',
+            'created_by' => $this->financeUser->id,
+        ]);
+
+        $this->actingAs($this->financeUser)
+            ->post("/payroll/periods/{$period->id}/mark-paid", [
+                'payment_reference' => 'TRF-001',
+            ])
+            ->assertSessionHasErrors('payment_date');
+
+        $period->refresh();
+        $this->assertEquals('LOCKED', $period->status);
+    }
+
+    public function test_mark_paid_updates_payslip_payment_status(): void
+    {
+        $period = PayrollPeriod::create([
+            'name'       => 'June 2026 Payroll',
+            'start_date' => '2026-06-01',
+            'end_date'   => '2026-06-30',
+            'status'     => 'LOCKED',
+            'created_by' => $this->financeUser->id,
+        ]);
+
+        $record = PayrollRecord::create([
+            'payroll_period_id' => $period->id,
+            'employee_id'       => $this->activeEmployee->id,
+            'basic_salary'      => 5000000,
+            'net_salary'        => 4500000,
+        ]);
+
+        \App\Models\Payslip::create([
+            'payroll_record_id' => $record->id,
+            'employee_id'       => $this->activeEmployee->id,
+            'payroll_period_id' => $period->id,
+            'snapshot_data'     => ['net' => 4500000],
+            'payment_status'    => 'UNPAID',
+        ]);
+
+        $this->actingAs($this->financeUser)
+            ->post("/payroll/periods/{$period->id}/mark-paid", [
+                'payment_reference' => 'TRF-20260630-001',
+                'payment_date'      => '2026-06-30',
+            ])
+            ->assertRedirect('/payroll/periods');
+
+        $payslip = \App\Models\Payslip::where('payroll_record_id', $record->id)->first();
+        $this->assertEquals('PAID', $payslip->payment_status);
+        $this->assertNotNull($payslip->paid_at);
+        $this->assertEquals('TRF-20260630-001', $payslip->payment_reference);
+    }
+
+    public function test_mark_paid_twice_does_not_overwrite(): void
+    {
+        // Policy requires LOCKED status → PAID period is blocked by policy (403),
+        // which prevents any data overwrite.
+        $period = PayrollPeriod::create([
+            'name'              => 'June 2026 Payroll',
+            'start_date'        => '2026-06-01',
+            'end_date'          => '2026-06-30',
+            'status'            => 'PAID',
+            'payment_reference' => 'TRF-001',
+            'payment_date'      => '2026-06-30',
+            'paid_by'           => $this->financeUser->id,
+            'created_by'        => $this->financeUser->id,
+        ]);
+
+        $this->actingAs($this->financeUser)
+            ->post("/payroll/periods/{$period->id}/mark-paid", [
+                'payment_reference' => 'TRF-OVERWRITE',
+                'payment_date'      => '2026-07-01',
+            ])
+            ->assertForbidden();
+
+        $period->refresh();
+        $this->assertEquals('TRF-001', $period->payment_reference);
+        $this->assertEquals('2026-06-30', $period->payment_date->toDateString());
+    }
+
+    // ── Phase 28: Export payment list ─────────────────────────────────────────
+
+    public function test_finance_can_export_payment_csv(): void
+    {
+        $period = PayrollPeriod::create([
+            'name'       => 'June 2026 Payroll',
+            'start_date' => '2026-06-01',
+            'end_date'   => '2026-06-30',
+            'status'     => 'LOCKED',
+            'created_by' => $this->financeUser->id,
+        ]);
+
+        $response = $this->actingAs($this->financeUser)
+            ->get("/payroll/periods/{$period->id}/export-payments");
+
+        $response->assertOk();
+        $response->assertHeader('content-type', 'text/csv; charset=UTF-8');
+    }
+
+    public function test_super_admin_can_export_payment_csv(): void
+    {
+        $period = PayrollPeriod::create([
+            'name'       => 'June 2026 Payroll',
+            'start_date' => '2026-06-01',
+            'end_date'   => '2026-06-30',
+            'status'     => 'CALCULATED',
+            'created_by' => $this->financeUser->id,
+        ]);
+
+        $this->actingAs($this->superAdminUser)
+            ->get("/payroll/periods/{$period->id}/export-payments")
+            ->assertOk();
+    }
+
+    public function test_employee_cannot_export_payment_csv(): void
+    {
+        $period = PayrollPeriod::create([
+            'name'       => 'June 2026 Payroll',
+            'start_date' => '2026-06-01',
+            'end_date'   => '2026-06-30',
+            'status'     => 'LOCKED',
+            'created_by' => $this->financeUser->id,
+        ]);
+
+        $this->actingAs($this->employeeUser)
+            ->get("/payroll/periods/{$period->id}/export-payments")
+            ->assertForbidden();
+    }
+
+    public function test_admin_hr_cannot_export_payment_csv(): void
+    {
+        $period = PayrollPeriod::create([
+            'name'       => 'June 2026 Payroll',
+            'start_date' => '2026-06-01',
+            'end_date'   => '2026-06-30',
+            'status'     => 'LOCKED',
+            'created_by' => $this->financeUser->id,
+        ]);
+
+        $this->actingAs($this->adminHrUser)
+            ->get("/payroll/periods/{$period->id}/export-payments")
+            ->assertForbidden();
+    }
+
+    public function test_export_payment_csv_forbidden_for_draft_period(): void
+    {
+        $period = PayrollPeriod::create([
+            'name'       => 'Draft Payroll',
+            'start_date' => '2026-07-01',
+            'end_date'   => '2026-07-31',
+            'status'     => 'DRAFT',
+            'created_by' => $this->financeUser->id,
+        ]);
+
+        $this->actingAs($this->financeUser)
+            ->get("/payroll/periods/{$period->id}/export-payments")
+            ->assertForbidden();
+    }
+
+    public function test_export_payment_csv_contains_required_columns(): void
+    {
+        $period = PayrollPeriod::create([
+            'name'       => 'June 2026 Payroll',
+            'start_date' => '2026-06-01',
+            'end_date'   => '2026-06-30',
+            'status'     => 'LOCKED',
+            'created_by' => $this->financeUser->id,
+        ]);
+
+        PayrollRecord::create([
+            'payroll_period_id' => $period->id,
+            'employee_id'       => $this->activeEmployee->id,
+            'basic_salary'      => 5000000,
+            'net_salary'        => 4500000,
+        ]);
+
+        $response = $this->actingAs($this->financeUser)
+            ->get("/payroll/periods/{$period->id}/export-payments");
+
+        $response->assertOk();
+        $content = $response->streamedContent();
+        $this->assertStringContainsString('Employee ID', $content);
+        $this->assertStringContainsString('Bank Name', $content);
+        $this->assertStringContainsString('Bank Account Number', $content);
+        $this->assertStringContainsString('Net Salary', $content);
+        $this->assertStringContainsString('Payment Reference', $content);
     }
 }

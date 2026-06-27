@@ -136,6 +136,7 @@ Route::middleware(['auth', 'role:finance,super_admin'])->group(function (): void
     Route::post('/payroll/periods/{payrollPeriod}/lock',                   [PayrollPeriodController::class, 'lock'])->name('payroll.periods.lock');
     Route::post('/payroll/periods/{payrollPeriod}/mark-paid',              [PayrollPeriodController::class, 'markPaid'])->name('payroll.periods.mark-paid');
     Route::get('/payroll/periods/{payrollPeriod}/export',                  [PayrollPeriodController::class, 'export'])->name('payroll.periods.export');
+    Route::get('/payroll/periods/{payrollPeriod}/export-payments',         [PayrollPeriodController::class, 'exportPayments'])->name('payroll.periods.export-payments');
 
     // Finance Expenses — approve/mark-paid/reject restricted to finance+super_admin (Phase 20)
     Route::post('/finance/expenses/{expense}/approve',   [ExpenseController::class, 'approve'])->name('finance.expenses.approve');

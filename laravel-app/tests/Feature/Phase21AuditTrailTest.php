@@ -148,6 +148,7 @@ class Phase21AuditTrailTest extends TestCase
         $this->actingAs($this->checker)
             ->post("/payroll/periods/{$period->id}/mark-paid", [
                 'payment_reference' => 'PAY-AUDIT-001',
+                'payment_date'      => '2026-07-31',
             ]);
 
         $this->assertDatabaseHas('audit_logs', [
