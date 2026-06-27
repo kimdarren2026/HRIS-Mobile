@@ -26,6 +26,7 @@ class PayrollPeriod extends Model
         'paid_by',
         'paid_at',
         'payment_reference',
+        'payment_date',
     ];
 
     protected function casts(): array
@@ -38,7 +39,8 @@ class PayrollPeriod extends Model
             'reviewed_at'   => 'datetime',
             'approved_at'   => 'datetime',
             'locked_at'     => 'datetime',
-            'paid_at'       => 'datetime',
+            'paid_at'        => 'datetime',
+            'payment_date'   => 'date',
         ];
     }
 

@@ -14,6 +14,7 @@ class Payslip extends Model
         'snapshot_data',
         'payment_status',
         'paid_at',
+        'payment_reference',
     ];
 
     protected function casts(): array
