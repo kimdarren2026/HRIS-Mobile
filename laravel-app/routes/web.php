@@ -104,13 +104,13 @@ Route::middleware(['auth', 'role:admin_hr,super_admin'])->group(function (): voi
     // Payroll HR review — submit CALCULATED → HR_REVIEW (admin_hr + super_admin)
     Route::post('/payroll/periods/{payrollPeriod}/submit-hr-review', [PayrollPeriodController::class, 'submitHrReview'])->name('payroll.periods.submit-hr-review');
 
-    // Employee master data (Phase 11)
-    Route::get('/employees',                 [HREmployeeController::class, 'index'])->name('employees.index');
-    Route::get('/employees/create',          [HREmployeeController::class, 'create'])->name('employees.create');
-    Route::post('/employees',                [HREmployeeController::class, 'store'])->name('employees.store');
-    Route::get('/employees/{employee}',      [HREmployeeController::class, 'show'])->name('employees.show');
-    Route::get('/employees/{employee}/edit', [HREmployeeController::class, 'edit'])->name('employees.edit');
-    Route::put('/employees/{employee}',      [HREmployeeController::class, 'update'])->name('employees.update');
+    // Employee master data (Phase 26)
+    Route::get('/hr/employees',                 [HREmployeeController::class, 'index'])->name('employees.index');
+    Route::get('/hr/employees/create',          [HREmployeeController::class, 'create'])->name('employees.create');
+    Route::post('/hr/employees',                [HREmployeeController::class, 'store'])->name('employees.store');
+    Route::get('/hr/employees/{employee}',      [HREmployeeController::class, 'show'])->name('employees.show');
+    Route::get('/hr/employees/{employee}/edit', [HREmployeeController::class, 'edit'])->name('employees.edit');
+    Route::put('/hr/employees/{employee}',      [HREmployeeController::class, 'update'])->name('employees.update');
 
     // System settings (Phase 19)
     Route::get('/settings', [SettingsController::class, 'index'])->name('settings.index');
@@ -123,8 +123,6 @@ Route::middleware(['auth', 'role:admin_hr,super_admin'])->group(function (): voi
     Route::put('/settings/leave-types/{leaveType}',        [LeaveTypeSettingsController::class, 'update'])->name('settings.leave-types.update');
     Route::delete('/settings/leave-types/{leaveType}',     [LeaveTypeSettingsController::class, 'destroy'])->name('settings.leave-types.destroy');
 
-    // Static views (Phase 1-4, preserved)
-    Route::view('/hr/employees', 'pages.hr.employees');
 });
 
 // ── Finance / Super Admin routes ─────────────────────────────────────────────

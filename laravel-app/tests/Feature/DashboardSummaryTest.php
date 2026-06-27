@@ -234,13 +234,13 @@ class DashboardSummaryTest extends TestCase
     public function test_finance_cannot_access_employee_directory(): void
     {
         $financeUser = User::factory()->create(['role' => 'finance', 'is_active' => true]);
-        $this->actingAs($financeUser)->get('/employees')->assertForbidden();
+        $this->actingAs($financeUser)->get('/hr/employees')->assertForbidden();
     }
 
     public function test_employee_cannot_access_employee_directory(): void
     {
         $user = User::factory()->create(['role' => 'employee', 'is_active' => true]);
-        $this->actingAs($user)->get('/employees')->assertForbidden();
+        $this->actingAs($user)->get('/hr/employees')->assertForbidden();
     }
 
     public function test_employee_can_access_own_profile(): void

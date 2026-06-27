@@ -297,4 +297,171 @@ class EmployeeMasterDataTest extends TestCase
             ->get(route('employees.show', $this->otherEmployee))
             ->assertForbidden();
     }
+
+    // ── Search by name ─────────────────────────────────────────────────────────
+
+    public function test_search_by_name_returns_matching_employee(): void
+    {
+        $user = User::factory()->create(['name' => 'ZZSEARCHNAME_Alpha', 'role' => 'employee', 'is_active' => true]);
+        $emp  = Employee::create([
+            'user_id' => $user->id, 'nik' => 'EMP-SRCHNAME-01',
+            'department_id' => $this->dept->id, 'position_id' => $this->position->id,
+            'join_date' => '2026-01-01', 'employment_status' => 'active', 'phone_number' => '+62800000001',
+        ]);
+
+        $this->actingAs($this->hrUser)
+            ->get(route('employees.index', ['search' => 'ZZSEARCHNAME_Alpha']))
+            ->assertOk()
+            ->assertSee('EMP-SRCHNAME-01')
+            ->assertDontSee('EMP-001')
+            ->assertDontSee('EMP-002');
+    }
+
+    // ── Search by email ────────────────────────────────────────────────────────
+
+    public function test_search_by_email_returns_matching_employee(): void
+    {
+        $user = User::factory()->create([
+            'name' => 'ZZSRCHEMAIL User', 'email' => 'zzsrchemail_unique@hris.local',
+            'role' => 'employee', 'is_active' => true,
+        ]);
+        Employee::create([
+            'user_id' => $user->id, 'nik' => 'EMP-SRCHEMAIL-01',
+            'department_id' => $this->dept->id, 'position_id' => $this->position->id,
+            'join_date' => '2026-01-01', 'employment_status' => 'active', 'phone_number' => '+62800000002',
+        ]);
+
+        $this->actingAs($this->hrUser)
+            ->get(route('employees.index', ['search' => 'zzsrchemail_unique']))
+            ->assertOk()
+            ->assertSee('EMP-SRCHEMAIL-01')
+            ->assertDontSee('EMP-001')
+            ->assertDontSee('EMP-002');
+    }
+
+    // ── Search by position ─────────────────────────────────────────────────────
+
+    public function test_search_by_position_returns_matching_employee(): void
+    {
+        $posManager = Position::create(['name' => 'ZZSRCHPOS_Manager', 'department_id' => $this->dept->id]);
+        $user       = User::factory()->create(['name' => 'Position Search User', 'role' => 'employee', 'is_active' => true]);
+        Employee::create([
+            'user_id' => $user->id, 'nik' => 'EMP-SRCHPOS-01',
+            'department_id' => $this->dept->id, 'position_id' => $posManager->id,
+            'join_date' => '2026-01-01', 'employment_status' => 'active', 'phone_number' => '+62800000003',
+        ]);
+
+        $this->actingAs($this->hrUser)
+            ->get(route('employees.index', ['search' => 'ZZSRCHPOS_Manager']))
+            ->assertOk()
+            ->assertSee('EMP-SRCHPOS-01')
+            ->assertDontSee('EMP-001')
+            ->assertDontSee('EMP-002');
+    }
+
+    // ── Department filter restricts all search results ─────────────────────────
+
+    public function test_department_filter_restricts_all_search_results(): void
+    {
+        $dept2 = Department::create(['name' => 'ZZDEPT2_Test', 'description' => '']);
+
+        $u1 = User::factory()->create(['role' => 'employee', 'is_active' => true]);
+        $u2 = User::factory()->create(['role' => 'employee', 'is_active' => true]);
+
+        Employee::create([
+            'user_id' => $u1->id, 'nik' => 'EMP-DEPTF-DEPT1',
+            'department_id' => $this->dept->id, 'position_id' => $this->position->id,
+            'join_date' => '2026-01-01', 'employment_status' => 'active', 'phone_number' => '+62800000010',
+        ]);
+        Employee::create([
+            'user_id' => $u2->id, 'nik' => 'EMP-DEPTF-DEPT2',
+            'department_id' => $dept2->id, 'position_id' => $this->position->id,
+            'join_date' => '2026-01-01', 'employment_status' => 'active', 'phone_number' => '+62800000011',
+        ]);
+
+        // Both NIKs start with EMP-DEPTF; department filter must exclude the dept2 employee
+        $this->actingAs($this->hrUser)
+            ->get(route('employees.index', ['search' => 'EMP-DEPTF', 'department_id' => $this->dept->id]))
+            ->assertOk()
+            ->assertSee('EMP-DEPTF-DEPT1')
+            ->assertDontSee('EMP-DEPTF-DEPT2');
+    }
+
+    // ── Status filter restricts all search results ─────────────────────────────
+
+    public function test_status_filter_restricts_all_search_results(): void
+    {
+        $u1 = User::factory()->create(['name' => 'ZZSTATUSF Alpha', 'role' => 'employee', 'is_active' => true]);
+        $u2 = User::factory()->create(['name' => 'ZZSTATUSF Beta',  'role' => 'employee', 'is_active' => true]);
+
+        Employee::create([
+            'user_id' => $u1->id, 'nik' => 'EMP-STATUSF-ACTIVE',
+            'department_id' => $this->dept->id, 'position_id' => $this->position->id,
+            'join_date' => '2026-01-01', 'employment_status' => 'active', 'phone_number' => '+62800000020',
+        ]);
+        Employee::create([
+            'user_id' => $u2->id, 'nik' => 'EMP-STATUSF-RESIGNED',
+            'department_id' => $this->dept->id, 'position_id' => $this->position->id,
+            'join_date' => '2026-01-01', 'employment_status' => 'resigned', 'phone_number' => '+62800000021',
+        ]);
+
+        // Both names contain ZZSTATUSF; status filter must exclude the resigned employee
+        $this->actingAs($this->hrUser)
+            ->get(route('employees.index', ['search' => 'ZZSTATUSF', 'status' => 'active']))
+            ->assertOk()
+            ->assertSee('EMP-STATUSF-ACTIVE')
+            ->assertDontSee('EMP-STATUSF-RESIGNED');
+    }
+
+    // ── Index contains View Detail and Edit links ──────────────────────────────
+
+    public function test_index_shows_view_detail_and_edit_links_for_each_employee(): void
+    {
+        $this->actingAs($this->hrUser)
+            ->get(route('employees.index'))
+            ->assertOk()
+            ->assertSee(route('employees.show', $this->employee), false)
+            ->assertSee(route('employees.edit', $this->employee), false)
+            ->assertSee(route('employees.show', $this->otherEmployee), false)
+            ->assertSee(route('employees.edit', $this->otherEmployee), false);
+    }
+
+    // ── Finance 403 on all employee management write routes ────────────────────
+
+    public function test_finance_cannot_access_employee_edit_form(): void
+    {
+        $this->actingAs($this->financeUser)
+            ->get(route('employees.edit', $this->employee))
+            ->assertForbidden();
+    }
+
+    public function test_finance_cannot_update_employee(): void
+    {
+        $this->actingAs($this->financeUser)
+            ->put(route('employees.update', $this->employee), [])
+            ->assertForbidden();
+    }
+
+    public function test_finance_cannot_access_employee_create_form(): void
+    {
+        $this->actingAs($this->financeUser)
+            ->get(route('employees.create'))
+            ->assertForbidden();
+    }
+
+    public function test_finance_cannot_store_employee(): void
+    {
+        $this->actingAs($this->financeUser)
+            ->post(route('employees.store'), [])
+            ->assertForbidden();
+    }
+
+    // ── Employee 403 on all employee management write routes ───────────────────
+
+    public function test_employee_cannot_access_employee_create_form_via_direct_route(): void
+    {
+        $this->actingAs($this->employeeUser)
+            ->get(route('employees.create'))
+            ->assertForbidden();
+    }
 }
