@@ -159,60 +159,16 @@
     </form>
 
   @elseif($payrollPeriod->status === 'LOCKED' && in_array($role, ['finance', 'super_admin']))
-    {{-- Payment checklist --}}
-    <div class="bg-white rounded-xl border border-border shadow-sm p-4 flex flex-col gap-3">
-      <p class="font-label-md text-label-md text-on-surface">Payment Checklist</p>
-      <div class="flex flex-col gap-2">
-        <div class="flex items-center gap-2 font-label-sm text-label-sm text-green-700">
-          <span class="material-symbols-outlined text-[16px]">check_circle</span>
-          <span>Payroll approved &amp; locked</span>
-        </div>
-        <div class="flex items-center gap-2 font-label-sm text-label-sm text-on-surface-variant">
-          <span class="material-symbols-outlined text-[16px]">group</span>
-          <span>{{ $totals['employee_count'] }} employee(s) · Net Rp {{ number_format($totals['net_pay'], 0, ',', '.') }}</span>
-        </div>
-        <div class="flex items-center gap-2 font-label-sm text-label-sm text-on-surface-variant">
-          <span class="material-symbols-outlined text-[16px]">download</span>
-          <span>Export payment list &amp; complete bank transfer before marking paid</span>
-        </div>
-        <div class="flex items-center gap-2 font-label-sm text-label-sm text-on-surface-variant">
-          <span class="material-symbols-outlined text-[16px]">key</span>
-          <span>Payment reference required (e.g. bank transfer receipt number)</span>
-        </div>
-        <div class="flex items-center gap-2 font-label-sm text-label-sm text-on-surface-variant">
-          <span class="material-symbols-outlined text-[16px]">calendar_today</span>
-          <span>Payment date required (actual transfer date)</span>
-        </div>
-      </div>
-    </div>
-
     <div class="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 font-body-md text-body-md text-amber-800 flex items-start gap-2">
       <span class="material-symbols-outlined text-[18px] mt-0.5 flex-shrink-0">info</span>
       <span><strong>Note:</strong> "Mark as Paid" records payment status in this system only. It does <strong>not</strong> initiate a real bank transfer or disburse funds.</span>
     </div>
-
-    @if($errors->any())
-      <div class="bg-red-50 border border-red-200 rounded-xl px-4 py-3 font-body-md text-body-md text-red-800">
-        <ul class="list-disc list-inside">
-          @foreach($errors->all() as $error)
-            <li>{{ $error }}</li>
-          @endforeach
-        </ul>
-      </div>
-    @endif
-
     <form method="POST" action="{{ route('payroll.periods.mark-paid', $payrollPeriod) }}"
       onsubmit="return confirm('Mark {{ addslashes($payrollPeriod->name) }} as paid? This records payment status only.')">
       @csrf
       <div class="flex flex-col gap-unit-sm">
-        <label class="font-label-md text-label-md text-on-surface-variant">Payment Reference <span class="text-red-500">*</span></label>
-        <input type="text" name="payment_reference" required maxlength="100"
-          placeholder="e.g. TRF-20260622-001"
-          value="{{ old('payment_reference') }}"
-          class="w-full border border-border rounded-xl px-4 py-3 font-body-md text-body-md bg-white focus:outline-none focus:ring-2 focus:ring-primary">
-        <label class="font-label-md text-label-md text-on-surface-variant">Payment Date <span class="text-red-500">*</span></label>
-        <input type="date" name="payment_date" required
-          value="{{ old('payment_date') }}"
+        <label class="font-label-md text-label-md text-on-surface-variant">Payment Reference (optional)</label>
+        <input type="text" name="payment_reference" maxlength="100" placeholder="e.g. TRF-20260622-001"
           class="w-full border border-border rounded-xl px-4 py-3 font-body-md text-body-md bg-white focus:outline-none focus:ring-2 focus:ring-primary">
         <button type="submit" class="w-full bg-success text-white py-3.5 rounded-xl font-label-md text-label-md flex items-center justify-center gap-2 active:opacity-90">
           <span class="material-symbols-outlined">payments</span>
@@ -228,14 +184,11 @@
         <span class="material-symbols-outlined text-success">check_circle</span>
         <p class="font-label-md text-label-md text-green-800">Payment Recorded</p>
       </div>
-      @if($payrollPeriod->payment_reference)
-        <p class="font-label-sm text-label-sm text-on-surface-variant">Reference: {{ $payrollPeriod->payment_reference }}</p>
-      @endif
-      @if($payrollPeriod->payment_date)
-        <p class="font-label-sm text-label-sm text-on-surface-variant">Payment Date: {{ $payrollPeriod->payment_date->format('M d, Y') }}</p>
-      @endif
       @if($payrollPeriod->paid_at)
         <p class="font-label-sm text-label-sm text-on-surface-variant">Recorded: {{ $payrollPeriod->paid_at->format('M d, Y H:i') }}</p>
+      @endif
+      @if($payrollPeriod->payment_reference)
+        <p class="font-label-sm text-label-sm text-on-surface-variant">Reference: {{ $payrollPeriod->payment_reference }}</p>
       @endif
       <p class="font-label-sm text-label-sm text-amber-700">This is a payment record only. No real bank transfer was initiated.</p>
     </div>
@@ -243,20 +196,11 @@
 
   {{-- Export CSV (finance + super_admin only) --}}
   @if(in_array(auth()->user()->role, ['finance', 'super_admin']))
-    <div class="flex flex-col gap-unit-sm">
-      <a href="{{ route('payroll.periods.export', $payrollPeriod) }}"
-         class="flex items-center justify-center gap-2 w-full bg-surface-container border border-border text-on-surface py-3 rounded-xl font-label-md text-label-md active:opacity-70 transition-opacity">
-        <span class="material-symbols-outlined">download</span>
-        Export Summary CSV
-      </a>
-      @if($payrollPeriod->status !== 'DRAFT')
-        <a href="{{ route('payroll.periods.export-payments', $payrollPeriod) }}"
-           class="flex items-center justify-center gap-2 w-full bg-blue-50 border border-blue-200 text-blue-700 py-3 rounded-xl font-label-md text-label-md active:opacity-70 transition-opacity">
-          <span class="material-symbols-outlined">account_balance</span>
-          Export Payment List (Bank Transfer)
-        </a>
-      @endif
-    </div>
+    <a href="{{ route('payroll.periods.export', $payrollPeriod) }}"
+       class="flex items-center justify-center gap-2 w-full bg-surface-container border border-border text-on-surface py-3 rounded-xl font-label-md text-label-md active:opacity-70 transition-opacity">
+      <span class="material-symbols-outlined">download</span>
+      Export CSV
+    </a>
   @endif
 
   {{-- Employee Records --}}

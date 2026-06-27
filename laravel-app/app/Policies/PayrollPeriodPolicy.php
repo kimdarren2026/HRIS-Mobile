@@ -60,11 +60,4 @@ class PayrollPeriodPolicy
     {
         return in_array($user->role, ['finance', 'super_admin'], true);
     }
-
-    // Export bank payment list — finance/super_admin only; period must be past DRAFT
-    public function exportPayments(User $user, PayrollPeriod $payrollPeriod): bool
-    {
-        return in_array($user->role, ['finance', 'super_admin'], true)
-            && $payrollPeriod->status !== 'DRAFT';
-    }
 }
