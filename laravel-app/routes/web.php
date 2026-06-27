@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\UserManagementController;
 use App\Http\Controllers\AuditLogController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
@@ -185,6 +186,11 @@ Route::middleware(['auth', 'role:employee,admin_hr,finance,super_admin'])->group
 Route::middleware(['auth', 'role:super_admin'])->group(function (): void {
     Route::get('/audit-logs',            [AuditLogController::class, 'index'])->name('audit-logs.index');
     Route::get('/audit-logs/{auditLog}', [AuditLogController::class, 'show'])->name('audit-logs.show');
+
+    // User / Role Management (Phase 29)
+    Route::get('/admin/users',                             [UserManagementController::class, 'index'])->name('admin.users.index');
+    Route::patch('/admin/users/{user}/role',               [UserManagementController::class, 'updateRole'])->name('admin.users.update-role');
+    Route::patch('/admin/users/{user}/status',             [UserManagementController::class, 'updateStatus'])->name('admin.users.update-status');
 });
 
 // ── Design preview (unauthenticated) ────────────────────────────────────────

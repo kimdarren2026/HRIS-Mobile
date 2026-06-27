@@ -3,6 +3,10 @@
     <span class="material-symbols-outlined">home</span>
     <span class="font-label-sm text-label-sm">Home</span>
   </a>
+  <a class="flex flex-col items-center justify-center text-on-surface-variant transition-transform active:scale-95 duration-150 py-2" href="{{ route('admin.users.index') }}">
+    <span class="material-symbols-outlined">manage_accounts</span>
+    <span class="font-label-sm text-label-sm">Users</span>
+  </a>
   <a class="flex flex-col items-center justify-center text-primary bg-secondary-fixed rounded-xl px-3 py-1 transition-transform active:scale-95 duration-150" href="{{ route('audit-logs.index') }}">
     <span class="material-symbols-outlined">shield</span>
     <span class="font-label-sm text-label-sm">Audit</span>
