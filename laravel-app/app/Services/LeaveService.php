@@ -9,6 +9,7 @@ use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 
 class LeaveService
 {
@@ -34,14 +35,12 @@ class LeaveService
 
     public function approve(LeaveRequest $leaveRequest, User $approver, ?string $note): void
     {
-        DB::transaction(function () use ($leaveRequest, $approver, $note): void {
-            $leaveRequest->update([
-                'status'        => 'APPROVED',
-                'approved_by'   => $approver->id,
-                'approved_at'   => now(),
-                'approval_note' => $note,
-            ]);
+        // Idempotency guard: prevent double-approval from causing double deduction
+        if ($leaveRequest->status === 'APPROVED') {
+            return;
+        }
 
+        DB::transaction(function () use ($leaveRequest, $approver, $note): void {
             if ($leaveRequest->leaveType->deducts_balance) {
                 $balance = LeaveBalance::firstOrCreate(
                     [
@@ -52,9 +51,22 @@ class LeaveService
                     ['total_quota' => 12, 'used' => 0, 'remaining' => 12]
                 );
 
+                if ($balance->remaining < $leaveRequest->total_days) {
+                    throw ValidationException::withMessages([
+                        'balance' => 'Saldo cuti tidak mencukupi untuk permintaan ini.',
+                    ]);
+                }
+
                 $balance->increment('used', $leaveRequest->total_days);
                 $balance->decrement('remaining', $leaveRequest->total_days);
             }
+
+            $leaveRequest->update([
+                'status'        => 'APPROVED',
+                'approved_by'   => $approver->id,
+                'approved_at'   => now(),
+                'approval_note' => $note,
+            ]);
         });
     }
 

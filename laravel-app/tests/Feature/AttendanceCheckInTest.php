@@ -224,6 +224,40 @@ class AttendanceCheckInTest extends TestCase
             ->assertSessionHasErrors(['lat', 'lng']);
     }
 
+    // ── distance_from_office storage ────────────────────────────────────────
+
+    public function test_distance_from_office_is_stored_on_checkin_within_radius(): void
+    {
+        $coords = $this->coordsWithin();
+
+        $this->actingAs($this->employeeUser)
+            ->post('/attendance/check-in', array_merge($coords, ['photo' => $this->validPhoto()]))
+            ->assertRedirect('/attendance/history');
+
+        $record = AttendanceRecord::where('employee_id', $this->employee->id)->first();
+        $this->assertNotNull($record);
+        $this->assertNotNull($record->distance_from_office);
+        $this->assertLessThanOrEqual($this->office->radius_meters, $record->distance_from_office);
+    }
+
+    public function test_distance_from_office_is_stored_on_checkin_outside_radius(): void
+    {
+        $coords = $this->coordsOutside();
+
+        $this->actingAs($this->employeeUser)
+            ->post('/attendance/check-in', array_merge($coords, [
+                'photo'  => $this->validPhoto(),
+                'reason' => 'Working from home, approved by manager.',
+            ]))
+            ->assertRedirect('/attendance/history');
+
+        $record = AttendanceRecord::where('employee_id', $this->employee->id)->first();
+        $this->assertNotNull($record);
+        $this->assertNotNull($record->distance_from_office);
+        $this->assertGreaterThan($this->office->radius_meters, $record->distance_from_office);
+        $this->assertSame('PENDING_REVIEW', $record->status);
+    }
+
     // ── HR Approval Queue access ────────────────────────────────────────────
 
     public function test_admin_hr_can_access_approval_queue(): void
