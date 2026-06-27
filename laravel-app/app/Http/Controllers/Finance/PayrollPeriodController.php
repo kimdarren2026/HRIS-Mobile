@@ -153,11 +153,11 @@ class PayrollPeriodController extends Controller
     {
         Gate::authorize('markPaid', $payrollPeriod);
 
+        // Guard: prevent re-paying (policy enforces LOCKED status, but be explicit)
         abort_if($payrollPeriod->status === 'PAID', 422, 'Payroll period has already been marked as paid.');
 
         $data = $request->validate([
             'payment_reference' => ['required', 'string', 'max:100'],
-            'payment_date'      => ['required', 'date'],
         ]);
 
         $old = $payrollPeriod->only(['status']);
@@ -167,30 +167,22 @@ class PayrollPeriodController extends Controller
             'paid_by'           => auth()->id(),
             'paid_at'           => now(),
             'payment_reference' => $data['payment_reference'],
-            'payment_date'      => $data['payment_date'],
         ]);
 
         AuditLogService::log(
             auth()->user(),
             'mark_payroll_paid',
             'payroll',
-            "Payroll period '{$payrollPeriod->name}' marked as paid. Ref: {$data['payment_reference']} Date: {$data['payment_date']}.",
+            "Payroll period '{$payrollPeriod->name}' marked as paid. Ref: {$data['payment_reference']}.",
             null,
             \App\Models\PayrollPeriod::class,
             $payrollPeriod->id,
             $old,
-            ['status' => 'PAID', 'paid_by' => auth()->id(), 'payment_reference' => $data['payment_reference'], 'payment_date' => $data['payment_date']],
+            ['status' => 'PAID', 'paid_by' => auth()->id(), 'payment_reference' => $data['payment_reference']],
         );
 
-        $payrollPeriod->loadMissing('payrollRecords.payslip', 'payrollRecords.employee.user');
+        $payrollPeriod->loadMissing('payrollRecords.employee.user');
         foreach ($payrollPeriod->payrollRecords as $record) {
-            if ($record->payslip) {
-                $record->payslip->update([
-                    'payment_status'    => 'PAID',
-                    'paid_at'           => now(),
-                    'payment_reference' => $data['payment_reference'],
-                ]);
-            }
             if ($record->employee?->user) {
                 $this->notifications->create(
                     $record->employee->user,
@@ -233,49 +225,6 @@ class PayrollPeriodController extends Controller
                     $record->deduction,
                     $record->net_salary,
                     $payrollPeriod->status,
-                ]);
-            }
-
-            fclose($out);
-        }, $filename, ['Content-Type' => 'text/csv']);
-    }
-
-    // Export bank payment list for manual bank transfer — finance/super_admin only.
-    // Contains sensitive bank account data; served as streamed download, never stored publicly.
-    public function exportPayments(PayrollPeriod $payrollPeriod): StreamedResponse
-    {
-        Gate::authorize('exportPayments', $payrollPeriod);
-
-        $payrollPeriod->load([
-            'payrollRecords.employee.user',
-            'payrollRecords.employee.department',
-            'payrollRecords.employee.position',
-        ]);
-
-        $filename = "payment-list-{$payrollPeriod->id}-" . now()->format('Ymd') . '.csv';
-
-        return response()->streamDownload(function () use ($payrollPeriod): void {
-            $out = fopen('php://output', 'w');
-
-            fputcsv($out, [
-                'Employee ID', 'Employee Name', 'Department', 'Position',
-                'Bank Name', 'Bank Account Number', 'Bank Account Name',
-                'Net Salary', 'Payroll Period', 'Payment Reference',
-            ]);
-
-            foreach ($payrollPeriod->payrollRecords as $record) {
-                $emp = $record->employee;
-                fputcsv($out, [
-                    $emp->nik ?? '',
-                    $emp->user?->name ?? '',
-                    $emp->department?->name ?? '',
-                    $emp->position?->name ?? '',
-                    $emp->bank_name ?? '',
-                    $emp->bank_account_number ?? '',
-                    $emp->user?->name ?? '',
-                    $record->net_salary,
-                    $payrollPeriod->name,
-                    '',
                 ]);
             }
 
