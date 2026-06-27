@@ -28,6 +28,12 @@ class Employee extends Model
         'bank_account_number',
     ];
 
+    // Prevent bank account data from leaking through toArray()/toJson() serialization
+    protected $hidden = [
+        'bank_account_number',
+        'bank_name',
+    ];
+
     protected function casts(): array
     {
         return [

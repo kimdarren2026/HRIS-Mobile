@@ -57,7 +57,8 @@ class AttendanceController extends Controller
         $office = $this->attendanceService->getActiveOffice();
 
         // Server-side radius decision — never trust client-supplied status
-        $withinRadius = $office && $this->attendanceService->isWithinRadius($lat, $lng, $office);
+        $distance     = $office ? round($this->attendanceService->calculateDistance($lat, $lng, $office), 2) : null;
+        $withinRadius = $office && ($distance !== null) && ($distance <= $office->radius_meters);
 
         if (! $withinRadius) {
             $request->validate([
@@ -88,6 +89,7 @@ class AttendanceController extends Controller
             'check_in_time'        => now(),
             'check_in_lat'         => $lat,
             'check_in_lng'         => $lng,
+            'distance_from_office' => $distance,
             'check_in_photo_path'  => $photoPath,
             'status'               => $status,
             'out_of_radius_reason' => $withinRadius ? null : $request->reason,

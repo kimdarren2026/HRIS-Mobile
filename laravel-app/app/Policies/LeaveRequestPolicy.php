@@ -9,7 +9,7 @@ class LeaveRequestPolicy
 {
     public function viewAttachment(User $user, LeaveRequest $leaveRequest): bool
     {
-        if (in_array($user->role, ['admin_hr', 'super_admin'], true)) {
+        if (in_array($user->role, [User::ROLE_ADMIN_HR, User::ROLE_SUPER_ADMIN], true)) {
             return true;
         }
 
