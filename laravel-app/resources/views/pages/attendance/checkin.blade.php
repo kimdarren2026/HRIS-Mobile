@@ -219,6 +219,13 @@
 
 <main class="flex-1 mt-16 px-container-margin py-unit-md flex flex-col gap-unit-lg">
 
+@if(!$officeLocation)
+<div class="bg-warning/10 border border-warning/30 rounded-lg px-4 py-3 flex items-start gap-2">
+<span class="material-symbols-outlined text-warning text-[18px] shrink-0 mt-0.5">warning</span>
+<p class="font-body-md text-body-md text-on-surface-variant">Lokasi kantor belum dikonfigurasi. Check-in tetap bisa dilakukan namun akan masuk status <strong>Pending Review</strong>. Hubungi HR untuk mengatur lokasi kantor.</p>
+</div>
+@endif
+
 <!-- Time Context -->
 <section class="flex flex-col items-center justify-center pt-unit-sm">
 <p class="font-body-md text-body-md text-on-surface-variant mb-1" id="current-date">—</p>
@@ -241,11 +248,16 @@
 </div>
 </div>
 <div class="relative w-full h-32 bg-surface-container overflow-hidden flex items-center justify-center">
+<div id="gps-loading" class="flex flex-col items-center justify-center gap-2 text-on-surface-variant">
+<div class="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+<span class="font-label-sm text-label-sm">Mengambil lokasi...</span>
+</div>
 <div id="gps-error-msg" class="hidden flex-col items-center gap-2 text-center px-4">
 <span class="material-symbols-outlined text-error text-[32px]">location_off</span>
 <p class="font-label-sm text-label-sm text-error" id="gps-error-text">Izin lokasi ditolak. Aktifkan GPS di pengaturan browser.</p>
+<button type="button" onclick="retryGps()" class="mt-1 text-primary font-label-sm text-label-sm underline">Coba lagi</button>
 </div>
-<div id="gps-ok" class="flex items-center justify-center w-full h-full">
+<div id="gps-ok" class="hidden items-center justify-center w-full h-full">
 <div class="relative flex items-center justify-center">
 <div class="absolute w-12 h-12 rounded-full bg-primary/20 animate-pin-pulse"></div>
 <div class="absolute w-4 h-4 rounded-full bg-primary shadow-sm border-2 border-white z-10"></div>
@@ -295,17 +307,17 @@ Capture Selfie
 <!-- Reason (hidden until outside radius detected) -->
 <section id="reason-section" class="flex flex-col gap-unit-xs hidden">
 <label class="font-label-md text-label-md text-on-surface px-1 flex justify-between" for="reason">
-Reason for checking in outside radius <span class="text-danger">*</span>
+Alasan absen di luar radius <span class="text-danger">*</span>
 </label>
 @error('reason')
 <p class="text-error font-label-sm text-label-sm px-1">{{ $message }}</p>
 @enderror
 <textarea id="reason" name="reason" rows="3"
     class="w-full rounded-lg border border-outline-variant bg-surface px-4 py-3 font-body-md text-body-md text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-shadow resize-none placeholder:text-outline"
-    placeholder="E.g., Client meeting, working remotely... (min. 10 characters)"
+    placeholder="Contoh: Rapat klien, bekerja dari rumah... (min. 10 karakter)"
     maxlength="500">{{ old('reason') }}</textarea>
 <p class="font-label-sm text-label-sm text-warning flex items-center gap-1">
-<span class="material-symbols-outlined text-[14px]">pending</span> Status: Pending HR Review
+<span class="material-symbols-outlined text-[14px]">pending</span> Status: Menunggu Review HR
 </p>
 </section>
 
@@ -365,76 +377,91 @@ Reason for checking in outside radius <span class="text-danger">*</span>
     }
 
     // ── GPS ────────────────────────────────────────────────────────────────
-    if (document.getElementById('checkin-form')) {
+    function startGps() {
         if (!navigator.geolocation) {
-            showGpsError('Browser ini tidak mendukung GPS.');
-        } else {
-            navigator.geolocation.getCurrentPosition(
-                function(pos) {
-                    const lat = pos.coords.latitude;
-                    const lng = pos.coords.longitude;
-                    const acc = Math.round(pos.coords.accuracy);
-
-                    document.getElementById('lat').value = lat;
-                    document.getElementById('lng').value = lng;
-
-                    gpsReady = true;
-                    updateSubmit();
-
-                    // Check radius to show/hide reason field and update badge
-                    let withinRadius = true;
-                    if (OFFICE_LAT !== null) {
-                        const dist = haversine(lat, lng, OFFICE_LAT, OFFICE_LNG);
-                        withinRadius = dist <= OFFICE_RADIUS;
-
-                        const badge   = document.getElementById('radius-badge');
-                        const detail  = document.getElementById('gps-detail');
-                        const reason  = document.getElementById('reason-section');
-                        const label   = document.getElementById('submit-label');
-
-                        detail.innerText = 'Accuracy: ' + acc + 'm';
-
-                        if (withinRadius) {
-                            badge.className   = 'flex items-center gap-1.5 px-2 py-1 rounded-full bg-success/10 border border-success/20';
-                            badge.innerHTML   = '<div class="w-1.5 h-1.5 rounded-full bg-success animate-pulse"></div><span class="font-status-badge text-status-badge text-success">Within office radius</span>';
-                            if (reason) reason.classList.add('hidden');
-                            if (label)  label.innerText = 'Confirm Check In';
-                        } else {
-                            badge.className   = 'flex items-center gap-1.5 px-2 py-1 rounded-full bg-error-container border border-error/20';
-                            badge.innerHTML   = '<div class="w-1.5 h-1.5 rounded-full bg-error animate-pulse"></div><span class="font-status-badge text-status-badge text-error">Outside office radius</span>';
-                            const distM       = Math.round(haversine(lat, lng, OFFICE_LAT, OFFICE_LNG));
-                            detail.innerText  = 'Accuracy: ' + acc + 'm • ' + distM + 'm from office';
-                            if (reason) reason.classList.remove('hidden');
-                            if (label)  label.innerText = 'Submit for HR Review';
-                        }
-                    } else {
-                        document.getElementById('gps-detail').innerText = 'Accuracy: ' + acc + 'm';
-                    }
-                },
-                function(err) {
-                    const msgs = {
-                        1: 'Izin lokasi ditolak. Aktifkan akses lokasi di pengaturan browser.',
-                        2: 'Posisi tidak tersedia. Pastikan GPS perangkat aktif.',
-                        3: 'Timeout GPS. Coba lagi.',
-                    };
-                    showGpsError(msgs[err.code] || 'Gagal mendapatkan lokasi.');
-                },
-                { enableHighAccuracy: true, timeout: 12000, maximumAge: 0 }
-            );
+            showGpsError('Perangkat/browser ini tidak mendukung GPS. Gunakan browser yang mendukung geolocation.');
+            return;
         }
+        const loadEl = document.getElementById('gps-loading');
+        const okEl   = document.getElementById('gps-ok');
+        const errDiv = document.getElementById('gps-error-msg');
+        if (errDiv) { errDiv.classList.add('hidden'); errDiv.classList.remove('flex'); }
+        if (okEl)   { okEl.classList.add('hidden'); okEl.classList.remove('flex'); }
+        if (loadEl) loadEl.classList.remove('hidden');
+
+        navigator.geolocation.getCurrentPosition(
+            function(pos) {
+                const lat = pos.coords.latitude;
+                const lng = pos.coords.longitude;
+                const acc = Math.round(pos.coords.accuracy);
+
+                document.getElementById('lat').value = lat;
+                document.getElementById('lng').value = lng;
+
+                if (loadEl) loadEl.classList.add('hidden');
+                if (okEl)   { okEl.classList.remove('hidden'); okEl.classList.add('flex'); }
+
+                gpsReady = true;
+                updateSubmit();
+
+                // Check radius to show/hide reason field and update badge
+                let withinRadius = true;
+                if (OFFICE_LAT !== null) {
+                    const dist = haversine(lat, lng, OFFICE_LAT, OFFICE_LNG);
+                    withinRadius = dist <= OFFICE_RADIUS;
+
+                    const badge   = document.getElementById('radius-badge');
+                    const detail  = document.getElementById('gps-detail');
+                    const reason  = document.getElementById('reason-section');
+                    const label   = document.getElementById('submit-label');
+
+                    detail.innerText = 'Akurasi: ' + acc + 'm';
+
+                    if (withinRadius) {
+                        badge.className   = 'flex items-center gap-1.5 px-2 py-1 rounded-full bg-success/10 border border-success/20';
+                        badge.innerHTML   = '<div class="w-1.5 h-1.5 rounded-full bg-success animate-pulse"></div><span class="font-status-badge text-status-badge text-success">Dalam radius kantor</span>';
+                        if (reason) reason.classList.add('hidden');
+                        if (label)  label.innerText = 'Konfirmasi Check In';
+                    } else {
+                        badge.className   = 'flex items-center gap-1.5 px-2 py-1 rounded-full bg-error-container border border-error/20';
+                        badge.innerHTML   = '<div class="w-1.5 h-1.5 rounded-full bg-error animate-pulse"></div><span class="font-status-badge text-status-badge text-error">Di luar radius kantor</span>';
+                        const distM       = Math.round(haversine(lat, lng, OFFICE_LAT, OFFICE_LNG));
+                        detail.innerText  = 'Akurasi: ' + acc + 'm • ' + distM + 'm dari kantor';
+                        if (reason) reason.classList.remove('hidden');
+                        if (label)  label.innerText = 'Kirim untuk Review HR';
+                    }
+                } else {
+                    const detail = document.getElementById('gps-detail');
+                    if (detail) detail.innerText = 'Akurasi: ' + acc + 'm — lokasi kantor belum diatur';
+                }
+            },
+            function(err) {
+                const msgs = {
+                    1: 'Izin lokasi ditolak. Aktifkan akses lokasi di pengaturan browser, lalu tekan "Coba lagi".',
+                    2: 'Posisi tidak tersedia. Pastikan GPS perangkat aktif.',
+                    3: 'Timeout GPS. Periksa koneksi dan tekan "Coba lagi".',
+                };
+                showGpsError(msgs[err.code] || 'Gagal mendapatkan lokasi.');
+            },
+            { enableHighAccuracy: true, timeout: 12000, maximumAge: 0 }
+        );
     }
 
+    window.retryGps = function() { startGps(); };
+
     function showGpsError(msg) {
+        const loadEl = document.getElementById('gps-loading');
         const errDiv = document.getElementById('gps-error-msg');
         const okDiv  = document.getElementById('gps-ok');
         const errTxt = document.getElementById('gps-error-text');
+        if (loadEl) loadEl.classList.add('hidden');
         if (errDiv) { errDiv.classList.remove('hidden'); errDiv.classList.add('flex'); }
-        if (okDiv)  okDiv.classList.add('hidden');
+        if (okDiv)  { okDiv.classList.add('hidden'); okDiv.classList.remove('flex'); }
         if (errTxt) errTxt.innerText = msg;
         const badge = document.getElementById('radius-badge');
         if (badge) {
             badge.className = 'flex items-center gap-1.5 px-2 py-1 rounded-full bg-error-container border border-error/20';
-            badge.innerHTML = '<span class="material-symbols-outlined text-error text-[14px]">location_off</span><span class="font-status-badge text-status-badge text-error">GPS unavailable</span>';
+            badge.innerHTML = '<span class="material-symbols-outlined text-error text-[14px]">location_off</span><span class="font-status-badge text-status-badge text-error">GPS tidak tersedia</span>';
         }
     }
 
@@ -575,8 +602,9 @@ Reason for checking in outside radius <span class="text-danger">*</span>
     if (rs) rs.classList.remove('hidden');
     @endif
 
-    // Start camera only when the check-in form is present
+    // Start GPS and camera only when the check-in form is present
     if (document.getElementById('checkin-form')) {
+        startGps();
         startCamera();
     }
 })();
