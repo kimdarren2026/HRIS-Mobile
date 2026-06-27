@@ -151,7 +151,7 @@
 <div class="flex justify-between items-start mb-unit-sm">
 <div>
 <h2 class="font-headline-md text-[16px] font-semibold text-on-surface">Your Location</h2>
-<p class="font-body-md text-body-md text-on-surface-variant mt-1" id="loc-detail-out">Detecting GPS...</p>
+<p class="font-body-md text-body-md text-on-surface-variant mt-1" id="loc-detail-out">Mengambil lokasi...</p>
 </div>
 <div class="bg-error-container text-on-error-container px-2 py-1 rounded-full font-label-sm text-label-sm flex items-center gap-1 shrink-0">
 <span class="material-symbols-outlined text-[14px]" style="font-variation-settings: 'FILL' 1;">warning</span>
@@ -160,8 +160,17 @@ Outside office radius
 </div>
 <!-- Map Preview -->
 <div class="w-full h-32 rounded-lg relative overflow-hidden mb-3 border border-border flex items-center justify-center bg-surface-container">
-<div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-danger drop-shadow-md">
+<div id="gps-loading-out" class="flex flex-col items-center justify-center gap-2 text-on-surface-variant">
+<div class="w-8 h-8 border-2 border-danger border-t-transparent rounded-full animate-spin"></div>
+<span class="font-label-sm text-label-sm">Mengambil lokasi...</span>
+</div>
+<div id="gps-pin-out" class="hidden absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-danger drop-shadow-md">
 <span class="material-symbols-outlined text-[32px]" style="font-variation-settings: 'FILL' 1;">location_on</span>
+</div>
+<div id="gps-error-out" class="hidden absolute inset-0 flex-col items-center justify-center gap-2 text-center px-4 bg-surface-container">
+<span class="material-symbols-outlined text-error text-[28px]">location_off</span>
+<p class="font-label-sm text-label-sm text-error" id="gps-error-text-out">GPS tidak tersedia.</p>
+<button type="button" onclick="retryGpsOut()" class="mt-1 text-primary font-label-sm text-label-sm underline">Coba lagi</button>
 </div>
 </div>
 <div class="flex justify-between items-center font-label-sm text-label-sm">
@@ -201,16 +210,16 @@ Capture Selfie
 <!-- Required Inputs Section -->
 <div class="mx-container-margin">
 <label class="block font-label-md text-label-md text-on-surface mb-2">
-Reason for outside office radius <span class="text-error">*</span>
+Alasan absen di luar radius <span class="text-error">*</span>
 </label>
 @error('reason')<p class="text-error font-label-sm text-label-sm mb-1">{{ $message }}</p>@enderror
 <textarea id="reason-out" name="reason" rows="4" maxlength="500"
     class="w-full border border-outline-variant rounded-lg p-3 font-body-md text-body-md text-on-surface bg-surface focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all placeholder:text-outline resize-none"
-    placeholder="Explain why you are checking in outside the office radius... (min 10 characters)">{{ old('reason') }}</textarea>
+    placeholder="Contoh: Rapat klien, bekerja dari rumah... (min. 10 karakter)">{{ old('reason') }}</textarea>
 <div class="mt-2 flex flex-col gap-1">
-<p class="font-body-md text-[13px] text-on-surface-variant">This attendance will be submitted for HR review.</p>
+<p class="font-body-md text-[13px] text-on-surface-variant">Presensi ini akan dikirim untuk review HR.</p>
 <p class="font-label-md text-label-md text-warning flex items-center gap-1 mt-1">
-<span class="material-symbols-outlined text-[16px]">pending</span> Status: Pending Review
+<span class="material-symbols-outlined text-[16px]">pending</span> Status: Menunggu Review HR
 </p>
 </div>
 <button id="submit-btn-out" type="submit" disabled
@@ -268,19 +277,54 @@ Submit for HR Review
     }
     setInterval(tick,1000); tick();
     // GPS
-    if (navigator.geolocation) {
+    function startGpsOut() {
+        if (!navigator.geolocation) {
+            showGpsErrorOut('Perangkat/browser ini tidak mendukung GPS.');
+            return;
+        }
+        const loadEl = document.getElementById('gps-loading-out');
+        const pinEl  = document.getElementById('gps-pin-out');
+        const errEl  = document.getElementById('gps-error-out');
+        const locEl  = document.getElementById('loc-detail-out');
+        if (errEl)  { errEl.classList.add('hidden'); errEl.classList.remove('flex'); }
+        if (pinEl)  pinEl.classList.add('hidden');
+        if (loadEl) loadEl.classList.remove('hidden');
+        if (locEl)  locEl.innerText = 'Mengambil lokasi...';
+
         navigator.geolocation.getCurrentPosition(function(p) {
             document.getElementById('lat-out').value = p.coords.latitude;
             document.getElementById('lng-out').value = p.coords.longitude;
             const acc = Math.round(p.coords.accuracy);
+            if (loadEl) loadEl.classList.add('hidden');
+            if (pinEl)  pinEl.classList.remove('hidden');
             const accEl = document.getElementById('acc-out');
-            if (accEl) accEl.innerHTML = '<span class="material-symbols-outlined text-[14px]">my_location</span> Accuracy: '+acc+'m';
+            if (accEl) accEl.innerHTML = '<span class="material-symbols-outlined text-[14px]">my_location</span> Akurasi: ' + acc + 'm';
+            if (locEl) locEl.innerText = 'GPS aktif — akurasi ' + acc + 'm';
             gpsOk = true; trySubmit();
         }, function(e) {
-            const loc = document.getElementById('loc-detail-out');
-            if (loc) loc.innerText = 'GPS unavailable — check browser permissions.';
-        }, {enableHighAccuracy:true,timeout:12000});
+            const msgs = {
+                1: 'Izin lokasi ditolak. Aktifkan akses lokasi di pengaturan browser.',
+                2: 'Posisi tidak tersedia. Pastikan GPS perangkat aktif.',
+                3: 'Timeout GPS. Tekan "Coba lagi".',
+            };
+            showGpsErrorOut(msgs[e.code] || 'Gagal mendapatkan lokasi.');
+        }, {enableHighAccuracy: true, timeout: 12000, maximumAge: 0});
     }
+
+    function showGpsErrorOut(msg) {
+        const loadEl = document.getElementById('gps-loading-out');
+        const errEl  = document.getElementById('gps-error-out');
+        const txtEl  = document.getElementById('gps-error-text-out');
+        const pinEl  = document.getElementById('gps-pin-out');
+        const locEl  = document.getElementById('loc-detail-out');
+        if (loadEl) loadEl.classList.add('hidden');
+        if (pinEl)  pinEl.classList.add('hidden');
+        if (errEl)  { errEl.classList.remove('hidden'); errEl.classList.add('flex'); }
+        if (txtEl)  txtEl.innerText = msg;
+        if (locEl)  locEl.innerText = 'GPS tidak tersedia';
+    }
+
+    window.retryGpsOut = function() { startGpsOut(); };
     // Camera / Selfie (getUserMedia)
     let cameraStreamOut = null;
     let capturedBlobOut = null;
@@ -409,7 +453,8 @@ Submit for HR Review
         });
     }
 
-    // Start camera on page load
+    // Start GPS and camera on page load
+    startGpsOut();
     startCameraOut();
 })();
 </script>
