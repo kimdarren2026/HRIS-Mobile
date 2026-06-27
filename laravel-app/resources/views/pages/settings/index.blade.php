@@ -257,6 +257,16 @@
 <span class="material-symbols-outlined text-[16px]">info</span>
 <span class="font-body-md text-body-md">Role management is handled by system administration</span>
 </div>
+@if(auth()->user()?->role === 'super_admin')
+<a href="{{ route('admin.users.index') }}"
+   class="mt-1 flex items-center justify-between p-3 bg-primary/5 border border-primary/20 rounded-lg hover:bg-primary/10 active:scale-95 transition-transform">
+  <div class="flex items-center gap-2 text-primary">
+    <span class="material-symbols-outlined text-[18px]">manage_accounts</span>
+    <span class="font-body-md text-body-md font-semibold">Manage Users & Roles</span>
+  </div>
+  <span class="material-symbols-outlined text-primary text-[18px]">chevron_right</span>
+</a>
+@endif
 </section>
 
 <!-- Section 5: Notification Settings -->

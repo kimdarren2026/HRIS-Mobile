@@ -1,5 +1,8 @@
 <?php
 
+// ⚠️  LOCAL / TESTING ONLY — do NOT run on production. Creates demo accounts with weak passwords.
+// For production master data, use: php artisan db:seed --class=ProductionSeeder
+
 namespace Database\Seeders;
 
 use App\Models\AttendanceRecord;
