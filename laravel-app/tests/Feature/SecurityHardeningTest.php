@@ -114,7 +114,7 @@ class SecurityHardeningTest extends TestCase
 
     public function test_guest_redirected_from_employee_directory(): void
     {
-        $this->get('/employees')->assertRedirect('/login');
+        $this->get('/hr/employees')->assertRedirect('/login');
     }
 
     public function test_guest_redirected_from_my_payroll(): void
@@ -132,7 +132,7 @@ class SecurityHardeningTest extends TestCase
     public function test_employee_forbidden_from_hr_employee_directory(): void
     {
         $this->actingAs($this->employeeUser)
-            ->get('/employees')
+            ->get('/hr/employees')
             ->assertForbidden();
     }
 
@@ -243,28 +243,28 @@ class SecurityHardeningTest extends TestCase
     public function test_finance_forbidden_from_employee_directory(): void
     {
         $this->actingAs($this->financeUser)
-            ->get('/employees')
+            ->get('/hr/employees')
             ->assertForbidden();
     }
 
     public function test_finance_forbidden_from_employee_detail(): void
     {
         $this->actingAs($this->financeUser)
-            ->get("/employees/{$this->employee->id}")
+            ->get("/hr/employees/{$this->employee->id}")
             ->assertForbidden();
     }
 
     public function test_finance_forbidden_from_employee_create_form(): void
     {
         $this->actingAs($this->financeUser)
-            ->get('/employees/create')
+            ->get('/hr/employees/create')
             ->assertForbidden();
     }
 
     public function test_finance_forbidden_from_employee_edit_form(): void
     {
         $this->actingAs($this->financeUser)
-            ->get("/employees/{$this->employee->id}/edit")
+            ->get("/hr/employees/{$this->employee->id}/edit")
             ->assertForbidden();
     }
 
@@ -596,7 +596,7 @@ class SecurityHardeningTest extends TestCase
     public function test_super_admin_can_access_employee_directory(): void
     {
         $this->actingAs($this->superAdminUser)
-            ->get('/employees')
+            ->get('/hr/employees')
             ->assertOk();
     }
 

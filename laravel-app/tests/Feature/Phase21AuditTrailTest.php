@@ -215,7 +215,7 @@ class Phase21AuditTrailTest extends TestCase
 
         // HR creates an employee with a bank account number
         $this->actingAs($this->adminHrUser)
-            ->post('/employees', [
+            ->post('/hr/employees', [
                 'name'                => 'Budi Santoso',
                 'email'               => 'budi@test.example',
                 'password'            => 'password123',

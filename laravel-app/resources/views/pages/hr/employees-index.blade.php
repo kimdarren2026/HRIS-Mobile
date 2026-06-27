@@ -38,6 +38,8 @@ tailwind.config = {
 <style>
   body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
   .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+  details > summary { list-style: none; }
+  details > summary::-webkit-details-marker { display: none; }
 </style>
 </head>
 <body class="bg-surface text-on-surface min-h-screen max-w-[390px] mx-auto overflow-x-hidden pb-24">
@@ -69,7 +71,7 @@ tailwind.config = {
       <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant group-focus-within:text-primary transition-colors">search</span>
       <input name="search" value="{{ request('search') }}"
         class="w-full pl-12 pr-4 py-3 bg-surface-container-lowest border border-outline-variant rounded-2xl focus:ring-2 focus:ring-primary focus:border-transparent outline-none font-body-md shadow-sm"
-        placeholder="Search by name or NIK" type="text">
+        placeholder="Search by name, email, NIK or position" type="text">
     </div>
     <div class="flex gap-3">
       <div class="flex-1 relative">
@@ -114,13 +116,13 @@ tailwind.config = {
           default      => 'text-on-surface-variant bg-surface-container',
         };
       @endphp
-      <a href="{{ route('employees.show', $emp) }}"
-        class="block bg-surface-container-lowest border border-outline-variant rounded-2xl p-unit-md shadow-sm hover:shadow-md transition-all">
+      <div class="bg-surface-container-lowest border border-outline-variant rounded-2xl p-unit-md shadow-sm hover:shadow-md transition-all">
         <div class="flex items-center gap-unit-md">
-          <div class="w-12 h-12 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center font-bold text-lg shrink-0">
+          <div class="w-12 h-12 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center font-bold text-lg shrink-0" aria-hidden="true">
             {{ strtoupper(substr($emp->user?->name ?? '?', 0, 2)) }}
           </div>
-          <div class="flex-1 min-w-0">
+          <a href="{{ route('employees.show', $emp) }}"
+             class="flex-1 min-w-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-lg">
             <div class="flex items-center justify-between gap-2">
               <h3 class="font-headline-md text-on-surface text-[16px] truncate">{{ $emp->user?->name ?? '—' }}</h3>
               <span class="inline-flex items-center px-2 py-0.5 rounded-full {{ $statusColor }} font-status-badge text-[11px] shrink-0 capitalize">
@@ -132,10 +134,27 @@ tailwind.config = {
               <span class="font-label-sm text-on-surface-variant">{{ $emp->department?->name ?? '—' }}</span>
               <span class="font-label-sm text-on-surface-variant">{{ $emp->nik }}</span>
             </div>
-          </div>
-          <span class="material-symbols-outlined text-on-surface-variant shrink-0">chevron_right</span>
+          </a>
+          <details class="relative shrink-0">
+            <summary class="p-1.5 rounded-full hover:bg-surface-container cursor-pointer transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                     aria-label="Actions for {{ $emp->user?->name ?? 'employee' }}">
+              <span class="material-symbols-outlined text-on-surface-variant text-[22px] block" aria-hidden="true">more_vert</span>
+            </summary>
+            <div class="absolute right-0 top-9 z-10 w-40 bg-surface-container-lowest border border-outline-variant rounded-xl shadow-lg overflow-hidden">
+              <a href="{{ route('employees.show', $emp) }}"
+                 class="flex items-center gap-3 px-4 py-3 font-body-md text-on-surface hover:bg-surface-container transition-colors">
+                <span class="material-symbols-outlined text-[18px]" aria-hidden="true">visibility</span>
+                View Detail
+              </a>
+              <a href="{{ route('employees.edit', $emp) }}"
+                 class="flex items-center gap-3 px-4 py-3 font-body-md text-on-surface hover:bg-surface-container transition-colors">
+                <span class="material-symbols-outlined text-[18px]" aria-hidden="true">edit</span>
+                Edit
+              </a>
+            </div>
+          </details>
         </div>
-      </a>
+      </div>
     @empty
       <div class="bg-surface-container-lowest border border-outline-variant rounded-2xl shadow-sm text-center py-10 px-4 text-on-surface-variant">
         <span class="material-symbols-outlined text-[48px] block mb-2 opacity-50">group_off</span>
