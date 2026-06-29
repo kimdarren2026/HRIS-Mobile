@@ -2,6 +2,8 @@
 
 Checklist ini menandakan suatu fitur **selesai dan siap demo** apabila seluruh poin tercentang. Gunakan bersama `09_TESTING_CHECKLIST.md` saat verifikasi.
 
+> Status terkini: acceptance criteria payroll internal dari PRD awal sudah tidak menjadi arah final. Setelah Phase 28 direvert, HRIS menjadi source of truth untuk employee data dan attendance; external payroll system akan menghitung salary; HRIS nantinya menerima payroll/payslip results dari external payroll system.
+
 ### F.1 Authentication & Role Access
 - [ ] User dapat login dengan email & password yang valid, dan ditolak jika salah dengan pesan error yang jelas.
 - [ ] Setelah login, user diarahkan otomatis ke dashboard sesuai role-nya.
@@ -40,20 +42,18 @@ Checklist ini menandakan suatu fitur **selesai dan siap demo** apabila seluruh p
 - [ ] Setiap submit dan approval cuti tercatat di audit log.
 
 ### F.6 Payroll
-- [ ] Finance/Admin HR dapat membuat periode payroll baru dengan nama dan rentang tanggal unik (tidak boleh duplikat rentang yang sama).
-- [ ] Sistem menghitung total gaji bersih secara otomatis dan akurat berdasarkan rumus yang ditentukan di business rules.
-- [ ] Status payroll berjalan sesuai alur: DRAFT → CALCULATED → HR_REVIEW → FINANCE_APPROVAL → LOCKED → PAID, tanpa bisa melompati tahap.
-- [ ] Setelah status LOCKED, komponen gaji tidak bisa diedit lagi melalui form biasa.
-- [ ] Setiap perubahan status payroll tercatat di audit log.
+- [ ] Dokumentasi dan demo tidak mengklaim HRIS sebagai final internal payroll calculator atau payment processor.
+- [ ] HRIS menjaga employee data dan attendance sebagai source of truth untuk kebutuhan payroll eksternal.
+- [ ] Kontrak integrasi payroll eksternal belum diklaim selesai sampai Phase 34 menerima detail external payroll project.
+- [ ] Phase 28 internal payroll payment workflow tercatat sebagai created lalu reverted.
 
 ### F.7 Payslip
-- [ ] Karyawan hanya bisa melihat payslip untuk periode yang sudah berstatus LOCKED atau PAID.
-- [ ] Detail payslip menampilkan seluruh komponen gaji secara akurat sesuai data payroll_records terkait.
-- [ ] Tombol download PDF tampil di UI (boleh non-fungsional/placeholder untuk MVP, dengan catatan "coming soon").
-- [ ] Karyawan tidak dapat melihat payslip karyawan lain.
+- [ ] Payslip HRIS diperlakukan sebagai hasil yang nantinya diterima dari external payroll system.
+- [ ] Detail struktur, akses, dan download payslip menunggu kontrak integrasi Phase 34.
+- [ ] Tidak ada klaim bahwa payslip final saat ini berasal dari payroll calculation internal HRIS.
 
 ### F.8 Report / Laporan
-- [ ] HR dapat melihat rekap presensi, cuti, dan payroll dalam bentuk tabel.
+- [ ] HR dapat melihat rekap presensi dan cuti dalam bentuk tabel.
 - [ ] Laporan dapat difilter berdasarkan rentang tanggal, departemen, dan/atau nama karyawan.
 - [ ] Data laporan sesuai dengan data aktual di database (tidak ada selisih perhitungan).
 - [ ] Tombol export CSV/Excel tampil di UI sebagai rencana fitur (boleh non-fungsional untuk MVP).
@@ -61,11 +61,11 @@ Checklist ini menandakan suatu fitur **selesai dan siap demo** apabila seluruh p
 ### F.9 Notification
 - [ ] Karyawan menerima notifikasi saat pengajuan presensi/cuti berhasil disubmit.
 - [ ] Karyawan menerima notifikasi saat pengajuan di-approve atau di-reject.
-- [ ] Karyawan menerima notifikasi saat payslip baru tersedia.
+- [ ] Notifikasi payroll/payslip baru menunggu kontrak integrasi external payroll.
 - [ ] Notifikasi dapat ditandai sebagai sudah dibaca, dan jumlah notifikasi belum dibaca tampil sebagai badge.
 
 ### F.10 Audit Log
-- [ ] Semua aksi penting yang ditentukan (login, submit presensi, approve/reject presensi, submit cuti, approve/reject cuti, update data karyawan, proses payroll) tercatat otomatis tanpa perlu input manual dari user.
+- [ ] Semua aksi penting yang ditentukan (login, submit presensi, approve/reject presensi, submit cuti, approve/reject cuti, update data karyawan, dan aksi payroll eksternal setelah kontraknya tersedia) tercatat otomatis tanpa perlu input manual dari user.
 - [ ] Setiap entri audit log menyimpan user, action, module, timestamp, dan detail perubahan jika relevan.
 - [ ] Audit log hanya bisa dilihat (read-only) oleh Admin HR dan Super Admin, tidak bisa diedit/dihapus oleh siapapun melalui aplikasi.
 - [ ] Audit log dapat difilter berdasarkan user, modul, atau rentang tanggal.

@@ -4,13 +4,16 @@ Use this before deploying HRIS Mobile App to any shared demo, staging, or produc
 
 ## Verified Baseline
 
-- Latest main commit: `72775ef Implement functional in-app notifications`
-- Current verified test result: 415 tests, 818 assertions
-- Phase 1-21: PASS
-- Finance self-service attendance fix: PASS
-- Functional in-app notifications: PASS
+- Production URL: https://hrismobile.my.id
+- Phase 27 Security Hardening: PASS, merged, deployed
+- Phase 28 Payroll Payment Workflow: created, then reverted
+- Phase 29 Role Management UI + Production Master Data: PASS, merged, deployed
+- Phase 30 Attendance Production Hardening & UX: PASS, merged
+- Last documented automated test baseline before later Phase 27-30 updates: 415 tests, 818 assertions
 - GitHub audit result: SAFE
 - Repository audit: no ABSENSI MOBILE contamination, no secrets or runtime files tracked
+- Production currently has HTTPS, secure cookie configuration, role management UI, production master data, attendance out-of-radius pending review, and in-app notifications.
+- Phase 30 is recorded as merged; this checklist does not claim Phase 30 has been deployed.
 
 ## Pre-Deployment
 
@@ -102,11 +105,14 @@ php artisan migrate:fresh
 
 `migrate:fresh` drops all tables and destroys existing data.
 
-## Payment and Notification Boundaries
+## Payroll and Notification Boundaries
 
-- Mark Paid records application state and payment reference only.
-- No real bank transfer integration exists.
-- In-app notifications cover attendance, leave, payroll, and expense workflows.
+- HRIS is the source of truth for employee data and attendance.
+- Salary calculation and payment processing will be handled by a separate external payroll project.
+- HRIS is planned to receive payroll and payslip results from the external payroll system later.
+- Phase 28 internal payroll payment workflow was created and then reverted. Do not deploy or document it as the final HRIS payroll workflow.
+- Historical internal payroll screens or data structures should be treated as legacy/demo context unless a future external integration contract reuses them explicitly.
+- In-app notifications cover implemented workflows.
 - No email, SMS, WhatsApp, Firebase, or browser push notification integration exists.
 - Do not expose payroll amounts, bank accounts, private attachments, attendance selfies, passwords, tokens, or private notification details in logs, screenshots, tickets, or public portfolio material.
 
@@ -160,9 +166,10 @@ php artisan view:cache
 - Finance users remain forbidden from HR attendance approval.
 - Leave attachment access is protected.
 - Office location and leave type settings work for Admin HR/Super Admin.
-- Payroll CSV export works for Finance/Super Admin only.
-- Payroll Mark Paid requires/records a payment reference and does not initiate bank transfer.
-- Employee payslip access does not expose other employees.
+- Role management UI is available where deployed.
+- Production master data is present where deployed.
+- Payroll calculation/payment is not verified as final internal HRIS functionality.
+- Future payroll/payslip behavior should be verified against the external payroll integration contract once that contract exists.
 - Company expense submit/approve/reject/paid workflow follows finance maker-checker controls.
 - Audit log UI is accessible to Super Admin only.
 - `/notifications` loads for Employee, Admin HR, Finance, and Super Admin.

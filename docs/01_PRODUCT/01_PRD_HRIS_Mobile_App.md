@@ -1,15 +1,17 @@
 # 01. PRD — HRIS Mobile App
 
+> Status terkini: PRD awal ini pernah memuat payroll internal sebagai bagian MVP. Setelah Phase 28 Payroll Payment Workflow dibuat lalu direvert, arah payroll berubah. HRIS menjadi source of truth untuk employee data dan attendance; external payroll system akan menghitung salary; HRIS nantinya menerima payroll/payslip results dari external payroll system.
+
 ## A. PRD (Product Requirements Document)
 
 ### A.1 Ringkasan Produk
 
-**HRIS Mobile App** adalah aplikasi web mobile-first berbasis Laravel yang digunakan untuk mengelola seluruh proses HR harian dalam satu sistem: presensi berbasis GPS dan selfie, pengajuan izin/cuti, approval HR, payroll sederhana, payslip digital, manajemen data karyawan, laporan, dan audit log. Aplikasi dirancang agar bisa diakses langsung dari browser HP karyawan (mobile-first responsive), dengan opsi dikembangkan menjadi PWA agar terasa seperti aplikasi native (bisa di-install, bekerja offline-ready untuk beberapa fitur).
+**HRIS Mobile App** adalah aplikasi web mobile-first berbasis Laravel yang digunakan untuk mengelola proses HR harian: presensi berbasis GPS dan selfie, pengajuan izin/cuti, approval HR, manajemen data karyawan, laporan, audit log, dan data sumber untuk integrasi payroll eksternal. Aplikasi dirancang agar bisa diakses langsung dari browser HP karyawan (mobile-first responsive), dengan opsi dikembangkan menjadi PWA agar terasa seperti aplikasi native (bisa di-install, bekerja offline-ready untuk beberapa fitur).
 
 Aplikasi ini menyatukan tiga kebutuhan yang biasanya terpisah di banyak perusahaan kecil-menengah:
 - **Karyawan**: presensi, cuti, payslip, profil.
 - **HR**: approval presensi & cuti, manajemen data karyawan, laporan, audit log.
-- **Finance**: payroll, perhitungan gaji, status pembayaran.
+- **Finance/Payroll eksternal**: konsumsi data karyawan dan presensi dari HRIS untuk proses payroll di sistem terpisah.
 
 ### A.2 Latar Belakang Masalah
 
@@ -17,7 +19,7 @@ Banyak perusahaan skala kecil-menengah masih mengelola presensi dengan kertas/Ex
 
 1. **Presensi tidak akurat** — karyawan bisa titip absen, tidak ada bukti lokasi/wajah.
 2. **Proses approval tidak terlacak** — tidak ada riwayat siapa approve, kapan, dan alasan apa.
-3. **Payroll rawan human error** — perhitungan manual rentan salah hitung tunjangan, potongan, lembur.
+3. **Payroll rawan human error** — perhitungan manual rentan salah hitung tunjangan, potongan, lembur; pada arah terbaru, perhitungan ini ditangani oleh external payroll system.
 4. **Tidak ada audit trail** — sulit menelusuri siapa mengubah data apa dan kapan, terutama untuk kebutuhan kepatuhan internal.
 5. **Data karyawan tersebar** — di Excel terpisah-pisah, tidak terpusat dan tidak real-time.
 
@@ -27,8 +29,8 @@ HRIS Mobile App hadir untuk menyatukan proses ini dalam satu sistem berbasis rol
 
 1. Menyediakan sistem presensi yang sulit dimanipulasi (GPS + selfie + radius kantor).
 2. Mempercepat proses pengajuan dan approval cuti/izin secara digital.
-3. Menyederhanakan perhitungan payroll dengan komponen gaji yang terstruktur.
-4. Memberi karyawan akses mandiri (self-service) untuk melihat status presensi, cuti, dan payslip.
+3. Menyediakan employee data dan attendance yang akurat sebagai sumber data payroll eksternal.
+4. Memberi karyawan akses mandiri (self-service) untuk melihat status presensi, cuti, dan nantinya payslip hasil integrasi payroll eksternal.
 5. Memberi HR dan Finance dashboard yang jelas untuk mengambil keputusan approval dan pembayaran.
 6. Mencatat seluruh aktivitas penting ke dalam audit log untuk transparansi dan akuntabilitas.
 7. Dibangun dengan arsitektur yang scalable (Laravel + MySQL) agar mudah dikembangkan ke fitur lanjutan (export, PDF, PWA, notifikasi push).
@@ -39,7 +41,7 @@ HRIS Mobile App hadir untuk menyatukan proses ini dalam satu sistem berbasis rol
 |---|---|
 | Karyawan (Employee) | Seluruh staf perusahaan yang melakukan presensi harian dan mengajukan cuti/izin |
 | Admin HR | Tim HR yang mengelola data karyawan, approval presensi/cuti, dan laporan |
-| Finance | Tim keuangan yang memproses payroll dan memastikan status pembayaran |
+| Finance | Tim keuangan yang memerlukan data HRIS dan hasil payroll dari sistem payroll eksternal |
 | Super Admin | Pemilik sistem/IT internal yang mengelola seluruh data, role, dan konfigurasi sistem |
 
 Perusahaan target: skala kecil-menengah (10–500 karyawan), satu atau beberapa kantor cabang, belum memiliki sistem HR digital terintegrasi.
@@ -50,7 +52,7 @@ Perusahaan target: skala kecil-menengah (10–500 karyawan), satu atau beberapa 
 |---|---|
 | **Employee** | Check-in/out presensi, ajukan cuti/izin, lihat riwayat presensi & cuti, lihat payslip, edit profil terbatas |
 | **Admin HR** | Semua hak Employee + kelola data karyawan (CRUD), approve/reject presensi pending, approve/reject cuti, lihat & buat laporan, lihat audit log, kelola periode payroll (tahap awal) |
-| **Finance** | Lihat data payroll, input/edit komponen gaji, proses perhitungan payroll, approval tahap finance, lihat laporan payroll, lihat payslip semua karyawan |
+| **Finance** | Melihat data HRIS yang relevan untuk payroll, memantau hasil payroll/payslip setelah integrasi eksternal tersedia |
 | **Super Admin** | Semua hak di atas + kelola user & role, kelola departemen/jabatan, kelola konfigurasi sistem (radius kantor, jenis cuti, dll), akses penuh audit log |
 
 **Prinsip permission**: setiap route dan setiap aksi (approve, edit, delete) divalidasi di middleware dan policy berdasarkan role yang login. Tidak ada akses langsung via URL tanpa validasi role.
@@ -62,9 +64,9 @@ Perusahaan target: skala kecil-menengah (10–500 karyawan), satu atau beberapa 
 3. Employee Management (CRUD data karyawan)
 4. Attendance / Presensi (GPS + Selfie + Radius)
 5. Leave & Permission (Cuti & Izin)
-6. Payroll (perhitungan gaji per periode)
-7. Payslip (slip gaji digital)
-8. Report / Laporan (presensi, cuti, payroll)
+6. Payroll external integration (planned; contract menunggu detail external payroll project)
+7. Payslip hasil payroll eksternal (planned)
+8. Report / Laporan (presensi, cuti, dan data HR terkait payroll)
 9. Notification (in-app)
 10. Audit Log
 
@@ -76,7 +78,7 @@ Perusahaan target: skala kecil-menengah (10–500 karyawan), satu atau beberapa 
 - Sebagai karyawan, saya ingin mengajukan cuti dengan memilih jenis cuti dan melampirkan dokumen pendukung jika perlu.
 - Sebagai karyawan, saya ingin melihat sisa saldo cuti saya sebelum mengajukan.
 - Sebagai karyawan, saya ingin melihat status pengajuan cuti saya (pending/approved/rejected).
-- Sebagai karyawan, saya ingin melihat dan (nantinya) mengunduh payslip saya per periode.
+- Sebagai karyawan, saya ingin melihat dan (nantinya) mengunduh payslip saya per periode setelah hasil payroll diterima dari external payroll system.
 - Sebagai karyawan, saya ingin mendapat notifikasi saat pengajuan saya disetujui/ditolak.
 
 **Admin HR**
@@ -87,10 +89,9 @@ Perusahaan target: skala kecil-menengah (10–500 karyawan), satu atau beberapa 
 - Sebagai admin HR, saya ingin melihat audit log untuk menelusuri perubahan data penting.
 
 **Finance**
-- Sebagai finance, saya ingin membuat periode payroll baru dan menginput komponen gaji per karyawan.
-- Sebagai finance, saya ingin sistem menghitung otomatis total gaji bersih berdasarkan komponen yang diinput.
-- Sebagai finance, saya ingin mengunci (lock) payroll setelah final agar tidak bisa diubah lagi.
-- Sebagai finance, saya ingin melihat status pembayaran tiap periode payroll.
+- Sebagai finance, saya ingin HRIS menyediakan employee data dan attendance yang akurat sebagai input ke external payroll system.
+- Sebagai finance, saya ingin HRIS menerima hasil payroll/payslip dari external payroll system setelah integrasi tersedia.
+- Sebagai finance, saya ingin melihat status hasil payroll/payslip yang diterima tanpa menjadikan HRIS sebagai kalkulator salary final.
 
 **Super Admin**
 - Sebagai super admin, saya ingin mengelola seluruh user dan role agar akses sistem terkontrol.
@@ -115,12 +116,12 @@ Perusahaan target: skala kecil-menengah (10–500 karyawan), satu atau beberapa 
    - Karyawan tidak bisa mengajukan cuti baru jika ada pengajuan lain yang tanggalnya tumpang tindih dan masih pending/approved.
    - Jika ditolak, saldo cuti tidak berkurang.
 
-3. **Payroll**
-   - Payroll dibuat per periode (misal: bulanan), satu periode untuk satu rentang tanggal.
-   - Alur status: **DRAFT → CALCULATED → HR_REVIEW → FINANCE_APPROVAL → LOCKED → PAID**.
-   - Setelah status **LOCKED**, data komponen gaji tidak bisa diubah lagi (read-only), kecuali oleh Super Admin dengan log perubahan khusus.
-   - Payslip hanya bisa diakses karyawan setelah payroll berstatus **LOCKED** atau **PAID**.
-   - Perhitungan total gaji bersih = Gaji Pokok + Tunjangan + Bonus + Lembur − Potongan − Potongan Keterlambatan − Potongan Absensi − Pajak/BPJS (jika diaktifkan).
+3. **Payroll External Integration**
+   - HRIS menyimpan employee data dan attendance sebagai source of truth.
+   - External payroll system bertanggung jawab atas salary calculation dan payment processing.
+   - HRIS nantinya menerima payroll/payslip results dari external payroll system.
+   - Kontrak data, endpoint/API, format file, status, dan aturan sinkronisasi akan ditentukan di Phase 34 setelah detail external payroll project tersedia.
+   - Phase 28 internal payroll payment workflow sudah direvert dan tidak menjadi final internal HRIS payroll.
 
 4. **Approval umum**
    - Setiap aksi approve/reject wajib dicatat siapa approver-nya dan waktu approve.
@@ -137,7 +138,7 @@ Perusahaan target: skala kecil-menengah (10–500 karyawan), satu atau beberapa 
 | Presensi | GPS aktif (lat/long terisi), foto selfie wajib (file image, max 5MB), alasan wajib jika di luar radius (min 10 karakter) |
 | Cuti | Tanggal mulai ≤ tanggal selesai, jenis cuti wajib dipilih, alasan wajib diisi, lampiran opsional (pdf/jpg/png, max 5MB), saldo cuti cukup (untuk jenis yang memotong saldo) |
 | Data Karyawan | Email unik, NIK unik, nomor HP format valid, field wajib (nama, email, NIK, jabatan, departemen, tanggal masuk) tidak boleh kosong |
-| Payroll | Komponen gaji berupa angka ≥ 0, periode tidak boleh duplikat untuk rentang tanggal yang sama, tidak bisa edit jika status LOCKED/PAID |
+| Payroll external integration | Validasi menunggu kontrak integrasi Phase 34; HRIS harus menjaga akurasi employee data dan attendance sebagai input payroll eksternal |
 | Upload File | Validasi tipe file dan ukuran maksimal di sisi server, bukan hanya di frontend |
 
 ### A.10 Data yang Disimpan
@@ -147,8 +148,7 @@ Perusahaan target: skala kecil-menengah (10–500 karyawan), satu atau beberapa 
 - Data presensi: timestamp check-in/out, koordinat GPS, foto selfie, status, alasan (jika di luar radius), approver.
 - Data cuti: jenis, tanggal mulai/selesai, alasan, lampiran, status, approver, catatan approval.
 - Data saldo cuti per karyawan per tahun.
-- Data payroll: periode, komponen gaji per karyawan, status, riwayat approval.
-- Data payslip: snapshot hasil payroll per karyawan per periode.
+- Data payroll/payslip: planned sebagai hasil yang diterima dari external payroll system, detail struktur menunggu kontrak integrasi Phase 34.
 - Data notifikasi: judul, pesan, status dibaca/belum, relasi ke modul terkait.
 - Data audit log: user, aksi, modul, waktu, detail perubahan (before/after jika relevan).
 
@@ -183,9 +183,9 @@ Perusahaan target: skala kecil-menengah (10–500 karyawan), satu atau beberapa 
 - Employee management dasar (CRUD).
 - Presensi GPS + selfie + radius + approval pending.
 - Pengajuan & approval cuti/izin + saldo cuti.
-- Payroll dasar (input komponen, hitung otomatis, alur status sampai PAID).
-- Payslip (lihat di web, tombol download PDF boleh placeholder/disabled dulu).
-- Laporan dasar (rekap presensi, cuti, payroll dalam tabel, filter tanggal/departemen).
+- Data HRIS untuk payroll eksternal: employee data dan attendance siap digunakan sebagai sumber data.
+- Payslip hasil payroll eksternal belum termasuk sampai kontrak integrasi tersedia.
+- Laporan dasar (rekap presensi, cuti, dan data HR terkait payroll dalam tabel, filter tanggal/departemen).
 - Notifikasi in-app sederhana (list/toast).
 - Audit log dasar untuk aksi-aksi penting yang disebutkan.
 
@@ -193,7 +193,8 @@ Perusahaan target: skala kecil-menengah (10–500 karyawan), satu atau beberapa 
 - Export CSV/Excel.
 - Download payslip dalam format PDF (real generation).
 - Push notification (web push/mobile native).
-- Integrasi payroll dengan pajak otomatis (PPh21) dan BPJS resmi.
+- Payroll external integration contract dan penerimaan hasil payroll/payslip dari sistem payroll eksternal.
+- Integrasi pajak otomatis (PPh21) dan BPJS resmi jika menjadi bagian dari external payroll system.
 - Multi-kantor dengan radius berbeda per cabang.
 - Offline mode penuh (PWA caching presensi saat offline).
 - Aplikasi native (Android/iOS) terpisah.
@@ -209,4 +210,4 @@ Perusahaan target: skala kecil-menengah (10–500 karyawan), satu atau beberapa 
 7. Mode offline untuk presensi (data tersimpan lokal, sync saat online kembali — fitur khas PWA).
 8. Dashboard analitik lanjutan (grafik tren kehadiran, turnover, dsb).
 9. Integrasi kalender (Google Calendar) untuk jadwal cuti tim.
-10. Self-service slip gaji + riwayat pajak tahunan (semacam e-Bukti Potong).
+10. Self-service slip gaji + riwayat pajak tahunan (semacam e-Bukti Potong) setelah hasil tersedia dari external payroll system.

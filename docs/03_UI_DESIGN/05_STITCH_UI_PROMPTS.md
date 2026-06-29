@@ -2,6 +2,8 @@
 
 **Petunjuk pemakaian**: salin setiap blok prompt di bawah ini satu per satu ke Google Stitch (atau UI generator lain seperti Figma AI / v0). Semua prompt sudah mengikuti gaya desain yang sama: mobile-first, clean modern HR dashboard, warna biru/indigo/putih, profesional untuk aplikasi kantor.
 
+> Status terkini: prompt payroll/payslip di dokumen ini adalah artefak rancangan historis. Setelah Phase 28 direvert, final payroll calculation/payment akan ditangani external payroll system. HRIS akan menyediakan employee data dan attendance sebagai source of truth, lalu menerima payroll/payslip results setelah kontrak integrasi tersedia.
+
 **Gaya desain global** (sertakan di setiap prompt jika tool memerlukan konteks ulang):
 > Design style: mobile-first, clean and modern HR dashboard, professional and corporate feel, color palette primary indigo/blue (#4F46E5 / #4338CA) with white background and soft gray neutrals, rounded cards with subtle shadow, clear status badges (green=approved, yellow=pending, red=rejected), bottom navigation bar with icons, generous spacing, sans-serif font (Inter or similar).
 

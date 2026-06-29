@@ -2,6 +2,8 @@
 
 Checklist manual testing ini dipakai sebelum demo/rilis MVP. Jalankan dengan minimal 2 akun berbeda per role (untuk menguji isolasi data antar user, misal Karyawan A tidak bisa lihat data Karyawan B).
 
+> Status terkini: testing payroll internal dari roadmap awal tidak lagi menjadi acceptance path final. Phase 28 Payroll Payment Workflow dibuat lalu direvert. HRIS menjadi source of truth untuk employee data dan attendance; salary calculation/payment akan ditangani external payroll system; HRIS nantinya menerima payroll/payslip results.
+
 ## Testing Login
 
 - [ ] Login dengan email & password benar → berhasil masuk
@@ -69,27 +71,23 @@ Checklist manual testing ini dipakai sebelum demo/rilis MVP. Jalankan dengan min
 
 ## Testing Payroll
 
-- [ ] Buat periode payroll baru dengan rentang tanggal unik → berhasil, status DRAFT
-- [ ] Buat periode payroll dengan rentang tanggal yang sama persis dengan periode lain → ditolak sistem
-- [ ] Input komponen gaji per karyawan, klik Hitung → net_salary terhitung sesuai rumus (cocokkan manual dengan kalkulator)
-- [ ] Status berubah ke CALCULATED setelah perhitungan
-- [ ] Coba ubah status langsung dari DRAFT ke LOCKED (skip tahap) → ditolak sistem
-- [ ] Lanjutkan status secara berurutan: CALCULATED → HR_REVIEW → FINANCE_APPROVAL → LOCKED → PAID, masing-masing berhasil sesuai urutan
-- [ ] Setelah status LOCKED, coba edit komponen gaji via form → ditolak backend (uji juga lewat request langsung, bukan hanya cek tombol UI hilang)
+- [ ] Dokumentasi dan demo menyebut Phase 28 internal payroll payment workflow sebagai created lalu reverted.
+- [ ] HRIS tidak diklaim sebagai final internal payroll calculator atau payment processor.
+- [ ] Employee data dan attendance dijelaskan sebagai source data untuk external payroll system.
+- [ ] Detail kontrak integrasi, format data, status, dan endpoint/API belum diklaim selesai sebelum Phase 34.
+- [ ] Tidak ada klaim bahwa HRIS melakukan bank transfer atau final salary calculation.
 
 ## Testing Payslip
 
-- [ ] Sebelum payroll periode terkait LOCKED, payslip belum muncul untuk karyawan
-- [ ] Setelah payroll LOCKED, payslip otomatis muncul untuk karyawan dengan data sesuai payroll_records
-- [ ] Detail payslip menampilkan komponen gaji lengkap dan net_salary yang benar
-- [ ] Karyawan A mencoba mengakses payslip karyawan B dengan mengubah ID di URL → ditolak (403/404)
-- [ ] Tombol Download PDF tampil sebagai placeholder, tidak error saat diklik (boleh disabled/menampilkan pesan "coming soon")
+- [ ] Payslip HRIS dijelaskan sebagai hasil yang nantinya diterima dari external payroll system.
+- [ ] Detail akses, tampilan, download, dan sinkronisasi payslip menunggu kontrak integrasi Phase 34.
+- [ ] Tidak ada klaim bahwa payslip final saat ini berasal dari payroll calculation internal HRIS.
 
 ## Testing Report
 
 - [ ] Laporan rekap presensi menampilkan data sesuai jumlah aktual presensi di database untuk filter tanggal yang dipilih
 - [ ] Laporan rekap cuti menampilkan data sesuai jumlah aktual cuti
-- [ ] Laporan rekap payroll menampilkan data sesuai aktual payroll_records
+- [ ] Laporan terkait payroll eksternal belum diklaim selesai sebelum kontrak integrasi Phase 34
 - [ ] Filter departemen menyaring data dengan benar
 - [ ] Filter karyawan (nama spesifik) menyaring data dengan benar
 - [ ] Akses halaman laporan oleh role Employee → ditolak (403)
@@ -102,14 +100,14 @@ Checklist manual testing ini dipakai sebelum demo/rilis MVP. Jalankan dengan min
 - [ ] Submit cuti tercatat di audit log
 - [ ] Approve/reject cuti tercatat di audit log
 - [ ] Update data karyawan tercatat di audit log dengan detail before/after
-- [ ] Setiap perubahan status payroll tercatat di audit log
+- [ ] Audit log untuk payroll eksternal menunggu kontrak integrasi Phase 34
 - [ ] Tidak ditemukan endpoint/tombol untuk edit atau hapus entri audit log di seluruh aplikasi
 - [ ] Filter audit log (user, modul, rentang tanggal) berfungsi dengan benar
 - [ ] Role Employee tidak bisa mengakses halaman audit log (403)
 
 ## Testing Responsive Mobile
 
-- [ ] Seluruh halaman utama (dashboard, presensi, cuti, payroll, payslip, profile) diuji di lebar layar 360px dan 414px — tidak ada elemen terpotong/overflow horizontal
+- [ ] Seluruh halaman utama (dashboard, presensi, cuti, employee directory, notifications, profile) diuji di lebar layar 360px dan 414px — tidak ada elemen terpotong/overflow horizontal
 - [ ] Bottom navigation tetap terlihat dan berfungsi di semua halaman employee
 - [ ] Form (presensi, cuti) mudah diisi dengan satu tangan di layar HP (tombol cukup besar, tidak terlalu rapat)
 - [ ] Status badge terbaca jelas (kontras warna cukup) di mode terang

@@ -1,5 +1,11 @@
 # HRIS Mobile App Manual QA Guide
 
+Current production URL:
+
+```text
+https://hrismobile.my.id
+```
+
 Use this guide for portfolio/demo verification after running:
 
 ```bash
@@ -67,49 +73,15 @@ password
 10. Repeat with another request and reject with a clear note.
 11. Expected: status changes correctly and attachment URL is protected by auth/policy.
 
-## 4. Payroll Calculate and Approval Workflow
+## 4. Payroll Boundary
 
-1. Login as Finance.
-2. Open `/payroll/periods`.
-3. Use seeded `Demo Payroll July 2026 Draft` or create a new payroll period.
-4. Open the period detail.
-5. Click `Run Calculation`.
-6. Expected: period status becomes `CALCULATED` and payroll records are created without duplicates.
-7. Logout and login as Admin HR.
-8. Open `/payroll/periods`, then the calculated period.
-9. Click `Submit for HR Review`.
-10. Expected: status becomes `HR_REVIEW`.
-11. Logout and login as Finance.
-12. Open the same period.
-13. Click `Finance Approve`.
-14. Expected: status becomes `FINANCE_APPROVAL`.
-15. Click `Lock Payroll`.
-16. Expected: status becomes `LOCKED`.
-17. Click `Mark as Paid`.
-18. Enter a payment reference when prompted.
-19. Expected: status becomes `PAID` and the payment reference is recorded.
-20. Note: Mark Paid records application state and payment reference only. No real bank transfer integration exists.
+1. Confirm demo and handoff material does not describe HRIS as the final internal payroll calculator or payment processor.
+2. Confirm the documented payroll direction is: HRIS is the source of truth for employee data and attendance; an external payroll system will calculate salary; HRIS will later receive payroll and payslip results from that external system.
+3. Confirm Phase 28 is described as created and then reverted.
+4. If historical payroll/payslip screens exist in the codebase, treat them as legacy/demo context only and do not present them as the current production payroll architecture.
+5. Confirm no demo step claims HRIS initiates bank transfer or owns final salary calculation.
 
-## 5. Employee Payslip View and Print
-
-1. Login as Employee.
-2. Open `/my/payroll`.
-3. Open seeded `Demo Payroll June 2026`.
-4. Confirm employee can only see own payroll record.
-5. Open print view from the payslip page.
-6. Expected: print-friendly payslip loads without exposing other employees.
-
-## 6. Finance CSV Export
-
-1. Login as Finance.
-2. Open `/payroll/periods`.
-3. Open `Demo Payroll June 2026`.
-4. Click `Export CSV`.
-5. Expected: CSV downloads with payroll period, employee, attendance days, leave days, salary columns, and status.
-6. Login as Employee and try the export URL.
-7. Expected: access denied.
-
-## 7. Employee Master Data CRUD
+## 5. Employee Master Data CRUD
 
 1. Login as Admin HR.
 2. Open `/employees`.
@@ -121,16 +93,16 @@ password
 8. Create a new demo employee with non-real NIK and bank data.
 9. Expected: employee and linked user are created.
 
-## 8. Dashboard Summaries
+## 6. Dashboard Summaries
 
 1. Login as Employee and open `/employee/dashboard`.
-2. Confirm today attendance, leave, and payroll summaries do not expose other employees.
+2. Confirm today attendance and leave summaries do not expose other employees.
 3. Login as Admin HR and open `/admin/dashboard`.
-4. Confirm employee count, pending attendance, pending leave, and latest payroll are shown.
+4. Confirm employee count, pending attendance, and pending leave are shown.
 5. Login as Finance and open `/finance/dashboard`.
-6. Confirm payroll status counts and latest periods are shown.
+6. Confirm finance dashboard data is limited to currently supported workflows and does not present reverted payroll payment workflow as final.
 
-## 9. In-App Notifications
+## 7. In-App Notifications
 
 1. Login as Employee and submit outside-radius attendance.
 2. Login as Admin HR and open `/notifications`.
@@ -146,7 +118,7 @@ password
 12. Expected: not found response, not data exposure.
 13. Note: notifications are in-app only. Email, SMS, WhatsApp, Firebase, and browser push notifications are not implemented.
 
-## 10. Finance Self-Service and Approval Boundary
+## 8. Finance Self-Service and Approval Boundary
 
 1. Login as Finance with a linked employee record.
 2. Open `/attendance/checkin` and `/attendance/history`.
@@ -154,17 +126,16 @@ password
 4. Open `/hr/approval-queue`.
 5. Expected: forbidden response.
 
-## 11. Mobile Responsiveness QA
+## 9. Mobile Responsiveness QA
 
 1. Open Chrome DevTools device toolbar.
-2. Test widths `375px`, `390px`, and `430px` on login, dashboards, attendance, leave, payroll, employee directory, profile, and error pages.
+2. Test widths `375px`, `390px`, and `430px` on login, dashboards, attendance, leave, employee directory, profile, notifications, and error pages.
 3. Confirm fixed headers and bottom navigation stay centered within the mobile frame on desktop preview.
 4. Confirm cards, status badges, action buttons, and empty states do not overflow horizontally.
-5. Open `/payroll/periods` as Finance and Admin HR; confirm only the role-appropriate payroll action is visible.
+5. Confirm any legacy payroll screens, if reviewed, are not used as evidence of final internal payroll ownership.
 6. Open employee directory with filters that return no result; confirm the empty state and actions fit inside the mobile width.
-7. Open employee payslip detail and print view; confirm payroll tables remain readable on narrow screens.
 
-## 12. Regression Checks
+## 10. Regression Checks
 
 Run:
 
@@ -177,7 +148,7 @@ git diff --check
 Expected:
 
 ```text
-PASS, currently verified at 415 tests and 818 assertions
+PASS. Last documented automated baseline before later Phase 27-30 updates: 415 tests and 818 assertions.
 ```
 
 ## Notes
