@@ -1,5 +1,7 @@
 # HRIS Mobile App — Dokumen Lengkap Pengembangan
 
+> Status terkini: dokumen lengkap ini berisi gabungan spesifikasi historis. Setelah Phase 28 Payroll Payment Workflow dibuat lalu direvert, payroll calculation/payment tidak lagi menjadi final internal HRIS workflow. Arah terbaru: HRIS menjadi source of truth untuk employee data dan attendance; external payroll system menghitung salary; HRIS nantinya menerima payroll/payslip results dari external payroll system.
+
 ## A. PRD (Product Requirements Document)
 
 ### A.1 Ringkasan Produk
@@ -309,6 +311,8 @@ flowchart TD
 ```
 
 ### B.6 Alur Payroll
+
+> Status note: alur ini adalah rancangan historis payroll internal. Setelah Phase 28 direvert, payroll calculation/payment final akan ditangani external payroll system. HRIS akan berperan sebagai source of truth employee data dan attendance, lalu menerima payroll/payslip results dari sistem eksternal.
 
 ```mermaid
 flowchart TD

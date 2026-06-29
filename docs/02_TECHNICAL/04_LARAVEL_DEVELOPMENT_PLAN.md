@@ -1,5 +1,7 @@
 # 04. Laravel Development Plan
 
+> Status terkini: controller/service/model payroll dalam dokumen ini adalah rancangan historis internal payroll. Setelah Phase 28 direvert, final payroll calculation/payment akan dikerjakan oleh external payroll system. HRIS akan menyediakan employee data dan attendance sebagai source of truth, lalu menerima payroll/payslip results setelah kontrak integrasi Phase 34 tersedia.
+
 ### D.1 Struktur Folder yang Disarankan
 
 ```

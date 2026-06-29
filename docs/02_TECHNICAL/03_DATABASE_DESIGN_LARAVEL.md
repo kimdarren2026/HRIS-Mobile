@@ -1,5 +1,7 @@
 # 03. Database Design — Laravel + MySQL
 
+> Status terkini: bagian payroll/payslip dalam desain database ini berasal dari rancangan internal payroll awal. Setelah Phase 28 direvert, final payroll calculation/payment akan ditangani external payroll system. Struktur data payroll/payslip masa depan akan ditentukan ulang di Phase 34 Payroll External Integration Contract.
+
 ### C.1 Daftar Tabel
 
 1. `users` — akun login & role

@@ -1,6 +1,60 @@
 # 07. Development Roadmap — Step by Step
 
-Roadmap ini dipecah menjadi **10 phase berurutan**. Setiap phase punya: tujuan, file/tabel yang dibuat, fitur yang harus selesai, testing wajib, output akhir, dan **prompt lanjutan** yang bisa langsung Anda copy ke Claude/Codex untuk mengerjakan phase tersebut.
+Dokumen ini berisi roadmap awal dan catatan status terkini. Roadmap awal di bawah dipecah menjadi **10 phase berurutan** dan tetap disimpan sebagai riwayat perencanaan. Status terbaru sudah melewati Phase 21 dan perlu dibaca bersama addendum berikut.
+
+## Addendum Status Terkini
+
+Production URL: https://hrismobile.my.id
+
+Production saat ini sudah memiliki HTTPS, secure cookie configuration, role management UI, production master data, attendance out-of-radius pending review, dan in-app notifications.
+
+| Phase | Scope | Status | Deployment note |
+| --- | --- | --- | --- |
+| 1-21 | Baseline HRIS mobile, attendance, leave, employee data, expenses, audit, notifications, and historical internal payroll/payslip work | PASS | Historical baseline |
+| 22 | Staging deployment preparation | PASS, merged | Not separately documented as deployed |
+| 22B | PHP 8.3 dependency integration | PASS, merged | Not separately documented as deployed |
+| 23 | Blade UI refactor and flash message reuse | PASS, merged | Not separately documented as deployed |
+| 24 | Bottom navigation refactor | PASS, merged | Not separately documented as deployed |
+| 25 | Validation error component refactor | PASS, merged | Not separately documented as deployed |
+| 26 | Employee management database integration | PASS, merged | Not separately documented as deployed |
+| 27 | Security hardening | PASS, merged | Deployed |
+| 28 | Payroll payment workflow | Reverted | Created, then reverted because payroll will be handled by a separate external payroll project |
+| 29 | Role management UI and production master data | PASS, merged | Deployed |
+| 30 | Attendance production hardening and UX | PASS, merged | Merged; deployment not claimed here |
+
+Payroll plan terkini:
+
+- HRIS menjadi source of truth untuk employee data dan attendance.
+- Salary calculation dan payment processing akan ditangani oleh external payroll system.
+- HRIS nantinya menerima payroll dan payslip results dari external payroll system.
+- Phase 28 internal payroll payment workflow sudah direvert dan tidak boleh dianggap sebagai final internal HRIS payroll.
+
+Post-Phase 21 timeline:
+
+- Phase 22 prepared staging deployment work after the Phase 21 baseline.
+- Phase 22B updated dependency integration for PHP 8.3 staging compatibility.
+- Phase 23 refactored Blade UI details and reused flash messages.
+- Phase 24 refactored bottom navigation.
+- Phase 25 extracted reusable validation error presentation.
+- Phase 26 integrated employee management with database-backed production data.
+- Phase 27 completed security hardening and was merged and deployed.
+- Phase 28 introduced an internal payroll payment workflow, then was reverted.
+- Phase 29 delivered role management UI and production master data, then was merged and deployed.
+- Phase 30 delivered attendance production hardening and UX work, then was merged.
+
+Next planned phases:
+
+| Phase | Planned scope | Status |
+| --- | --- | --- |
+| 31 | Documentation Status Update | Current documentation-only update |
+| 32 | Mobile UI Consistency Audit | Planned |
+| 33 | Backup/Production DevOps | Planned |
+| 34 | Payroll External Integration Contract | Planned; waiting for external payroll project details |
+| 35 | SIAKAT SSO Integration | Planned |
+
+## Roadmap Awal Phase 1-10
+
+Setiap phase punya: tujuan, file/tabel yang dibuat, fitur yang harus selesai, testing wajib, output akhir, dan **prompt lanjutan** yang bisa langsung Anda copy ke Claude/Codex untuk mengerjakan phase tersebut.
 
 > **Aturan utama: JANGAN lanjut ke phase berikutnya sebelum phase saat ini berstatus PASS** (lihat kolom "Output Akhir Phase" sebagai kriteria PASS, dan silangkan dengan `06_ACCEPTANCE_CRITERIA.md` + `09_TESTING_CHECKLIST.md`).
 
@@ -215,6 +269,8 @@ Jangan kerjakan phase lain di luar Phase 4 ini.
 ---
 
 ## Phase 5 — Payroll
+
+> Status note: bagian ini adalah roadmap historis dari arah payroll internal awal. Setelah Phase 28 direvert, final payroll calculation/payment tidak lagi direncanakan sebagai workflow internal HRIS. Lihat Addendum Status Terkini untuk arah external payroll integration.
 
 **Tujuan**: Membangun fitur perhitungan payroll per periode dengan alur status berjenjang.
 

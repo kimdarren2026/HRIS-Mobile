@@ -1,5 +1,7 @@
 # 08. Security and Validation Rules — HRIS Mobile App
 
+> Status terkini: aturan payroll internal di dokumen ini adalah referensi historis. Setelah Phase 28 direvert, final payroll calculation/payment ditangani external payroll system. Validasi, otorisasi, dan audit untuk payroll eksternal akan ditentukan ulang saat Phase 34 Payroll External Integration Contract tersedia.
+
 Dokumen ini adalah checklist keamanan dan validasi **khusus untuk konteks HRIS** — bukan generic security checklist. Gunakan sebagai acuan wajib di setiap phase development (Phase 1-10), bukan ditambahkan belakangan saat aplikasi sudah jadi. Standar teknis dasar (SOLID, fail-fast, least privilege, secure defaults, secrets via env, logging tanpa data sensitif) mengikuti `CLAUDE.md` yang menjadi acuan engineering project ini.
 
 ## 1. Autentikasi dan Session
