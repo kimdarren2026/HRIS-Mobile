@@ -1,12 +1,10 @@
 <!DOCTYPE html>
-
 <html class="light" lang="en"><head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Employee Profile - HRIS Mobile App</title>
+<title>Profile - HRIS Mobile App</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
 <style>
         .material-symbols-outlined {
@@ -16,13 +14,6 @@
         body {
             font-family: 'Inter', sans-serif;
             -webkit-tap-highlight-color: transparent;
-        }
-        .hide-scrollbar::-webkit-scrollbar {
-            display: none;
-        }
-        .hide-scrollbar {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
         }
     </style>
 <script id="tailwind-config">
@@ -130,158 +121,60 @@
 <body class="bg-surface text-on-surface min-h-screen flex flex-col items-center">
 <!-- Top App Bar -->
 <header class="fixed top-0 left-1/2 -translate-x-1/2 w-full max-w-[390px] z-50 flex justify-between items-center px-container-margin h-16 bg-surface border-b border-border shadow-sm">
-<button aria-label="Back" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container transition-colors active:scale-95" onclick="window.location.href='/employee/dashboard'">
-<span class="material-symbols-outlined text-primary">arrow_back</span>
-</button>
-<h1 class="text-headline-md font-headline-md font-bold text-primary">Employee Profile</h1>
+<div class="w-10 h-10"></div>
+<h1 class="text-headline-md font-headline-md font-bold text-primary">Profile</h1>
 	@include('partials.notification-bell', [
 	    'class' => 'relative w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container transition-colors active:scale-95 text-primary',
 	])
 </header>
 <!-- Main Content Canvas -->
 <main class="w-full max-w-[390px] pt-16 pb-28 px-container-margin overflow-y-auto overflow-x-hidden flex flex-col gap-unit-lg">
-<!-- Profile Section Card -->
-<section class="mt-unit-lg flex flex-col items-center text-center">
-<div class="relative mb-4">
-<div class="w-32 h-32 rounded-full border-4 border-white shadow-lg overflow-hidden bg-surface-container">
-<img class="w-full h-full object-cover" data-alt="A professional headshot of Alex Rivers, a young male product designer with a friendly expression. He is wearing a clean charcoal polo shirt against a minimalist, soft-focus office background with warm natural lighting. The image style is polished and high-end corporate, with a slight indigo tint to match the UI branding." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDwG55OYz1RFQ9Pt5D_Yrp8WIa_hx1i8waU4HsIcMmqDTsVhFGJtTE5LMq7U2Tdm6TLC2_S_fySZBQuPRKcgKnpUWEnbdG5T7lPoPL1lRfgFILBPLnlTlakt8RADMw1_pUYVvz-2t2h0AhDi2zvj--9uD14X5lOufnSL0zZdFyQHB1Ie19Wp9-UJDBeCzI5i7jQAFsB8owzxaCADZuyHS5PHREIc8TbQyIHvYcDi7xiWx2nO7HCh7UHOCXjMtvlIV6cAtxzpyOHIqQ"/>
-</div>
-<div class="absolute bottom-1 right-1 bg-success text-white px-3 py-1 rounded-full border-2 border-white shadow-sm flex items-center justify-center gap-1">
-<span class="font-status-badge text-status-badge uppercase">Active</span>
-</div>
-</div>
-<h2 class="font-headline-lg text-headline-lg text-on-surface">Alex Rivers</h2>
-<p class="font-label-md text-label-md text-outline tracking-wider mb-2">ID: HR-2024-089</p>
-<div class="flex flex-col gap-1 items-center">
-<span class="font-body-lg text-body-lg text-primary-container font-semibold">Product Designer</span>
-<span class="font-body-md text-body-md text-on-surface-variant">IT &amp; Engineering</span>
-</div>
+
+<!-- Account info -->
+<section class="mt-unit-lg flex flex-col items-center text-center gap-unit-sm">
+    <div class="w-20 h-20 rounded-full bg-surface-container flex items-center justify-center">
+        <span class="material-symbols-outlined text-[48px] text-outline">account_circle</span>
+    </div>
+    <h2 class="font-headline-md text-headline-md text-on-surface">{{ auth()->user()->name }}</h2>
+    <span class="font-body-md text-body-md text-outline">{{ auth()->user()->email }}</span>
+    <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-surface-container text-on-surface-variant font-label-md text-label-md uppercase">
+        {{ str_replace('_', ' ', auth()->user()->role) }}
+    </span>
 </section>
-<!-- Summary Cards Row (Horizontal Scroll) -->
-<section class="flex gap-card-gap overflow-x-auto hide-scrollbar pb-1 -mx-container-margin px-container-margin">
-<!-- Leave Balance -->
-<div class="min-w-[120px] bg-white border border-border rounded-xl p-unit-md shadow-sm flex flex-col gap-1">
-<span class="text-label-md font-label-md text-on-surface-variant">Leave Balance</span>
-<span class="text-headline-md font-headline-md text-primary">12 Days</span>
-</div>
-<!-- Attendance -->
-<div class="min-w-[120px] bg-white border border-border rounded-xl p-unit-md shadow-sm flex flex-col gap-1">
-<span class="text-label-md font-label-md text-on-surface-variant">Attendance</span>
-<span class="text-headline-md font-headline-md text-success">98%</span>
-<span class="text-[10px] text-outline">This Month</span>
-</div>
-<!-- Latest Payslip -->
-<div class="min-w-[120px] bg-white border border-border rounded-xl p-unit-md shadow-sm flex flex-col gap-1">
-<span class="text-label-md font-label-md text-on-surface-variant">Latest Payslip</span>
-<span class="text-headline-md font-headline-md text-warning">Paid</span>
-<span class="text-[10px] text-outline">June 2026</span>
-</div>
-</section>
-<!-- Profile Information List -->
+
+<!-- No employee record notice -->
 <section class="flex flex-col gap-unit-md">
-<h3 class="font-label-md text-label-md text-outline uppercase tracking-widest pl-1">General Information</h3>
-<div class="bg-white rounded-xl border border-border overflow-hidden divide-y divide-border shadow-sm">
-<!-- Email -->
-<div class="p-unit-md flex items-center justify-between">
-<div class="flex items-center gap-3">
-<div class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center text-primary">
-<span class="material-symbols-outlined text-[20px]">mail</span>
-</div>
-<div class="flex flex-col">
-<span class="text-[10px] text-outline font-semibold uppercase">Email</span>
-<span class="text-body-md font-body-md text-on-surface">alex.rivers@company.com</span>
-</div>
-</div>
-</div>
-<!-- Phone -->
-<div class="p-unit-md flex items-center justify-between">
-<div class="flex items-center gap-3">
-<div class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center text-primary">
-<span class="material-symbols-outlined text-[20px]">call</span>
-</div>
-<div class="flex flex-col">
-<span class="text-[10px] text-outline font-semibold uppercase">Phone</span>
-<span class="text-body-md font-body-md text-on-surface">+62 812 3456 7890</span>
-</div>
-</div>
-</div>
-<!-- Join Date -->
-<div class="p-unit-md flex items-center justify-between">
-<div class="flex items-center gap-3">
-<div class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center text-primary">
-<span class="material-symbols-outlined text-[20px]">calendar_today</span>
-</div>
-<div class="flex flex-col">
-<span class="text-[10px] text-outline font-semibold uppercase">Join Date</span>
-<span class="text-body-md font-body-md text-on-surface">Jan 15, 2024</span>
-</div>
-</div>
-</div>
-<!-- NIK (Masked) -->
-<div class="p-unit-md flex items-center justify-between">
-<div class="flex items-center gap-3">
-<div class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center text-primary">
-<span class="material-symbols-outlined text-[20px]">badge</span>
-</div>
-<div class="flex flex-col">
-<span class="text-[10px] text-outline font-semibold uppercase">NIK</span>
-<span class="text-body-md font-body-md text-on-surface">3275***********001</span>
-</div>
-</div>
-</div>
-<!-- Bank Account -->
-<div class="p-unit-md flex items-center justify-between">
-<div class="flex items-center gap-3">
-<div class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center text-primary">
-<span class="material-symbols-outlined text-[20px]">account_balance_wallet</span>
-</div>
-<div class="flex flex-col">
-<span class="text-[10px] text-outline font-semibold uppercase">Bank Account</span>
-<span class="text-body-md font-body-md text-on-surface">**** 4521</span>
-</div>
-</div>
-</div>
-</div>
+    <div class="bg-white rounded-xl border border-border p-unit-md flex gap-3 shadow-sm">
+        <div class="w-9 h-9 rounded-lg bg-warning/10 text-warning flex items-center justify-center shrink-0">
+            <span class="material-symbols-outlined text-[20px]">info</span>
+        </div>
+        <div>
+            <p class="font-label-md text-label-md text-on-surface">No employee record linked</p>
+            <p class="font-body-md text-body-md text-on-surface-variant mt-1">
+                Your account is not linked to an employee record. Contact HR to link your account.
+            </p>
+        </div>
+    </div>
 </section>
-<!-- Location Section -->
-<section class="flex flex-col gap-unit-md">
-<h3 class="font-label-md text-label-md text-outline uppercase tracking-widest pl-1">Work Location</h3>
-<div class="bg-white rounded-xl border border-border overflow-hidden shadow-sm">
-<!-- Map Preview -->
-<div class="h-32 w-full relative">
-<div class="w-full h-full bg-cover bg-center" data-alt="A clean, minimalist vector map illustration of Jakarta Sudirman central business district. The map uses a soft palette of light grays and indigos with primary blue highlights for major roads. A single primary-colored pin icon marks the Jakarta Headquarters location. The style is flat, professional, and integrates perfectly with a corporate HR dashboard." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDxtc3U5wzlTsjg-xofxPU6F_SXKXtV8Jc4kNNnbXUS3OdzlXfpYCiL_QQtVV3IpESceoI3t48BS1bZZjdI7Xn41Xe9Wp3kEzn46f0FGbEAwRRQfRJ3rgMZwIzKLjZo8-zqBSKtZuno3zyWOXWboxzqGhn2lSaRTR0VMIbNd_CjIOee8Q9hQuvsZThZxGzBZVEHqwGQlynqy4V8W4TqSOiQVLse81rRCsb6F7ei0J06r3VYskCiv1vvcr5zPwr_6ExGtBbUDt0e81k')"></div>
-<div class="absolute inset-0 bg-gradient-to-t from-white/40 to-transparent"></div>
-</div>
-<div class="p-unit-md divide-y divide-border">
-<div class="pb-unit-md flex flex-col gap-1">
-<span class="text-[10px] text-outline font-semibold uppercase">Office</span>
-<span class="text-body-md font-body-md text-on-surface">Jakarta Headquarters</span>
-</div>
-<div class="pt-unit-md flex flex-col gap-1">
-<span class="text-[10px] text-outline font-semibold uppercase">Address</span>
-<span class="text-body-md font-body-md text-on-surface">Jl. Sudirman No. 12, Jakarta Pusat</span>
-</div>
-</div>
-</div>
-</section>
+
 <!-- Action Buttons -->
 <section class="flex flex-col gap-unit-md pt-unit-md">
-<div class="w-full rounded-xl border border-border bg-surface-container-low p-unit-md flex gap-3">
-<div class="w-9 h-9 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0">
-<span class="material-symbols-outlined text-[20px]">admin_panel_settings</span>
-</div>
-<div>
-<p class="font-label-md text-label-md text-on-surface">Profile updates are managed by HR</p>
-<p class="font-body-md text-body-md text-on-surface-variant mt-1">Contact HR to update personal or payroll-related data</p>
-</div>
-</div>
-<form action="{{ route('logout') }}" method="POST">
-@csrf
-<button class="w-full h-12 text-danger font-semibold rounded-xl active:opacity-70 transition-opacity flex items-center justify-center gap-2" type="submit">
-<span class="material-symbols-outlined text-[20px]">logout</span>
-                Logout
-            </button>
-</form>
+    <div class="w-full rounded-xl border border-border bg-surface-container-low p-unit-md flex gap-3">
+        <div class="w-9 h-9 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0">
+            <span class="material-symbols-outlined text-[20px]">admin_panel_settings</span>
+        </div>
+        <div>
+            <p class="font-label-md text-label-md text-on-surface">Profile updates are managed by HR</p>
+            <p class="font-body-md text-body-md text-on-surface-variant mt-1">Contact HR to update personal or payroll-related data</p>
+        </div>
+    </div>
+    <form action="{{ route('logout') }}" method="POST">
+        @csrf
+        <button class="w-full h-12 text-danger font-semibold rounded-xl active:opacity-70 transition-opacity flex items-center justify-center gap-2" type="submit">
+            <span class="material-symbols-outlined text-[20px]">logout</span>
+            Logout
+        </button>
+    </form>
 </section>
 </main>
 <!-- Bottom Navigation Bar -->
@@ -327,19 +220,4 @@
 </a>
 @endif
 </nav>
-<!-- Interaction Script -->
-<script>
-        // Simple ripple-like effect for interaction
-        document.querySelectorAll('button, a').forEach(el => {
-            el.addEventListener('mousedown', function() {
-                this.style.opacity = '0.7';
-            });
-            el.addEventListener('mouseup', function() {
-                this.style.opacity = '1';
-            });
-            el.addEventListener('mouseleave', function() {
-                this.style.opacity = '1';
-            });
-        });
-    </script>
 </body></html>

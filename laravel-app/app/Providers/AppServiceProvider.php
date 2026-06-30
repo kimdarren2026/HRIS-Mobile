@@ -17,11 +17,23 @@ class AppServiceProvider extends ServiceProvider
     {
         Gate::policy(CompanyExpense::class, CompanyExpensePolicy::class);
 
+        // Compute once per request and reuse across sub-views.
         View::composer('*', function ($view): void {
-            $user = auth()->user();
-            $view->with('unreadNotificationCount', $user
-                ? Notification::where('user_id', $user->id)->where('is_read', false)->count()
-                : 0);
+            $request = request();
+
+            if (! $request->attributes->has('unreadNotificationCount')) {
+                $user  = auth()->user();
+                $count = $user
+                    ? Notification::where('user_id', $user->id)->where('is_read', false)->count()
+                    : 0;
+
+                $request->attributes->set('unreadNotificationCount', $count);
+            }
+
+            $view->with(
+                'unreadNotificationCount',
+                $request->attributes->get('unreadNotificationCount', 0)
+            );
         });
     }
 }
