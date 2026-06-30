@@ -1,4 +1,4 @@
-<a href="{{ route('notifications.index') }}"
+<a href="{{ route('notifications.index') . '?return_url=' . urlencode(request()->getRequestUri()) }}"
    class="{{ $class ?? '' }}"
    aria-label="Notifications">
     <span class="material-symbols-outlined">notifications</span>

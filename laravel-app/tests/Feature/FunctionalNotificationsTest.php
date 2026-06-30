@@ -164,6 +164,96 @@ class FunctionalNotificationsTest extends TestCase
         $response->assertSee('Your payslip for June 2026 is available.'); // 3
     }
 
+    // ── Return URL navigation ──────────────────────────────────────────────────
+
+    public function test_notification_index_accepts_safe_return_url(): void
+    {
+        $this->actingAs($this->employeeUser)
+            ->get('/notifications?return_url=/employee/dashboard')
+            ->assertOk()
+            ->assertSee('/employee/dashboard', false);                  // 1
+    }
+
+    public function test_notification_show_preserves_return_url(): void
+    {
+        $n = $this->makeNotification($this->employeeUser);
+
+        $this->actingAs($this->employeeUser)
+            ->get("/notifications/{$n->id}?return_url=/employee/dashboard")
+            ->assertOk()
+            ->assertSee('/employee/dashboard', false);                  // 1
+    }
+
+    public function test_mark_read_preserves_return_url(): void
+    {
+        $n = $this->makeNotification($this->employeeUser);
+
+        $this->actingAs($this->employeeUser)
+            ->patch("/notifications/{$n->id}/read", ['return_url' => '/employee/dashboard'])
+            ->assertRedirect(route('notifications.index', ['return_url' => '/employee/dashboard'])); // 1
+    }
+
+    public function test_read_all_preserves_return_url(): void
+    {
+        $this->actingAs($this->employeeUser)
+            ->patch('/notifications/read-all', ['return_url' => '/attendance/history'])
+            ->assertRedirect(route('notifications.index', ['return_url' => '/attendance/history'])); // 1
+    }
+
+    public function test_unsafe_return_url_is_rejected_on_index(): void
+    {
+        // External URL — must not appear in rendered HTML
+        $this->actingAs($this->employeeUser)
+            ->get('/notifications?return_url=https://evil.com')
+            ->assertOk()
+            ->assertDontSee('https://evil.com', false);                 // 1
+
+        // Protocol-relative URL
+        $this->actingAs($this->employeeUser)
+            ->get('/notifications?return_url=//evil.com')
+            ->assertOk()
+            ->assertDontSee('//evil.com', false);                       // 2
+
+        // Private file path
+        $this->actingAs($this->employeeUser)
+            ->get('/notifications?return_url=/attendance/photo/1')
+            ->assertOk()
+            ->assertDontSee('/attendance/photo/1', false);              // 3
+
+        // No leading slash
+        $this->actingAs($this->employeeUser)
+            ->get('/notifications?return_url=evil.com/path')
+            ->assertOk()
+            ->assertDontSee('evil.com/path', false);                    // 4
+    }
+
+    public function test_mark_read_unsafe_return_url_falls_back_to_index(): void
+    {
+        $n = $this->makeNotification($this->employeeUser);
+
+        $this->actingAs($this->employeeUser)
+            ->patch("/notifications/{$n->id}/read", ['return_url' => 'https://evil.com'])
+            ->assertRedirect(route('notifications.index'));              // 1
+    }
+
+    public function test_read_all_unsafe_return_url_falls_back_to_index(): void
+    {
+        $this->actingAs($this->employeeUser)
+            ->patch('/notifications/read-all', ['return_url' => '//evil.com'])
+            ->assertRedirect(route('notifications.index'));              // 1
+    }
+
+    public function test_user_cannot_mark_read_other_users_notification(): void
+    {
+        $other = $this->makeNotification($this->hrUser);
+
+        $this->actingAs($this->employeeUser)
+            ->patch("/notifications/{$other->id}/read")
+            ->assertNotFound();                                         // 1
+
+        $this->assertFalse($other->fresh()->is_read);                  // 2
+    }
+
     // ── Safe action URL ────────────────────────────────────────────────────────
 
     public function test_safe_action_url_allows_valid_internal_paths(): void

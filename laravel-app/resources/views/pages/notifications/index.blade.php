@@ -50,14 +50,24 @@
 
 <!-- TopAppBar -->
 <header class="fixed top-0 left-1/2 -translate-x-1/2 w-full max-w-[390px] z-50 flex justify-between items-center px-container-margin h-16 bg-surface border-b border-border shadow-sm">
+    @if($returnUrl)
+    <a href="{{ $returnUrl }}"
+       class="text-on-surface-variant hover:bg-surface-container active:scale-95 transition-transform duration-150 p-2 rounded-full flex items-center justify-center">
+        <span class="material-symbols-outlined">arrow_back</span>
+    </a>
+    @else
     <button class="text-on-surface-variant hover:bg-surface-container active:scale-95 transition-transform duration-150 p-2 rounded-full flex items-center justify-center"
             onclick="history.back()">
         <span class="material-symbols-outlined">arrow_back</span>
     </button>
+    @endif
     <h1 class="font-headline-md text-headline-md font-bold text-primary">Notifications</h1>
     @if($notifications->total() > 0)
     <form method="POST" action="{{ route('notifications.read-all') }}">
         @csrf @method('PATCH')
+        @if($returnUrl)
+        <input type="hidden" name="return_url" value="{{ $returnUrl }}">
+        @endif
         <button type="submit"
                 class="text-primary font-label-md text-label-md hover:bg-surface-container-low active:scale-95 transition-transform duration-150 px-3 py-2 rounded-lg">
             Mark all read
@@ -90,8 +100,10 @@
                 'expense'    => 'text-on-surface-variant bg-surface-container',
                 default      => 'text-on-surface-variant bg-surface-container',
             };
+            $showUrl = route('notifications.show', $notification)
+                . ($returnUrl ? '?return_url=' . urlencode($returnUrl) : '');
         @endphp
-        <a href="{{ route('notifications.show', $notification) }}"
+        <a href="{{ $showUrl }}"
            class="flex items-start gap-unit-md p-unit-md rounded-xl border
                   {{ $notification->is_read ? 'bg-white border-border' : 'bg-surface-container-low border-primary/30' }}
                   hover:bg-surface-container transition-colors active:scale-[0.99] duration-100">
