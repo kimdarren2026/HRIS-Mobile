@@ -30,7 +30,7 @@ $screens = [
     ['label' => '06 Leave History',                             'uri' => '/leave/history',          'view' => 'pages.leave.history'],
     ['label' => '07 Payslip Detail',                            'uri' => '/payslip/detail',         'view' => 'pages.payslip.detail'],
     ['label' => '08 HR Approval Queue',                         'uri' => '/hr/approval-queue',      'view' => 'pages.hr.approval-queue'],
-    ['label' => '09 Employee Management',                       'uri' => '/hr/employees',           'view' => 'pages.hr.employees'],
+    ['label' => '09 Employee Management',                       'uri' => '/hr/employees',           'view' => 'pages.hr.employees-index'],
     ['label' => '10 Payroll Periods',                           'uri' => '/payroll/periods',        'view' => 'pages.payroll.periods'],
     ['label' => '11 Reports & Analytics',                       'uri' => '/reports',                'view' => 'pages.reports.index'],
     ['label' => '12 Employee Profile',                          'uri' => '/profile',                'view' => 'pages.profile.show'],

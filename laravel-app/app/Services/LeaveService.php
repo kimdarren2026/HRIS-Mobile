@@ -53,6 +53,7 @@ class LeaveService
         }
 
         DB::transaction(function () use ($leaveRequest, $approver, $note): void {
+            $leaveRequest->loadMissing('leaveType');
             if ($leaveRequest->leaveType->deducts_balance) {
                 $balance = LeaveBalance::firstOrCreate(
                     [
@@ -60,7 +61,11 @@ class LeaveService
                         'leave_type_id' => $leaveRequest->leave_type_id,
                         'year'          => $leaveRequest->start_date->year,
                     ],
-                    ['total_quota' => 12, 'used' => 0, 'remaining' => 12]
+                    [
+                        'total_quota' => LeaveBalance::DEFAULT_ANNUAL_QUOTA,
+                        'used'        => 0,
+                        'remaining'   => LeaveBalance::DEFAULT_ANNUAL_QUOTA,
+                    ]
                 );
 
                 if ($balance->remaining < $leaveRequest->total_days) {

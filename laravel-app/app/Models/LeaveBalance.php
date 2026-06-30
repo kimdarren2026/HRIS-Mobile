@@ -7,6 +7,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class LeaveBalance extends Model
 {
+    // TODO: replace with leave balance module config once implemented
+    public const DEFAULT_ANNUAL_QUOTA = 12;
+
     protected $fillable = [
         'employee_id',
         'leave_type_id',
