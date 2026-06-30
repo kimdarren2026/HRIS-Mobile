@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Employee;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\AttendanceCheckInRequest;
+use App\Http\Requests\AttendanceCheckOutRequest;
 use App\Models\AttendanceRecord;
 use App\Services\AttendanceService;
 use App\Services\AuditLogService;
@@ -118,6 +119,46 @@ class AttendanceController extends Controller
             : 'Check-in terkirim. Presensi Anda menunggu review HR.';
 
         return redirect('/attendance/history')->with('success', $message);
+    }
+
+    // TODO (Phase 38): Add checkout selfie photo (mirroring check-in photo flow).
+    // TODO (Phase 38): Evaluate whether checkout outside office radius should trigger HR review.
+    // TODO (Phase 38): Decide whether PENDING_REVIEW records should be blocked from checkout.
+    public function checkOut(AttendanceCheckOutRequest $request): RedirectResponse
+    {
+        $user     = auth()->user();
+        $employee = $user->employee;
+
+        if (! $employee) {
+            return back()->withErrors(['general' => 'Data karyawan tidak ditemukan untuk akun ini.']);
+        }
+
+        $record = AttendanceRecord::where('employee_id', $employee->id)
+            ->whereDate('attendance_date', today())
+            ->first();
+
+        if (! $record) {
+            return back()->withErrors(['general' => 'Anda belum melakukan check-in hari ini.']);
+        }
+
+        if ($record->check_out_time !== null) {
+            return back()->withErrors(['general' => 'Anda sudah melakukan check-out hari ini.']);
+        }
+
+        $record->update([
+            'check_out_time' => now(),
+            'check_out_lat'  => (float) $request->lat,
+            'check_out_lng'  => (float) $request->lng,
+        ]);
+
+        AuditLogService::log(
+            $user,
+            'submit_checkout',
+            'attendance',
+            "Employee #{$employee->id} check-out. Coords: {$request->lat},{$request->lng}."
+        );
+
+        return redirect('/attendance/history')->with('success', 'Check-out berhasil dicatat.');
     }
 
     public function history(): View

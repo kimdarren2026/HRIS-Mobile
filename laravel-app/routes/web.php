@@ -72,6 +72,8 @@ Route::middleware(['auth', 'has_employee'])->group(function (): void {
     Route::get('/attendance/checkin-outside', [AttendanceController::class, 'showCheckIn']);
     Route::post('/attendance/check-in',       [AttendanceController::class, 'checkIn'])
         ->middleware('throttle:10,1');
+    Route::post('/attendance/check-out',      [AttendanceController::class, 'checkOut'])
+        ->middleware('throttle:10,1');
     Route::get('/attendance/history', [AttendanceController::class, 'history']);
 
     // Leave — functional (Phase 6)

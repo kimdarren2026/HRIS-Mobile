@@ -19,6 +19,18 @@ class LeaveService
         $endDate   = Carbon::parse($data['end_date']);
         $totalDays = $startDate->diffInDays($endDate) + 1;
 
+        $overlaps = LeaveRequest::where('employee_id', $employee->id)
+            ->whereIn('status', ['PENDING_HR', 'APPROVED'])
+            ->where('start_date', '<=', $endDate->toDateString())
+            ->where('end_date', '>=', $startDate->toDateString())
+            ->exists();
+
+        if ($overlaps) {
+            throw ValidationException::withMessages([
+                'start_date' => 'You already have a pending or approved leave request that overlaps with this period.',
+            ]);
+        }
+
         $attachmentPath = $attachment?->store('leave-attachments', 'local');
 
         return LeaveRequest::create([

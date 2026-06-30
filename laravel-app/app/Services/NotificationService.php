@@ -7,6 +7,14 @@ use App\Models\User;
 
 class NotificationService
 {
+    private const CATEGORY_LABELS = [
+        'attendance' => 'Attendance',
+        'leave'      => 'Leave',
+        'payroll'    => 'Payroll',
+        'expense'    => 'Expense',
+        'general'    => 'General',
+    ];
+
     public function create(
         User $user,
         string $title,
@@ -20,6 +28,7 @@ class NotificationService
             'title'          => $title,
             'message'        => $message,
             'type'           => $type,
+            'category'       => self::CATEGORY_LABELS[$type] ?? ucfirst($type),
             'action_url'     => $this->safeActionUrl($actionUrl),
             'reference_type' => $reference ? get_class($reference) : null,
             'reference_id'   => $reference?->getKey(),
