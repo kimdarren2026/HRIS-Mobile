@@ -138,6 +138,11 @@ class EmployeeController extends Controller
             'bank_account_number' => ['nullable', 'string', 'max:50'],
         ]);
 
+        // Preserve existing bank account number when no replacement is submitted
+        if (empty($validated['bank_account_number'])) {
+            unset($validated['bank_account_number']);
+        }
+
         $employee->update($validated);
 
         AuditLogService::log(

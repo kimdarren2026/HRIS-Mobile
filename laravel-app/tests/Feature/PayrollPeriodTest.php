@@ -509,6 +509,41 @@ class PayrollPeriodTest extends TestCase
             ->assertForbidden();
     }
 
+    // ── Production environment blocks demo calculation ─────────────────────────
+
+    public function test_payroll_calculation_blocked_in_production_environment(): void
+    {
+        // detectEnvironment('production') disables CSRF bypass (runningUnitTests() checks
+        // env === 'testing'), so the HTTP layer would return 419 before reaching the guard.
+        // Test the service guard directly to avoid that false positive.
+        $this->app->detectEnvironment(fn () => 'production');
+
+        $period = PayrollPeriod::create([
+            'name'       => 'Prod Block Test',
+            'start_date' => '2026-07-01',
+            'end_date'   => '2026-07-31',
+            'status'     => 'DRAFT',
+            'created_by' => $this->financeUser->id,
+        ]);
+
+        /** @var \App\Services\PayrollCalculationService $service */
+        $service = app(\App\Services\PayrollCalculationService::class);
+        $blocked = false;
+
+        try {
+            $service->calculate($period, $this->financeUser);
+        } catch (\RuntimeException $e) {
+            $blocked = true;
+            $this->assertStringContainsString('production', $e->getMessage());
+        }
+
+        $this->assertTrue($blocked, 'PayrollCalculationService must throw RuntimeException in production.');
+        $this->assertDatabaseMissing('payroll_records', ['payroll_period_id' => $period->id]);
+
+        $period->refresh();
+        $this->assertEquals('DRAFT', $period->status);
+    }
+
     // ── Phase 5/6 regression ───────────────────────────────────────────────────
 
     public function test_attendance_checkin_route_still_works(): void

@@ -19,6 +19,11 @@ class PayrollCalculationService
 
     public function calculate(PayrollPeriod $period, User $calculatedBy): void
     {
+        // Demo calculation is not real payroll — block it from writing in production.
+        if (app()->environment('production')) {
+            throw new \RuntimeException('Payroll calculation is unavailable in production. External payroll integration is required.');
+        }
+
         DB::transaction(function () use ($period, $calculatedBy): void {
             $employees = Employee::where('employment_status', 'active')->get();
 

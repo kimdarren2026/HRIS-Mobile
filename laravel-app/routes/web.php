@@ -19,7 +19,7 @@ use App\Http\Controllers\Settings\OfficeLocationController;
 use App\Http\Controllers\Settings\SettingsController;
 use Illuminate\Support\Facades\Route;
 
-// ── Preview (design reference, no auth) ────────────────────────────────────
+// ── Preview (design reference) ─────────────────────────────────────────────
 $screens = [
     ['label' => '01 Login',                                     'uri' => '/login',                  'view' => 'pages.auth.login'],
     ['label' => '02 Employee Dashboard',                        'uri' => '/employee/dashboard',     'view' => 'pages.employee.dashboard'],
@@ -193,5 +193,5 @@ Route::middleware(['auth', 'role:super_admin'])->group(function (): void {
     Route::patch('/admin/users/{user}/status',             [UserManagementController::class, 'updateStatus'])->name('admin.users.update-status');
 });
 
-// ── Design preview (unauthenticated) ────────────────────────────────────────
-Route::get('/preview', fn () => view('pages.preview.index', ['screens' => $screens]));
+// ── Design preview (authenticated only) ─────────────────────────────────────
+Route::middleware('auth')->get('/preview', fn () => view('pages.preview.index', ['screens' => $screens]));

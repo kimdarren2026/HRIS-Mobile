@@ -15,10 +15,10 @@ class ExampleTest extends TestCase
         $response->assertRedirect('/login');
     }
 
-    public function test_login_and_preview_routes_are_public(): void
+    public function test_login_route_is_public_and_preview_redirects_guest(): void
     {
         $this->get('/login')->assertOk()->assertSee('HRIS Mobile App');
-        $this->get('/preview')->assertOk()->assertSee('HRIS Mobile App');
+        $this->get('/preview')->assertRedirect('/login');
     }
 
     #[DataProvider('protectedStaticRoutes')]
