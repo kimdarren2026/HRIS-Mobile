@@ -196,7 +196,10 @@ tailwind.config = {
       <div>
         <label class="field-label" for="bank_account_number">Account Number</label>
         <input class="field-input" id="bank_account_number" name="bank_account_number" type="text"
-          value="{{ old('bank_account_number', $employee->bank_account_number ?? '') }}" placeholder="1234567890">
+          value="{{ old('bank_account_number') }}" placeholder="1234567890">
+        @if(isset($employee) && $employee->bank_account_number)
+          <p class="text-xs text-on-surface-variant mt-1">Leave blank to keep the existing account number on file.</p>
+        @endif
         @error('bank_account_number') <p class="field-error">{{ $message }}</p> @enderror
       </div>
     </section>

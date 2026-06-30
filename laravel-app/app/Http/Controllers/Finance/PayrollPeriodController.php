@@ -77,7 +77,11 @@ class PayrollPeriodController extends Controller
     {
         Gate::authorize('calculate', $payrollPeriod);
 
-        $this->calculationService->calculate($payrollPeriod, auth()->user());
+        try {
+            $this->calculationService->calculate($payrollPeriod, auth()->user());
+        } catch (\RuntimeException $e) {
+            return redirect('/payroll/periods')->withErrors(['calculate' => $e->getMessage()]);
+        }
 
         AuditLogService::log(
             auth()->user(),

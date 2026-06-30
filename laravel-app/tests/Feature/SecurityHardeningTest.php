@@ -80,6 +80,18 @@ class SecurityHardeningTest extends TestCase
         $this->otherRecord = PayrollRecord::create(['employee_id' => $this->otherEmployee->id] + $recordBase);
     }
 
+    // ── Preview route access control ─────────────────────────────────────────
+
+    public function test_guest_cannot_access_preview(): void
+    {
+        $this->get('/preview')->assertRedirect('/login');
+    }
+
+    public function test_authenticated_user_can_access_preview(): void
+    {
+        $this->actingAs($this->employeeUser)->get('/preview')->assertOk();
+    }
+
     // ── Unauthenticated redirects ─────────────────────────────────────────────
 
     public function test_guest_redirected_from_employee_dashboard(): void

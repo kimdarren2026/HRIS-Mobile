@@ -262,6 +262,56 @@ class EmployeeMasterDataTest extends TestCase
         $this->assertDatabaseHas('employees', ['id' => $this->employee->id, 'nik' => 'EMP-001']);
     }
 
+    // ── Bank account number not exposed in edit form ──────────────────────────
+
+    public function test_edit_employee_page_does_not_expose_bank_account_number(): void
+    {
+        $bankUser = User::factory()->create(['role' => 'employee', 'is_active' => true]);
+        $bankEmployee = Employee::create([
+            'user_id'             => $bankUser->id,
+            'nik'                 => 'EMP-BANKTEST-001',
+            'department_id'       => $this->dept->id,
+            'position_id'         => $this->position->id,
+            'join_date'           => '2026-01-01',
+            'employment_status'   => 'active',
+            'phone_number'        => '+62800000099',
+            'bank_account_number' => '9876543210',
+        ]);
+
+        $this->actingAs($this->hrUser)
+            ->get(route('employees.edit', $bankEmployee))
+            ->assertOk()
+            ->assertDontSee('9876543210');
+    }
+
+    public function test_update_preserves_bank_account_number_when_field_is_blank(): void
+    {
+        $bankUser = User::factory()->create(['role' => 'employee', 'is_active' => true]);
+        $bankEmployee = Employee::create([
+            'user_id'             => $bankUser->id,
+            'nik'                 => 'EMP-BANKTEST-002',
+            'department_id'       => $this->dept->id,
+            'position_id'         => $this->position->id,
+            'join_date'           => '2026-01-01',
+            'employment_status'   => 'active',
+            'phone_number'        => '+62800000098',
+            'bank_account_number' => '1112223334',
+        ]);
+
+        $this->actingAs($this->hrUser)->put(route('employees.update', $bankEmployee), [
+            'nik'               => 'EMP-BANKTEST-002',
+            'department_id'     => $this->dept->id,
+            'position_id'       => $this->position->id,
+            'join_date'         => '2026-01-01',
+            'employment_status' => 'active',
+            'phone_number'      => '+62800000098',
+            // bank_account_number intentionally omitted — existing value must be preserved
+        ]);
+
+        $bankEmployee->refresh();
+        $this->assertEquals('1112223334', $bankEmployee->bank_account_number);
+    }
+
     // ── Employee Self Profile ──────────────────────────────────────────────────
 
     public function test_employee_can_view_own_profile(): void
