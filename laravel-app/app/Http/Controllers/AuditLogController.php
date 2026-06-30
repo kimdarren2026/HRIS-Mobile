@@ -11,7 +11,7 @@ class AuditLogController extends Controller
 {
     public function index(Request $request): View
     {
-        abort_unless(auth()->user()->role === 'super_admin', 403);
+        abort_unless(auth()->user()->role === User::ROLE_SUPER_ADMIN, 403);
 
         $query = AuditLog::with('user')->orderByDesc('created_at');
 
@@ -46,7 +46,7 @@ class AuditLogController extends Controller
 
     public function show(AuditLog $auditLog): View
     {
-        abort_unless(auth()->user()->role === 'super_admin', 403);
+        abort_unless(auth()->user()->role === User::ROLE_SUPER_ADMIN, 403);
 
         $auditLog->load('user');
 
