@@ -51,13 +51,16 @@
 
 <!-- TopAppBar -->
 <header class="fixed top-0 left-1/2 -translate-x-1/2 w-full max-w-[390px] z-50 flex justify-between items-center px-container-margin h-16 bg-surface border-b border-border shadow-sm">
-    <a href="{{ route('notifications.index') }}"
+    <a href="{{ route('notifications.index') . ($returnUrl ? '?return_url=' . urlencode($returnUrl) : '') }}"
        class="text-on-surface-variant hover:bg-surface-container active:scale-95 transition-transform duration-150 p-2 rounded-full flex items-center justify-center">
         <span class="material-symbols-outlined">arrow_back</span>
     </a>
     <h1 class="font-headline-md text-headline-md font-bold text-primary truncate px-2">Notification</h1>
     <form method="POST" action="{{ route('notifications.read', $notification) }}">
         @csrf @method('PATCH')
+        @if($returnUrl)
+        <input type="hidden" name="return_url" value="{{ $returnUrl }}">
+        @endif
         <button type="submit"
                 class="text-primary font-label-md text-label-md hover:bg-surface-container-low active:scale-95 transition-transform duration-150 px-3 py-2 rounded-lg {{ $notification->is_read ? 'opacity-30 cursor-default' : '' }}"
                 {{ $notification->is_read ? 'disabled' : '' }}>
