@@ -1,7 +1,7 @@
-<!DOCTYPE html><html lang="en"><head>
+<!DOCTYPE html><html lang="id"><head>
 <meta charset="utf-8">
 <meta content="width=device-width, initial-scale=1.0" name="viewport">
-<title>HRIS Mobile App Dashboard</title>
+<title>Dasbor - HRIS Mobile App</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
@@ -181,8 +181,8 @@
 <div class="flex items-center gap-3">
 <img alt="Profile Picture" class="w-10 h-10 rounded-full object-cover border-2 border-surface-container" data-alt="A professional headshot of a young male employee with dark hair, wearing a casual light blue button-down shirt. The background is a soft, blurred modern office environment with bright natural lighting. The mood is approachable, dependable, and efficient." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDxpSLF5Un9emZdClalmC9VGRITCLVYJs-A0IZ-Xfkr-tBR4cMbJvCHrLRpH9I_qJ_Z0x1yMBf75SNA4L2JueltuC2Q8fYXDSpkimM60flB2ZX75Y9eaa9RGi_OIoTEkEbszVcvKE4nUPG5Vx-Pq4WVZDhLnIVShDpMFBRm7zFRpMCT8IxvhBGhVETHw4bLb-IuV0a9shGt7iQ2YnpBi65m2Np-2a3pzL3KGq1I994o71iy2NJSIL9_7v_ZILBHTaZiLrfcvZPmnyU">
 <div>
-<p class="font-label-sm text-label-sm text-on-surface-variant">Good morning,</p>
-<h1 class="font-headline-md text-headline-md text-on-background">Hi, {{ auth()->user()->name }}</h1>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Selamat pagi,</p>
+<h1 class="font-headline-md text-headline-md text-on-background">Hai, {{ auth()->user()->name }}</h1>
 </div>
 </div>
 	@include('partials.notification-bell', [
@@ -196,7 +196,7 @@
 <section class="bg-surface-container-lowest rounded-xl p-unit-md shadow-sm border border-border">
 <div class="flex justify-between items-start mb-4">
 <div>
-<h2 class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider mb-1">Today's Attendance</h2>
+<h2 class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider mb-1">Presensi Hari Ini</h2>
 <p class="font-headline-lg text-headline-lg text-on-background">
 @if ($todayRecord)
     {{ $todayRecord->check_in_time?->format('h:i A') ?? '—' }}
@@ -217,27 +217,32 @@
         'REJECTED' => 'cancel',
         default    => 'history',
     };
+    $badgeLabel = match($todayRecord->status) {
+        'APPROVED' => 'Disetujui',
+        'REJECTED' => 'Ditolak',
+        default    => 'Menunggu Review HR',
+    };
     @endphp
     <div class="{{ $badgeClass }} px-3 py-1 rounded-full font-status-badge text-status-badge flex items-center gap-1">
     <span class="material-symbols-outlined text-[14px]">{{ $badgeIcon }}</span>
-    {{ str_replace('_', ' ', $todayRecord->status) }}
+    {{ $badgeLabel }}
     </div>
 @else
     <div class="bg-surface-variant text-on-surface-variant px-3 py-1 rounded-full font-status-badge text-status-badge flex items-center gap-1">
     <span class="material-symbols-outlined text-[14px]">history</span>
-    Not Checked In
+    Belum Absen
     </div>
 @endif
 </div>
 @if (!$todayRecord)
 <a class="w-full bg-primary-container text-on-primary font-label-md text-label-md py-3 rounded-lg shadow-sm active:scale-95 transition-transform duration-150 flex items-center justify-center gap-2" href="/attendance/checkin">
 <span class="material-symbols-outlined" data-weight="fill">location_on</span>
-Check In Now
+Absen Sekarang
 </a>
 @else
 <a class="w-full bg-surface-container text-on-surface font-label-md text-label-md py-3 rounded-lg flex items-center justify-center gap-2" href="/attendance/history">
 <span class="material-symbols-outlined">schedule</span>
-View Attendance History
+Lihat Riwayat Presensi
 </a>
 @endif
 </section>
@@ -246,11 +251,11 @@ View Attendance History
 <a class="bg-surface-container-lowest rounded-xl p-unit-md shadow-sm border border-border flex flex-col justify-between" href="/leave/history">
 <div class="flex justify-between items-center mb-2">
 <span class="material-symbols-outlined text-secondary text-[24px]">event_note</span>
-<span class="bg-surface-variant text-on-surface-variant px-2 py-0.5 rounded text-[10px] font-bold">Leave</span>
+<span class="bg-surface-variant text-on-surface-variant px-2 py-0.5 rounded text-[10px] font-bold">Cuti</span>
 </div>
 <div>
 <p class="font-headline-lg text-headline-lg text-on-background mb-0.5">{{ $leaveRemaining }}</p>
-<p class="font-label-sm text-label-sm text-on-surface-variant">Remaining Days</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Sisa Hari</p>
 </div>
 </a>
 <a class="bg-surface-container-lowest rounded-xl p-unit-md shadow-sm border border-border flex flex-col justify-between" href="/leave/history">
@@ -259,15 +264,15 @@ View Attendance History
 </div>
 <div>
 <p class="font-headline-lg text-headline-lg text-on-background mb-0.5">{{ $pendingLeaveCount }}</p>
-<p class="font-label-sm text-label-sm text-on-surface-variant">Pending Requests</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Pengajuan Menunggu</p>
 </div>
 </a>
 </section>
 <!-- Latest Leave Request -->
 <section class="bg-surface-container-lowest rounded-xl p-unit-md shadow-sm border border-border">
 <div class="flex justify-between items-center mb-3">
-<h3 class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Latest Request</h3>
-<a class="text-primary font-label-md text-label-md hover:underline" href="/leave/history">View All</a>
+<h3 class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Pengajuan Terbaru</h3>
+<a class="text-primary font-label-md text-label-md hover:underline" href="/leave/history">Lihat Semua</a>
 </div>
 @if ($latestLeave)
 @php
@@ -276,50 +281,55 @@ $leaveStatusClass = match($latestLeave->status) {
     'REJECTED'   => 'bg-danger/10 text-danger',
     default      => 'bg-warning/10 text-warning',
 };
+$leaveStatusLabel = match($latestLeave->status) {
+    'APPROVED' => 'Disetujui',
+    'REJECTED' => 'Ditolak',
+    default    => 'Menunggu HR',
+};
 @endphp
 <div class="flex items-center gap-3">
 <div class="bg-surface-container w-10 h-10 rounded-lg flex items-center justify-center text-primary">
 <span class="material-symbols-outlined">event_note</span>
 </div>
 <div class="flex-1 min-w-0">
-<p class="font-body-md text-body-md font-semibold text-on-background truncate">{{ $latestLeave->leaveType?->name ?? 'Leave Request' }}</p>
+<p class="font-body-md text-body-md font-semibold text-on-background truncate">{{ $latestLeave->leaveType?->name ?? 'Pengajuan Cuti' }}</p>
 <p class="font-label-sm text-label-sm text-on-surface-variant">{{ $latestLeave->start_date->format('M d') }} - {{ $latestLeave->end_date->format('M d, Y') }}</p>
 </div>
 <div class="{{ $leaveStatusClass }} px-2 py-1 rounded-full font-status-badge text-status-badge shrink-0">
-{{ str_replace('PENDING_HR', 'PENDING', $latestLeave->status) }}
+{{ $leaveStatusLabel }}
 </div>
 </div>
 @else
-<p class="font-body-md text-body-md text-on-surface-variant text-center py-2">No leave requests yet.</p>
-<a class="mt-2 block w-full text-center text-primary font-label-md text-label-md hover:underline" href="/leave/request">Submit a Request</a>
+<p class="font-body-md text-body-md text-on-surface-variant text-center py-2">Belum ada pengajuan cuti.</p>
+<a class="mt-2 block w-full text-center text-primary font-label-md text-label-md hover:underline" href="/leave/request">Ajukan Cuti</a>
 @endif
 </section>
 <!-- Payslip Summary -->
 <section class="bg-surface-container-lowest rounded-xl p-unit-md shadow-sm border border-border relative overflow-hidden">
 <div class="absolute -right-8 -top-8 w-32 h-32 bg-primary-container/5 rounded-full blur-2xl pointer-events-none"></div>
 <div class="flex justify-between items-center mb-4 relative z-10">
-<h3 class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Latest Payslip</h3>
+<h3 class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Slip Gaji Terbaru</h3>
 <span class="font-label-sm text-label-sm text-on-surface-variant">{{ $latestPayroll?->payrollPeriod?->name ?? '' }}</span>
 </div>
 @if ($latestPayroll)
 <div class="flex justify-between items-end relative z-10">
 <div>
-<p class="font-body-md text-body-md text-on-background font-semibold">Net Pay</p>
+<p class="font-body-md text-body-md text-on-background font-semibold">Gaji Bersih</p>
 <p class="font-headline-md text-headline-md text-on-background">{{ number_format((float) $latestPayroll->net_salary, 2) }}</p>
 </div>
 <a class="text-primary font-label-md text-label-md flex items-center gap-1 hover:underline active:opacity-70 transition-opacity" href="/my/payroll/{{ $latestPayroll->id }}">
-View Details
+Lihat Detail
 <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
 </a>
 </div>
 @else
 <div class="flex justify-between items-end relative z-10">
 <div>
-<p class="font-body-md text-body-md text-on-background font-semibold">Net Pay</p>
-<p class="font-body-md text-body-md text-on-surface-variant">Not available yet</p>
+<p class="font-body-md text-body-md text-on-background font-semibold">Gaji Bersih</p>
+<p class="font-body-md text-body-md text-on-surface-variant">Belum tersedia</p>
 </div>
 <a class="text-primary font-label-md text-label-md flex items-center gap-1 hover:underline active:opacity-70 transition-opacity" href="/my/payroll">
-View All
+Lihat Semua
 <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
 </a>
 </div>
@@ -331,24 +341,24 @@ View All
 <!-- Active Tab: Home -->
 <a class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-full px-4 py-1 active:scale-90 transition-all duration-200" href="/employee/dashboard">
 <span class="material-symbols-outlined" data-weight="fill">home</span>
-<span class="font-label-sm text-label-sm mt-0.5">Home</span>
+<span class="font-label-sm text-label-sm mt-0.5">Beranda</span>
 </a>
 <!-- Inactive Tabs -->
 <a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 hover:bg-surface-container-highest rounded-full active:scale-90 transition-all duration-200" href="/attendance/checkin">
 <span class="material-symbols-outlined">schedule</span>
-<span class="font-label-sm text-label-sm mt-0.5">Attendance</span>
+<span class="font-label-sm text-label-sm mt-0.5">Presensi</span>
 </a>
 <a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 hover:bg-surface-container-highest rounded-full active:scale-90 transition-all duration-200" href="/leave/history">
 <span class="material-symbols-outlined">event_note</span>
-<span class="font-label-sm text-label-sm mt-0.5">Leave</span>
+<span class="font-label-sm text-label-sm mt-0.5">Cuti</span>
 </a>
 <a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 hover:bg-surface-container-highest rounded-full active:scale-90 transition-all duration-200" href="/my/payroll">
 <span class="material-symbols-outlined">payments</span>
-<span class="font-label-sm text-label-sm mt-0.5">Payslip</span>
+<span class="font-label-sm text-label-sm mt-0.5">Slip Gaji</span>
 </a>
 <a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 hover:bg-surface-container-highest rounded-full active:scale-90 transition-all duration-200" href="{{ route('my.profile') }}">
 <span class="material-symbols-outlined">person</span>
-<span class="font-label-sm text-label-sm mt-0.5">Profile</span>
+<span class="font-label-sm text-label-sm mt-0.5">Profil</span>
 </a>
 </nav>
 </body></html>

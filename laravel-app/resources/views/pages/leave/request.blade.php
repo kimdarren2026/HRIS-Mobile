@@ -1,7 +1,7 @@
-<!DOCTYPE html><html class="light" lang="en"><head>
+<!DOCTYPE html><html class="light" lang="id"><head>
 <meta charset="utf-8">
 <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
-<title>Request Leave - HRIS Mobile App</title>
+<title>Pengajuan Cuti - HRIS Mobile App</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
@@ -111,7 +111,7 @@
     <button class="w-10 h-10 flex items-center justify-center text-primary hover:bg-surface-container-low active:opacity-70 transition-opacity rounded-full" onclick="window.location.href='/leave/history'">
         <span class="material-symbols-outlined">arrow_back</span>
     </button>
-    <h1 class="text-headline-md font-headline-md font-bold text-primary">Request Leave</h1>
+    <h1 class="text-headline-md font-headline-md font-bold text-primary">Pengajuan Cuti</h1>
     <div class="w-10 h-10"></div>
 </header>
 
@@ -132,15 +132,15 @@
 
     {{-- Leave Balance Card --}}
     <section class="bg-primary-container text-on-primary-container p-unit-md rounded-xl shadow-sm flex flex-col gap-unit-sm">
-        <h2 class="text-label-md font-label-md uppercase tracking-wider opacity-90">Leave Balance {{ now()->year }}</h2>
+        <h2 class="text-label-md font-label-md uppercase tracking-wider opacity-90">Saldo Cuti {{ now()->year }}</h2>
         @if($balances->isEmpty())
-        <p class="text-body-md font-body-md opacity-80">No balance records. Balance will be set on first approval.</p>
+        <p class="text-body-md font-body-md opacity-80">Belum ada data saldo. Saldo akan ditetapkan setelah persetujuan pertama.</p>
         @else
         <div class="flex flex-col gap-1" id="balance-list">
             @foreach($balances as $typeId => $bal)
             <div class="balance-row flex items-center justify-between" data-type-id="{{ $typeId }}">
                 <span class="text-body-md opacity-90">{{ $bal->leaveType->name }}</span>
-                <span class="text-headline-md font-bold">{{ (int) $bal->remaining }} days left</span>
+                <span class="text-headline-md font-bold">{{ (int) $bal->remaining }} hari tersisa</span>
             </div>
             @endforeach
         </div>
@@ -154,11 +154,11 @@
 
         {{-- Leave Type --}}
         <div class="flex flex-col gap-unit-xs">
-            <label class="text-label-md font-label-md text-on-surface-variant" for="leave_type_id">Leave Type</label>
+            <label class="text-label-md font-label-md text-on-surface-variant" for="leave_type_id">Jenis Cuti</label>
             <div class="relative">
                 <select class="w-full h-12 px-unit-md bg-surface border border-outline-variant rounded-lg text-body-md font-body-md text-on-surface appearance-none focus:outline-none focus:ring-2 focus:ring-primary-container focus:border-transparent"
                         id="leave_type_id" name="leave_type_id" required>
-                    <option value="">Select leave type...</option>
+                    <option value="">Pilih jenis cuti...</option>
                     @foreach($leaveTypes as $type)
                     <option value="{{ $type->id }}" {{ old('leave_type_id') == $type->id ? 'selected' : '' }}>
                         {{ $type->name }}
@@ -172,14 +172,14 @@
         {{-- Dates --}}
         <div class="flex gap-unit-md">
             <div class="flex flex-col gap-unit-xs w-1/2">
-                <label class="text-label-md font-label-md text-on-surface-variant" for="start_date">Start Date</label>
+                <label class="text-label-md font-label-md text-on-surface-variant" for="start_date">Tanggal Mulai</label>
                 <input class="w-full h-12 px-unit-md bg-surface border border-outline-variant rounded-lg text-body-md font-body-md text-on-surface focus:outline-none focus:ring-2 focus:ring-primary-container focus:border-transparent"
                        id="start_date" name="start_date" type="date"
                        min="{{ now()->toDateString() }}"
                        value="{{ old('start_date') }}" required>
             </div>
             <div class="flex flex-col gap-unit-xs w-1/2">
-                <label class="text-label-md font-label-md text-on-surface-variant" for="end_date">End Date</label>
+                <label class="text-label-md font-label-md text-on-surface-variant" for="end_date">Tanggal Selesai</label>
                 <input class="w-full h-12 px-unit-md bg-surface border border-outline-variant rounded-lg text-body-md font-body-md text-on-surface focus:outline-none focus:ring-2 focus:ring-primary-container focus:border-transparent"
                        id="end_date" name="end_date" type="date"
                        min="{{ now()->toDateString() }}"
@@ -192,19 +192,19 @@
 
         {{-- Reason --}}
         <div class="flex flex-col gap-unit-xs">
-            <label class="text-label-md font-label-md text-on-surface-variant" for="reason">Reason</label>
+            <label class="text-label-md font-label-md text-on-surface-variant" for="reason">Alasan</label>
             <textarea class="w-full p-unit-md bg-surface border border-outline-variant rounded-lg text-body-md font-body-md text-on-surface focus:outline-none focus:ring-2 focus:ring-primary-container focus:border-transparent resize-none"
                       id="reason" name="reason" rows="4"
-                      placeholder="Provide a brief reason for your leave..." required minlength="10" maxlength="1000">{{ old('reason') }}</textarea>
+                      placeholder="Berikan alasan singkat untuk cuti Anda..." required minlength="10" maxlength="1000">{{ old('reason') }}</textarea>
         </div>
 
         {{-- Attachment --}}
         <div class="flex flex-col gap-unit-xs">
-            <label class="text-label-md font-label-md text-on-surface-variant">Attachments (Optional)</label>
+            <label class="text-label-md font-label-md text-on-surface-variant">Lampiran (Opsional)</label>
             <label class="border-2 border-dashed border-outline-variant rounded-lg p-unit-md flex flex-col items-center justify-center gap-unit-sm bg-surface hover:bg-surface-container-low transition-colors cursor-pointer">
                 <span class="material-symbols-outlined text-outline text-[32px]">upload_file</span>
                 <p class="text-body-md font-body-md text-on-surface-variant text-center" id="attach-label">
-                    Tap to upload<br><span class="text-label-sm font-label-sm text-outline">PDF, JPG, or PNG up to 5MB</span>
+                    Ketuk untuk unggah<br><span class="text-label-sm font-label-sm text-outline">PDF, JPG, atau PNG maks. 5MB</span>
                 </p>
                 <input accept=".pdf,.jpg,.jpeg,.png" class="hidden" type="file" name="attachment" id="attachment-input">
             </label>
@@ -212,12 +212,12 @@
     </form>
 
     <p class="text-label-sm font-label-sm text-on-surface-variant text-center px-unit-md">
-        Leave balance will be deducted only after HR approval.
+        Saldo cuti akan dikurangi hanya setelah disetujui HR.
     </p>
 
     <button class="w-full h-12 bg-primary-container text-on-primary-container rounded-lg text-body-lg font-body-lg font-semibold shadow-sm hover:bg-secondary-container active:scale-95 transition-all flex items-center justify-center gap-unit-sm"
             type="button" onclick="document.querySelector('form').submit()">
-        <span>Submit Request</span>
+        <span>Ajukan Cuti</span>
         <span class="material-symbols-outlined text-[20px]">send</span>
     </button>
 </main>
@@ -226,23 +226,23 @@
 <nav class="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[390px] mx-auto h-16 bg-surface-container-lowest border-t border-outline-variant flex items-center justify-around px-unit-sm z-50">
     <a class="flex flex-col items-center gap-unit-xs text-on-surface-variant hover:text-primary transition-colors" href="/employee/dashboard">
         <span class="material-symbols-outlined">home</span>
-        <span class="text-label-sm">Home</span>
+        <span class="text-label-sm">Beranda</span>
     </a>
     <a class="flex flex-col items-center gap-unit-xs text-on-surface-variant hover:text-primary transition-colors" href="/attendance/checkin">
         <span class="material-symbols-outlined">schedule</span>
-        <span class="text-label-sm">Attendance</span>
+        <span class="text-label-sm">Presensi</span>
     </a>
     <a class="flex flex-col items-center gap-unit-xs text-primary" href="/leave/history">
         <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">event_note</span>
-        <span class="text-label-sm font-bold">Leave</span>
+        <span class="text-label-sm font-bold">Cuti</span>
     </a>
     <a class="flex flex-col items-center gap-unit-xs text-on-surface-variant hover:text-primary transition-colors" href="/payslip/detail">
         <span class="material-symbols-outlined">payments</span>
-        <span class="text-label-sm">Payslip</span>
+        <span class="text-label-sm">Slip Gaji</span>
     </a>
     <a class="flex flex-col items-center gap-unit-xs text-on-surface-variant hover:text-primary transition-colors" href="{{ route('my.profile') }}">
         <span class="material-symbols-outlined">person</span>
-        <span class="text-label-sm">Profile</span>
+        <span class="text-label-sm">Profil</span>
     </a>
 </nav>
 
@@ -259,7 +259,7 @@ function updateDuration() {
         return;
     }
     const days = Math.round((e - s) / 86400000) + 1;
-    preview.textContent = days + ' day' + (days !== 1 ? 's' : '') + ' requested';
+    preview.textContent = days + ' hari diajukan';
     preview.classList.remove('hidden');
 }
 
@@ -275,7 +275,7 @@ document.getElementById('attachment-input').addEventListener('change', function(
     if (this.files.length) {
         label.innerHTML = '<span class="font-semibold text-primary">' + this.files[0].name + '</span>';
     } else {
-        label.innerHTML = 'Tap to upload<br><span class="text-label-sm font-label-sm text-outline">PDF, JPG, or PNG up to 5MB</span>';
+        label.innerHTML = 'Ketuk untuk unggah<br><span class="text-label-sm font-label-sm text-outline">PDF, JPG, atau PNG maks. 5MB</span>';
     }
 });
 

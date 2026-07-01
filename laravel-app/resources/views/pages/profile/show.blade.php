@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html class="light" lang="en"><head>
+<html class="light" lang="id"><head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Profile - HRIS Mobile App</title>
+<title>Profil - HRIS Mobile App</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
@@ -122,7 +122,7 @@
 <!-- Top App Bar -->
 <header class="fixed top-0 left-1/2 -translate-x-1/2 w-full max-w-[390px] z-50 flex justify-between items-center px-container-margin h-16 bg-surface border-b border-border shadow-sm">
 <div class="w-10 h-10"></div>
-<h1 class="text-headline-md font-headline-md font-bold text-primary">Profile</h1>
+<h1 class="text-headline-md font-headline-md font-bold text-primary">Profil</h1>
 	@include('partials.notification-bell', [
 	    'class' => 'relative w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container transition-colors active:scale-95 text-primary',
 	])
@@ -149,9 +149,9 @@
             <span class="material-symbols-outlined text-[20px]">info</span>
         </div>
         <div>
-            <p class="font-label-md text-label-md text-on-surface">No employee record linked</p>
+            <p class="font-label-md text-label-md text-on-surface">Belum ada data karyawan yang tertaut</p>
             <p class="font-body-md text-body-md text-on-surface-variant mt-1">
-                Your account is not linked to an employee record. Contact HR to link your account.
+                Akun Anda belum tertaut ke data karyawan. Hubungi HR untuk menautkan akun Anda.
             </p>
         </div>
     </div>
@@ -164,15 +164,15 @@
             <span class="material-symbols-outlined text-[20px]">admin_panel_settings</span>
         </div>
         <div>
-            <p class="font-label-md text-label-md text-on-surface">Profile updates are managed by HR</p>
-            <p class="font-body-md text-body-md text-on-surface-variant mt-1">Contact HR to update personal or payroll-related data</p>
+            <p class="font-label-md text-label-md text-on-surface">Profil dikelola oleh HR</p>
+            <p class="font-body-md text-body-md text-on-surface-variant mt-1">Hubungi HR untuk memperbarui data pribadi atau data terkait penggajian</p>
         </div>
     </div>
     <form action="{{ route('logout') }}" method="POST">
         @csrf
         <button class="w-full h-12 text-danger font-semibold rounded-xl active:opacity-70 transition-opacity flex items-center justify-center gap-2" type="submit">
             <span class="material-symbols-outlined text-[20px]">logout</span>
-            Logout
+            Keluar
         </button>
     </form>
 </section>
@@ -183,40 +183,40 @@
 @if($role === 'finance')
 <a class="flex flex-col items-center justify-center text-on-surface-variant px-3 py-1 hover:bg-surface-container-high transition-all active:scale-90" href="/finance/dashboard">
 <span class="material-symbols-outlined" data-icon="home">home</span>
-<span class="font-label-sm text-label-sm-mobile mt-1">Home</span>
+<span class="font-label-sm text-label-sm-mobile mt-1">Beranda</span>
 </a>
 <a class="flex flex-col items-center justify-center text-on-surface-variant px-3 py-1 hover:bg-surface-container-high transition-all active:scale-90" href="/payroll/periods">
 <span class="material-symbols-outlined" data-icon="payments">payments</span>
-<span class="font-label-sm text-label-sm-mobile mt-1">Payroll</span>
+<span class="font-label-sm text-label-sm-mobile mt-1">Penggajian</span>
 </a>
 <a class="flex flex-col items-center justify-center text-on-surface-variant px-3 py-1 hover:bg-surface-container-high transition-all active:scale-90" href="/reports">
 <span class="material-symbols-outlined" data-icon="assessment">assessment</span>
-<span class="font-label-sm text-label-sm-mobile mt-1">Reports</span>
+<span class="font-label-sm text-label-sm-mobile mt-1">Laporan</span>
 </a>
 <a class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-full px-3 py-1 active:scale-90 transition-all" href="/profile">
 <span class="material-symbols-outlined" data-icon="person" style="font-variation-settings: 'FILL' 1;">person</span>
-<span class="font-label-sm text-label-sm-mobile mt-1">Profile</span>
+<span class="font-label-sm text-label-sm-mobile mt-1">Profil</span>
 </a>
 @else
 <a class="flex flex-col items-center justify-center text-on-surface-variant px-3 py-1 hover:bg-surface-container-high transition-all active:scale-90" href="/admin/dashboard">
 <span class="material-symbols-outlined" data-icon="home">home</span>
-<span class="font-label-sm text-label-sm-mobile mt-1">Home</span>
+<span class="font-label-sm text-label-sm-mobile mt-1">Beranda</span>
 </a>
 <a class="flex flex-col items-center justify-center text-on-surface-variant px-3 py-1 hover:bg-surface-container-high transition-all active:scale-90" href="/hr/employees">
 <span class="material-symbols-outlined" data-icon="groups">groups</span>
-<span class="font-label-sm text-label-sm-mobile mt-1">Employees</span>
+<span class="font-label-sm text-label-sm-mobile mt-1">Karyawan</span>
 </a>
 <a class="flex flex-col items-center justify-center text-on-surface-variant px-3 py-1 hover:bg-surface-container-high transition-all active:scale-90" href="/hr/approval-queue">
 <span class="material-symbols-outlined" data-icon="rule">rule</span>
-<span class="font-label-sm text-label-sm-mobile mt-1">Approvals</span>
+<span class="font-label-sm text-label-sm-mobile mt-1">Persetujuan</span>
 </a>
 <a class="flex flex-col items-center justify-center text-on-surface-variant px-3 py-1 hover:bg-surface-container-high transition-all active:scale-90" href="/reports">
 <span class="material-symbols-outlined" data-icon="assessment">assessment</span>
-<span class="font-label-sm text-label-sm-mobile mt-1">Reports</span>
+<span class="font-label-sm text-label-sm-mobile mt-1">Laporan</span>
 </a>
 <a class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-full px-3 py-1 active:scale-90 transition-all" href="/profile">
 <span class="material-symbols-outlined" data-icon="person" style="font-variation-settings: 'FILL' 1;">person</span>
-<span class="font-label-sm text-label-sm-mobile mt-1">Profile</span>
+<span class="font-label-sm text-label-sm-mobile mt-1">Profil</span>
 </a>
 @endif
 </nav>

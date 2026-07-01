@@ -101,8 +101,8 @@ class AttendanceController extends Controller
         if (! $withinRadius) {
             $this->notifications->notifyRoles(
                 ['admin_hr', 'super_admin'],
-                'Attendance needs review',
-                'An attendance check-in outside the office radius is waiting for HR review.',
+                'Presensi perlu ditinjau',
+                'Ada absen masuk di luar radius kantor yang menunggu review HR.',
                 'attendance',
                 '/hr/approval-queue',
                 $attendanceRecord,

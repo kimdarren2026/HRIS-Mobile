@@ -1,8 +1,8 @@
-<!DOCTYPE html><html lang="en"><head>
+<!DOCTYPE html><html lang="id"><head>
 <meta charset="utf-8">
 <meta content="width=device-width, initial-scale=1.0" name="viewport">
 <meta name="csrf-token" content="{{ csrf_token() }}">
-<title>Attendance Check-in - HRIS Mobile App</title>
+<title>Absen Masuk - HRIS Mobile App</title>
 <!-- Google Fonts & Material Symbols -->
 <link href="https://fonts.googleapis.com" rel="preconnect">
 <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
@@ -132,7 +132,7 @@
 <button class="p-2 -ml-2 text-on-surface-variant hover:bg-surface-container rounded-full transition-colors" onclick="window.location.href='/employee/dashboard'">
 <span class="material-symbols-outlined" data-icon="arrow_back">arrow_back</span>
 </button>
-<h1 class="flex-1 text-center font-headline-md text-headline-md text-on-surface mr-8">Check In</h1>
+<h1 class="flex-1 text-center font-headline-md text-headline-md text-on-surface mr-8">Absen Masuk</h1>
 </header>
 <!-- Scrollable Content -->
 <form id="checkin-outside-form" method="POST" action="/attendance/check-in" enctype="multipart/form-data">
@@ -150,12 +150,12 @@
 <div class="mx-container-margin bg-surface border border-border rounded-xl shadow-sm p-unit-md mb-unit-lg">
 <div class="flex justify-between items-start mb-unit-sm">
 <div>
-<h2 class="font-headline-md text-[16px] font-semibold text-on-surface">Your Location</h2>
+<h2 class="font-headline-md text-[16px] font-semibold text-on-surface">Lokasi Anda</h2>
 <p class="font-body-md text-body-md text-on-surface-variant mt-1" id="loc-detail-out">Mengambil lokasi...</p>
 </div>
 <div class="bg-error-container text-on-error-container px-2 py-1 rounded-full font-label-sm text-label-sm flex items-center gap-1 shrink-0">
 <span class="material-symbols-outlined text-[14px]" style="font-variation-settings: 'FILL' 1;">warning</span>
-Outside office radius
+Di luar radius kantor
 </div>
 </div>
 <!-- Map Preview -->
@@ -175,16 +175,16 @@ Outside office radius
 </div>
 <div class="flex justify-between items-center font-label-sm text-label-sm">
 <span class="text-danger font-semibold flex items-center gap-1" id="dist-out">
-<span class="material-symbols-outlined text-[14px]">error</span> Outside radius
+<span class="material-symbols-outlined text-[14px]">error</span> Di luar radius
 </span>
 <span class="text-outline flex items-center gap-1" id="acc-out">
-<span class="material-symbols-outlined text-[14px]">my_location</span> Accuracy: --
+<span class="material-symbols-outlined text-[14px]">my_location</span> Akurasi: --
 </span>
 </div>
 </div>
 <!-- Verification Section -->
 <div class="mx-container-margin bg-surface border border-border rounded-xl shadow-sm p-unit-md mb-unit-lg">
-<h2 class="font-headline-md text-[16px] font-semibold text-on-surface mb-unit-sm">Photo Verification</h2>
+<h2 class="font-headline-md text-[16px] font-semibold text-on-surface mb-unit-sm">Verifikasi Foto</h2>
 @error('photo')<p class="text-error font-label-sm text-label-sm mb-2">{{ $message }}</p>@enderror
 <div id="camera-error-out" class="hidden bg-error-container text-on-error-container rounded-lg px-4 py-3 mb-2 font-label-sm text-label-sm items-center gap-2">
 <span class="material-symbols-outlined text-[16px] shrink-0">videocam_off</span>
@@ -199,11 +199,11 @@ Outside office radius
 <div id="capture-overlay-out" class="hidden absolute inset-0 flex items-end justify-center pb-2 z-20">
 <button type="button" id="capture-btn-out" class="bg-primary text-on-primary rounded-full px-4 py-1.5 font-label-md text-label-md flex items-center gap-1.5 shadow-md active:scale-95 transition-all">
 <span class="material-symbols-outlined text-[16px]" style="font-variation-settings:'FILL' 1;">photo_camera</span>
-Capture Selfie
+Ambil Selfie
 </button>
 </div>
-<img id="photo-preview-out" class="hidden absolute inset-0 w-full h-full object-cover z-10" alt="Selfie preview">
-<button type="button" id="photo-retake-out" class="hidden absolute bottom-2 right-2 z-20 bg-surface/80 rounded-full px-2 py-1 font-label-sm text-label-sm text-primary backdrop-blur-sm">Retake</button>
+<img id="photo-preview-out" class="hidden absolute inset-0 w-full h-full object-cover z-10" alt="Pratinjau selfie">
+<button type="button" id="photo-retake-out" class="hidden absolute bottom-2 right-2 z-20 bg-surface/80 rounded-full px-2 py-1 font-label-sm text-label-sm text-primary backdrop-blur-sm">Ambil Ulang</button>
 </div>
 <canvas id="selfie-canvas-out" class="hidden"></canvas>
 </div>
@@ -224,7 +224,7 @@ Alasan absen di luar radius <span class="text-error">*</span>
 </div>
 <button id="submit-btn-out" type="submit" disabled
     class="w-full bg-primary text-on-primary disabled:opacity-40 disabled:cursor-not-allowed py-3.5 rounded-lg font-label-md text-label-md mt-8 hover:bg-on-primary-fixed-variant transition-colors shadow-sm active:scale-[0.98]">
-Submit for HR Review
+Kirim untuk Review HR
 </button>
 </div>
 </main>
@@ -234,27 +234,27 @@ Submit for HR Review
 <!-- Inactive: Home -->
 <button class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 hover:bg-surface-container-high rounded-lg transition-all duration-200" onclick="window.location.href='/employee/dashboard'">
 <span class="material-symbols-outlined" data-icon="home">home</span>
-<span class="font-label-sm text-label-sm mt-1">Home</span>
+<span class="font-label-sm text-label-sm mt-1">Beranda</span>
 </button>
 <!-- Active: Attendance -->
 <button class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-full px-4 py-1 active:scale-90 transition-all duration-200" onclick="window.location.href='/attendance/checkin'">
 <span class="material-symbols-outlined" data-icon="schedule" style="font-variation-settings: 'FILL' 1;">schedule</span>
-<span class="font-label-sm text-label-sm mt-1">Attendance</span>
+<span class="font-label-sm text-label-sm mt-1">Presensi</span>
 </button>
 <!-- Inactive: Leave -->
 <button class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 hover:bg-surface-container-high rounded-lg transition-all duration-200" onclick="window.location.href='/leave/history'">
 <span class="material-symbols-outlined" data-icon="event_note">event_note</span>
-<span class="font-label-sm text-label-sm mt-1">Leave</span>
+<span class="font-label-sm text-label-sm mt-1">Cuti</span>
 </button>
 <!-- Inactive: Payslip -->
 <button class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 hover:bg-surface-container-high rounded-lg transition-all duration-200" onclick="window.location.href='/payslip/detail'">
 <span class="material-symbols-outlined" data-icon="payments">payments</span>
-<span class="font-label-sm text-label-sm mt-1">Payslip</span>
+<span class="font-label-sm text-label-sm mt-1">Slip Gaji</span>
 </button>
 <!-- Inactive: Profile -->
 <button class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 hover:bg-surface-container-high rounded-lg transition-all duration-200" onclick="window.location.href='{{ route('my.profile') }}'">
 <span class="material-symbols-outlined" data-icon="person">person</span>
-<span class="font-label-sm text-label-sm mt-1">Profile</span>
+<span class="font-label-sm text-label-sm mt-1">Profil</span>
 </button>
 </nav>
 </div>

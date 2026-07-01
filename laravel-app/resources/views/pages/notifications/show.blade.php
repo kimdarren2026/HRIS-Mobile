@@ -1,7 +1,7 @@
-<!DOCTYPE html><html lang="en"><head>
+<!DOCTYPE html><html lang="id"><head>
 <meta charset="utf-8">
 <meta content="width=device-width, initial-scale=1.0" name="viewport">
-<title>Notification - HRIS Mobile App</title>
+<title>Notifikasi - HRIS Mobile App</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
@@ -55,7 +55,7 @@
        class="text-on-surface-variant hover:bg-surface-container active:scale-95 transition-transform duration-150 p-2 rounded-full flex items-center justify-center">
         <span class="material-symbols-outlined">arrow_back</span>
     </a>
-    <h1 class="font-headline-md text-headline-md font-bold text-primary truncate px-2">Notification</h1>
+    <h1 class="font-headline-md text-headline-md font-bold text-primary truncate px-2">Notifikasi</h1>
     <form method="POST" action="{{ route('notifications.read', $notification) }}">
         @csrf @method('PATCH')
         @if($returnUrl)
@@ -64,7 +64,7 @@
         <button type="submit"
                 class="text-primary font-label-md text-label-md hover:bg-surface-container-low active:scale-95 transition-transform duration-150 px-3 py-2 rounded-lg {{ $notification->is_read ? 'opacity-30 cursor-default' : '' }}"
                 {{ $notification->is_read ? 'disabled' : '' }}>
-            Mark read
+            Tandai sudah dibaca
         </button>
     </form>
 </header>
@@ -102,7 +102,7 @@
 
         @if(! $notification->is_read)
         <p class="inline-flex items-center gap-1 font-label-sm text-label-sm text-primary bg-surface-container-low px-3 py-1 rounded-full mb-unit-md">
-            <span class="w-2 h-2 rounded-full bg-primary inline-block"></span> Unread
+            <span class="w-2 h-2 rounded-full bg-primary inline-block"></span> Belum dibaca
         </p>
         @endif
 
@@ -111,7 +111,7 @@
         <a href="{{ $safeUrl }}"
            class="w-full flex items-center justify-center gap-2 bg-primary-container text-on-primary rounded-xl py-3 font-label-md text-label-md hover:opacity-90 active:scale-[0.98] transition-transform duration-100">
             <span class="material-symbols-outlined text-[18px]">open_in_new</span>
-            View details
+            Lihat Detail
         </a>
         @endif
     </div>

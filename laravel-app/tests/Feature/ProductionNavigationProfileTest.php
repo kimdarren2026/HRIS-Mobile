@@ -19,8 +19,8 @@ class ProductionNavigationProfileTest extends TestCase
         $this->actingAs($user)
             ->get('/my/profile')
             ->assertOk()
-            ->assertSee('Profile updates are managed by HR')
-            ->assertSee('Contact HR to update personal or payroll-related data')
+            ->assertSee('Profil dikelola oleh HR')
+            ->assertSee('Hubungi HR untuk memperbarui data pribadi atau data terkait penggajian')
             ->assertDontSee('Edit Profile');
     }
 

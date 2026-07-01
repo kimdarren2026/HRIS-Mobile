@@ -120,7 +120,7 @@
             <div class="flex flex-col gap-1.5">
                 <label for="email"
                        style="font-size:11px;font-weight:700;color:#475569;letter-spacing:0.06em;text-transform:uppercase;">
-                    Email
+                    Alamat Email
                 </label>
                 <div class="relative">
                     <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none"
@@ -141,7 +141,7 @@
             <div class="flex flex-col gap-1.5">
                 <label for="password"
                        style="font-size:11px;font-weight:700;color:#475569;letter-spacing:0.06em;text-transform:uppercase;">
-                    Password
+                    Kata Sandi
                 </label>
                 <div class="relative">
                     <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none"
@@ -167,7 +167,7 @@
                 <div class="flex justify-end mt-0.5">
                     {{-- TODO Phase 5: add forgot-password route --}}
                     <a href="#" class="text-xs font-medium transition-colors"
-                       style="color:#7c3aed;">Lupa Password?</a>
+                       style="color:#7c3aed;">Lupa Kata Sandi?</a>
                 </div>
             </div>
 
