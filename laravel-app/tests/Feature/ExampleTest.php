@@ -17,7 +17,7 @@ class ExampleTest extends TestCase
 
     public function test_login_route_is_public_and_preview_redirects_guest(): void
     {
-        $this->get('/login')->assertOk()->assertSee('HRIS Mobile App');
+        $this->get('/login')->assertOk()->assertSee('Hadir');
         $this->get('/preview')->assertRedirect('/login');
     }
 
