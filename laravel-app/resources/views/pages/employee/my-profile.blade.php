@@ -1,7 +1,7 @@
-<!DOCTYPE html><html class="light" lang="en"><head>
+<!DOCTYPE html><html class="light" lang="id"><head>
 <meta charset="utf-8">
 <meta content="width=device-width, initial-scale=1.0" name="viewport">
-<title>My Profile - HRIS Mobile App</title>
+<title>Profil Saya - HRIS Mobile App</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
@@ -57,7 +57,7 @@ tailwind.config = {
   <a href="{{ $dashboardUrl }}" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container transition-colors active:scale-95">
     <span class="material-symbols-outlined text-primary">arrow_back</span>
   </a>
-  <h1 class="text-headline-md font-headline-md font-bold text-primary">My Profile</h1>
+  <h1 class="text-headline-md font-headline-md font-bold text-primary">Profil Saya</h1>
   <div class="w-10"></div>
 </header>
 
@@ -100,14 +100,14 @@ tailwind.config = {
       <span class="material-symbols-outlined text-[20px]">admin_panel_settings</span>
     </div>
     <div class="flex flex-col gap-1">
-      <p class="font-label-md text-label-md text-on-surface">Profile updates are managed by HR</p>
-      <p class="font-body-md text-body-md text-on-surface-variant">Contact HR to update personal or payroll-related data</p>
+      <p class="font-label-md text-label-md text-on-surface">Profil dikelola oleh HR</p>
+      <p class="font-body-md text-body-md text-on-surface-variant">Hubungi HR untuk memperbarui data pribadi atau data terkait penggajian</p>
     </div>
   </section>
 
   {{-- General Information --}}
   <section class="flex flex-col gap-unit-md">
-    <h3 class="font-label-md text-label-md text-outline uppercase tracking-widest pl-1">General Information</h3>
+    <h3 class="font-label-md text-label-md text-outline uppercase tracking-widest pl-1">Informasi Umum</h3>
     <div class="bg-white rounded-xl border border-border overflow-hidden divide-y divide-border shadow-sm">
       <div class="p-unit-md flex items-center gap-3">
         <div class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center text-primary">
@@ -123,7 +123,7 @@ tailwind.config = {
           <span class="material-symbols-outlined text-[20px]">call</span>
         </div>
         <div class="flex flex-col">
-          <span class="text-[10px] text-outline font-semibold uppercase">Phone</span>
+          <span class="text-[10px] text-outline font-semibold uppercase">Telepon</span>
           <span class="text-body-md font-body-md text-on-surface">{{ $employee->phone_number }}</span>
         </div>
       </div>
@@ -132,7 +132,7 @@ tailwind.config = {
           <span class="material-symbols-outlined text-[20px]">calendar_today</span>
         </div>
         <div class="flex flex-col">
-          <span class="text-[10px] text-outline font-semibold uppercase">Join Date</span>
+          <span class="text-[10px] text-outline font-semibold uppercase">Tanggal Bergabung</span>
           <span class="text-body-md font-body-md text-on-surface">{{ $employee->join_date?->format('M d, Y') }}</span>
         </div>
       </div>
@@ -142,7 +142,7 @@ tailwind.config = {
           <span class="material-symbols-outlined text-[20px]">home</span>
         </div>
         <div class="flex flex-col">
-          <span class="text-[10px] text-outline font-semibold uppercase">Address</span>
+          <span class="text-[10px] text-outline font-semibold uppercase">Alamat</span>
           <span class="text-body-md font-body-md text-on-surface">{{ $employee->address }}</span>
         </div>
       </div>
@@ -153,7 +153,7 @@ tailwind.config = {
           <span class="material-symbols-outlined text-[20px]">account_balance_wallet</span>
         </div>
         <div class="flex flex-col">
-          <span class="text-[10px] text-outline font-semibold uppercase">Bank Account</span>
+          <span class="text-[10px] text-outline font-semibold uppercase">Rekening Bank</span>
           <span class="text-body-md font-body-md text-on-surface">**** {{ substr($employee->bank_account_number, -4) }}</span>
         </div>
       </div>
@@ -163,14 +163,14 @@ tailwind.config = {
 
   {{-- Quick Links --}}
   <section class="flex flex-col gap-unit-md">
-    <h3 class="font-label-md text-label-md text-outline uppercase tracking-widest pl-1">Quick Links</h3>
+    <h3 class="font-label-md text-label-md text-outline uppercase tracking-widest pl-1">Tautan Cepat</h3>
     <div class="bg-white rounded-xl border border-border overflow-hidden divide-y divide-border shadow-sm">
       <a href="{{ route('my.payroll.index') }}" class="p-unit-md flex items-center justify-between hover:bg-surface-container-low transition-colors">
         <div class="flex items-center gap-3">
           <div class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center text-primary">
             <span class="material-symbols-outlined text-[20px]">payments</span>
           </div>
-          <span class="text-body-md font-body-md text-on-surface">My Payslips</span>
+          <span class="text-body-md font-body-md text-on-surface">Slip Gaji Saya</span>
         </div>
         <span class="material-symbols-outlined text-on-surface-variant">chevron_right</span>
       </a>
@@ -179,7 +179,7 @@ tailwind.config = {
           <div class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center text-primary">
             <span class="material-symbols-outlined text-[20px]">schedule</span>
           </div>
-          <span class="text-body-md font-body-md text-on-surface">Attendance History</span>
+          <span class="text-body-md font-body-md text-on-surface">Riwayat Presensi</span>
         </div>
         <span class="material-symbols-outlined text-on-surface-variant">chevron_right</span>
       </a>
@@ -188,7 +188,7 @@ tailwind.config = {
           <div class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center text-primary">
             <span class="material-symbols-outlined text-[20px]">event_note</span>
           </div>
-          <span class="text-body-md font-body-md text-on-surface">Leave Requests</span>
+          <span class="text-body-md font-body-md text-on-surface">Pengajuan Cuti</span>
         </div>
         <span class="material-symbols-outlined text-on-surface-variant">chevron_right</span>
       </a>
@@ -201,7 +201,7 @@ tailwind.config = {
       @csrf
       <button class="w-full h-12 text-danger font-semibold rounded-xl active:opacity-70 transition-opacity flex items-center justify-center gap-2 border border-red-200 bg-red-50" type="submit">
         <span class="material-symbols-outlined text-[20px]">logout</span>
-        Logout
+        Keluar
       </button>
     </form>
   </section>
@@ -212,23 +212,23 @@ tailwind.config = {
 <nav class="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[390px] z-50 flex justify-around items-center px-2 py-3 bg-surface border-t border-border backdrop-blur-md shadow-lg h-20">
   <a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 hover:bg-surface-container-high transition-all active:scale-90" href="{{ $dashboardUrl }}">
     <span class="material-symbols-outlined">home</span>
-    <span class="font-label-sm text-label-sm-mobile mt-1">Home</span>
+    <span class="font-label-sm text-label-sm-mobile mt-1">Beranda</span>
   </a>
   <a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 hover:bg-surface-container-high transition-all active:scale-90" href="/attendance/checkin">
     <span class="material-symbols-outlined">schedule</span>
-    <span class="font-label-sm text-label-sm-mobile mt-1">Attendance</span>
+    <span class="font-label-sm text-label-sm-mobile mt-1">Presensi</span>
   </a>
   <a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 hover:bg-surface-container-high transition-all active:scale-90" href="/leave/history">
     <span class="material-symbols-outlined">event_note</span>
-    <span class="font-label-sm text-label-sm-mobile mt-1">Leave</span>
+    <span class="font-label-sm text-label-sm-mobile mt-1">Cuti</span>
   </a>
   <a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 hover:bg-surface-container-high transition-all active:scale-90" href="{{ route('my.payroll.index') }}">
     <span class="material-symbols-outlined">payments</span>
-    <span class="font-label-sm text-label-sm-mobile mt-1">Payslip</span>
+    <span class="font-label-sm text-label-sm-mobile mt-1">Slip Gaji</span>
   </a>
   <a class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-full px-4 py-1 active:scale-90 transition-all" href="{{ route('my.profile') }}">
     <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">person</span>
-    <span class="font-label-sm text-label-sm-mobile mt-1">Profile</span>
+    <span class="font-label-sm text-label-sm-mobile mt-1">Profil</span>
   </a>
 </nav>
 

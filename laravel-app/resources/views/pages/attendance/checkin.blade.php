@@ -1,8 +1,8 @@
-<!DOCTYPE html><html class="light" lang="en"><head>
+<!DOCTYPE html><html class="light" lang="id"><head>
 <meta charset="utf-8">
 <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
 <meta name="csrf-token" content="{{ csrf_token() }}">
-<title>Attendance Check-In - HRIS Mobile App</title>
+<title>Absen Masuk - HRIS Mobile App</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
@@ -185,7 +185,7 @@
 <!-- Done for today: checked in AND checked out -->
 <header class="fixed top-0 left-1/2 -translate-x-1/2 w-full max-w-[390px] z-50 flex items-center px-container-margin h-16 bg-surface border-b border-border shadow-sm">
 <a href="/employee/dashboard" class="p-2 -ml-2 rounded-full hover:bg-surface-container active:scale-95 transition-all text-on-surface-variant"><span class="material-symbols-outlined">arrow_back</span></a>
-<h1 class="font-headline-md text-headline-md text-primary ml-2 flex-1">Attendance</h1>
+<h1 class="font-headline-md text-headline-md text-primary ml-2 flex-1">Presensi</h1>
 </header>
 <main class="flex-1 mt-16 px-container-margin py-unit-md flex flex-col items-center justify-center gap-unit-lg">
 <div class="flex flex-col items-center gap-4 py-12">
@@ -208,7 +208,7 @@
 @endif
 <header class="fixed top-0 left-1/2 -translate-x-1/2 w-full max-w-[390px] z-50 flex items-center px-container-margin h-16 bg-surface border-b border-border shadow-sm">
 <a href="/employee/dashboard" class="p-2 -ml-2 rounded-full hover:bg-surface-container active:scale-95 transition-all text-on-surface-variant"><span class="material-symbols-outlined" style="font-variation-settings:'FILL' 0;">arrow_back</span></a>
-<h1 class="font-headline-md text-headline-md text-primary ml-2 flex-1">Check Out</h1>
+<h1 class="font-headline-md text-headline-md text-primary ml-2 flex-1">Absen Pulang</h1>
 </header>
 <form id="checkout-form" method="POST" action="/attendance/check-out">
 @csrf
@@ -226,11 +226,11 @@
 <!-- Today's check-in summary -->
 <section class="bg-surface rounded-xl border border-border shadow-sm p-4">
 <div class="flex items-center justify-between mb-3">
-<h2 class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Check-in Today</h2>
+<h2 class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Presensi Masuk Hari Ini</h2>
 @php
 $coStatusCls  = $todayRecord->status === 'APPROVED' ? 'bg-success/10 text-success' : 'bg-warning/10 text-warning';
 $coStatusIcon = $todayRecord->status === 'APPROVED' ? 'check_circle' : 'pending';
-$coStatusLbl  = $todayRecord->status === 'APPROVED' ? 'Approved' : 'Pending Review';
+$coStatusLbl  = $todayRecord->status === 'APPROVED' ? 'Disetujui' : 'Menunggu Review HR';
 @endphp
 <span class="px-2 py-1 rounded-full {{ $coStatusCls }} text-status-badge font-status-badge flex items-center gap-1">
 <span class="material-symbols-outlined text-[14px]">{{ $coStatusIcon }}</span> {{ $coStatusLbl }}
@@ -240,7 +240,7 @@ $coStatusLbl  = $todayRecord->status === 'APPROVED' ? 'Approved' : 'Pending Revi
 @if($todayRecord->status === 'PENDING_REVIEW')
 <p class="font-body-md text-body-md text-on-surface-variant mt-2 flex items-start gap-1.5">
 <span class="material-symbols-outlined text-warning text-[16px] mt-0.5 shrink-0">info</span>
-Check-out akan dicatat. Status Pending Review tetap menunggu keputusan HR.
+Absen pulang akan dicatat. Status Menunggu Review HR tetap menunggu keputusan HR.
 </p>
 @endif
 </section>
@@ -249,11 +249,11 @@ Check-out akan dicatat. Status Pending Review tetap menunggu keputusan HR.
 <div class="p-4 border-b border-border flex justify-between items-center bg-surface-container-low">
 <div class="flex items-center gap-2">
 <span class="material-symbols-outlined text-primary text-xl">location_on</span>
-<h2 class="font-label-md text-label-md text-on-surface">Your Location</h2>
+<h2 class="font-label-md text-label-md text-on-surface">Lokasi Anda</h2>
 </div>
 <div id="co-radius-badge" class="flex items-center gap-1.5 px-2 py-1 rounded-full bg-surface-container border border-outline-variant/50">
 <div class="w-1.5 h-1.5 rounded-full bg-outline animate-pulse"></div>
-<span class="font-status-badge text-status-badge text-on-surface-variant">Detecting GPS...</span>
+<span class="font-status-badge text-status-badge text-on-surface-variant">Mendeteksi GPS...</span>
 </div>
 </div>
 <div class="relative w-full h-32 bg-surface-container overflow-hidden flex items-center justify-center">
@@ -277,7 +277,7 @@ Check-out akan dicatat. Status Pending Review tetap menunggu keputusan HR.
 <div class="p-3 bg-surface text-center">
 <p class="font-label-sm text-label-sm text-on-surface-variant flex items-center justify-center gap-1">
 <span class="material-symbols-outlined text-[14px]">my_location</span>
-<span id="co-gps-detail">Waiting for location...</span>
+<span id="co-gps-detail">Menunggu lokasi...</span>
 </p>
 </div>
 </section>
@@ -288,7 +288,7 @@ Check-out akan dicatat. Status Pending Review tetap menunggu keputusan HR.
 <button id="co-submit-btn" type="submit" form="checkout-form" disabled
     class="w-full bg-primary hover:bg-primary/90 disabled:opacity-40 disabled:cursor-not-allowed text-on-primary font-headline-md text-body-lg font-semibold py-3.5 rounded-xl shadow-sm active:scale-[0.98] transition-all flex items-center justify-center gap-2">
 <span class="material-symbols-outlined text-xl" style="font-variation-settings:'FILL' 1;">logout</span>
-<span>Confirm Check Out</span>
+<span>Konfirmasi Absen Pulang</span>
 </button>
 </div>
 
@@ -306,7 +306,7 @@ Check-out akan dicatat. Status Pending Review tetap menunggu keputusan HR.
 
 <header class="fixed top-0 left-1/2 -translate-x-1/2 w-full max-w-[390px] z-50 flex items-center px-container-margin h-16 bg-surface border-b border-border shadow-sm">
 <a href="/employee/dashboard" class="p-2 -ml-2 rounded-full hover:bg-surface-container active:scale-95 transition-all text-on-surface-variant"><span class="material-symbols-outlined" style="font-variation-settings:'FILL' 0;">arrow_back</span></a>
-<h1 class="font-headline-md text-headline-md text-primary ml-2 flex-1">Check In</h1>
+<h1 class="font-headline-md text-headline-md text-primary ml-2 flex-1">Absen Masuk</h1>
 </header>
 
 <form id="checkin-form" method="POST" action="/attendance/check-in" enctype="multipart/form-data">
@@ -319,7 +319,7 @@ Check-out akan dicatat. Status Pending Review tetap menunggu keputusan HR.
 @if(!$officeLocation)
 <div class="bg-warning/10 border border-warning/30 rounded-lg px-4 py-3 flex items-start gap-2">
 <span class="material-symbols-outlined text-warning text-[18px] shrink-0 mt-0.5">warning</span>
-<p class="font-body-md text-body-md text-on-surface-variant">Lokasi kantor belum dikonfigurasi. Check-in tetap bisa dilakukan namun akan masuk status <strong>Pending Review</strong>. Hubungi HR untuk mengatur lokasi kantor.</p>
+<p class="font-body-md text-body-md text-on-surface-variant">Lokasi kantor belum dikonfigurasi. Absen masuk tetap bisa dilakukan namun akan masuk status <strong>Menunggu Review HR</strong>. Hubungi HR untuk mengatur lokasi kantor.</p>
 </div>
 @endif
 
@@ -337,11 +337,11 @@ Check-out akan dicatat. Status Pending Review tetap menunggu keputusan HR.
 <div class="p-4 border-b border-border flex justify-between items-center bg-surface-container-low">
 <div class="flex items-center gap-2">
 <span class="material-symbols-outlined text-primary text-xl">location_on</span>
-<h2 class="font-label-md text-label-md text-on-surface">Your Location</h2>
+<h2 class="font-label-md text-label-md text-on-surface">Lokasi Anda</h2>
 </div>
 <div id="radius-badge" class="flex items-center gap-1.5 px-2 py-1 rounded-full bg-surface-container border border-outline-variant/50">
 <div class="w-1.5 h-1.5 rounded-full bg-outline animate-pulse"></div>
-<span class="font-status-badge text-status-badge text-on-surface-variant">Detecting GPS...</span>
+<span class="font-status-badge text-status-badge text-on-surface-variant">Mendeteksi GPS...</span>
 </div>
 </div>
 <div class="relative w-full h-32 bg-surface-container overflow-hidden flex items-center justify-center">
@@ -365,15 +365,15 @@ Check-out akan dicatat. Status Pending Review tetap menunggu keputusan HR.
 <div class="p-3 bg-surface text-center">
 <p class="font-label-sm text-label-sm text-on-surface-variant flex items-center justify-center gap-1">
 <span class="material-symbols-outlined text-[14px]">my_location</span>
-<span id="gps-detail">Waiting for location...</span>
+<span id="gps-detail">Menunggu lokasi...</span>
 </p>
-<p class="font-label-sm text-label-sm text-on-surface-variant mt-2 opacity-80 italic">Reason required only when outside office radius.</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant mt-2 opacity-80 italic">Alasan hanya diperlukan jika di luar radius kantor.</p>
 </div>
 </section>
 
 <!-- Selfie Capture Section -->
 <section class="flex flex-col gap-unit-xs">
-<label class="font-label-md text-label-md text-on-surface px-1">Photo Verification</label>
+<label class="font-label-md text-label-md text-on-surface px-1">Verifikasi Foto</label>
 @error('photo')
 <p class="text-error font-label-sm text-label-sm px-1">{{ $message }}</p>
 @enderror
@@ -392,11 +392,11 @@ Check-out akan dicatat. Status Pending Review tetap menunggu keputusan HR.
 <div id="capture-overlay" class="hidden absolute inset-0 flex items-end justify-center pb-3 z-20">
 <button type="button" id="capture-btn" class="bg-primary text-on-primary rounded-full px-5 py-2 font-label-md text-label-md flex items-center gap-1.5 shadow-md active:scale-95 transition-all">
 <span class="material-symbols-outlined text-[18px]" style="font-variation-settings:'FILL' 1;">photo_camera</span>
-Capture Selfie
+Ambil Selfie
 </button>
 </div>
-<img id="photo-preview" class="hidden absolute inset-0 w-full h-full object-cover z-10" alt="Selfie preview">
-<button type="button" id="photo-retake" class="hidden absolute bottom-2 right-2 z-20 bg-surface/80 rounded-full px-3 py-1 font-label-sm text-label-sm text-primary backdrop-blur-sm">Retake</button>
+<img id="photo-preview" class="hidden absolute inset-0 w-full h-full object-cover z-10" alt="Pratinjau selfie">
+<button type="button" id="photo-retake" class="hidden absolute bottom-2 right-2 z-20 bg-surface/80 rounded-full px-3 py-1 font-label-sm text-label-sm text-primary backdrop-blur-sm">Ambil Ulang</button>
 </div>
 <canvas id="selfie-canvas" class="hidden"></canvas>
 </section>
@@ -426,7 +426,7 @@ Alasan absen di luar radius <span class="text-danger">*</span>
 <button id="submit-btn" type="submit" form="checkin-form" disabled
     class="w-full bg-primary hover:bg-primary/90 disabled:opacity-40 disabled:cursor-not-allowed text-on-primary font-headline-md text-body-lg font-semibold py-3.5 rounded-xl shadow-sm active:scale-[0.98] transition-all flex items-center justify-center gap-2">
 <span class="material-symbols-outlined text-xl" style="font-variation-settings:'FILL' 1;">login</span>
-<span id="submit-label">Confirm Check In</span>
+<span id="submit-label">Konfirmasi Absen Masuk</span>
 </button>
 </div>
 
@@ -518,7 +518,7 @@ Alasan absen di luar radius <span class="text-danger">*</span>
                         badge.className   = 'flex items-center gap-1.5 px-2 py-1 rounded-full bg-success/10 border border-success/20';
                         badge.innerHTML   = '<div class="w-1.5 h-1.5 rounded-full bg-success animate-pulse"></div><span class="font-status-badge text-status-badge text-success">Dalam radius kantor</span>';
                         if (reason) reason.classList.add('hidden');
-                        if (label)  label.innerText = 'Konfirmasi Check In';
+                        if (label)  label.innerText = 'Konfirmasi Absen Masuk';
                     } else {
                         badge.className   = 'flex items-center gap-1.5 px-2 py-1 rounded-full bg-error-container border border-error/20';
                         badge.innerHTML   = '<div class="w-1.5 h-1.5 rounded-full bg-error animate-pulse"></div><span class="font-status-badge text-status-badge text-error">Di luar radius kantor</span>';
@@ -663,7 +663,7 @@ Alasan absen di luar radius <span class="text-danger">*</span>
             const btn = document.getElementById('submit-btn');
             const lbl = document.getElementById('submit-label');
             if (btn) btn.disabled = true;
-            if (lbl) lbl.innerText = 'Submitting...';
+            if (lbl) lbl.innerText = 'Mengirim...';
 
             const csrf     = document.querySelector('meta[name="csrf-token"]')?.content || '';
             const formData = new FormData(checkinForm);
@@ -688,7 +688,7 @@ Alasan absen di luar radius <span class="text-danger">*</span>
             })
             .catch(function() {
                 if (btn) btn.disabled = false;
-                if (lbl) lbl.innerText = 'Confirm Check In';
+                if (lbl) lbl.innerText = 'Konfirmasi Absen Masuk';
             });
         });
     }

@@ -1,7 +1,7 @@
-<!DOCTYPE html><html lang="en"><head>
+<!DOCTYPE html><html lang="id"><head>
 <meta charset="utf-8">
 <meta content="width=device-width, initial-scale=1.0" name="viewport">
-<title>Notifications - HRIS Mobile App</title>
+<title>Notifikasi - HRIS Mobile App</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
@@ -61,7 +61,7 @@
         <span class="material-symbols-outlined">arrow_back</span>
     </button>
     @endif
-    <h1 class="font-headline-md text-headline-md font-bold text-primary">Notifications</h1>
+    <h1 class="font-headline-md text-headline-md font-bold text-primary">Notifikasi</h1>
     @if($notifications->total() > 0)
     <form method="POST" action="{{ route('notifications.read-all') }}">
         @csrf @method('PATCH')
@@ -70,7 +70,7 @@
         @endif
         <button type="submit"
                 class="text-primary font-label-md text-label-md hover:bg-surface-container-low active:scale-95 transition-transform duration-150 px-3 py-2 rounded-lg">
-            Mark all read
+            Tandai semua sudah dibaca
         </button>
     </form>
     @else
@@ -124,7 +124,7 @@
         @empty
         <div class="flex flex-col items-center justify-center py-unit-xl opacity-40 select-none mt-unit-xl">
             <span class="material-symbols-outlined text-[64px]">notifications_off</span>
-            <p class="font-label-md mt-2 text-on-surface-variant">No notifications yet.</p>
+            <p class="font-label-md mt-2 text-on-surface-variant">Belum ada notifikasi.</p>
         </div>
         @endforelse
     </div>

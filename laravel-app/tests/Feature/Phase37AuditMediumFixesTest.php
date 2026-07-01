@@ -73,8 +73,8 @@ class Phase37AuditMediumFixesTest extends TestCase
         $this->actingAs($user)
             ->get('/profile')
             ->assertOk()
-            ->assertSee('No employee record linked')
-            ->assertSee('Contact HR to link your account');
+            ->assertSee('Belum ada data karyawan yang tertaut')
+            ->assertSee('Hubungi HR untuk menautkan akun Anda');
     }
 
     public function test_profile_fallback_still_shows_logout(): void
@@ -84,7 +84,7 @@ class Phase37AuditMediumFixesTest extends TestCase
         $this->actingAs($user)
             ->get('/profile')
             ->assertOk()
-            ->assertSee('Logout');
+            ->assertSee('Keluar');
     }
 
     // ── Fix 2: Notification count computed only once per request ────────────

@@ -549,7 +549,7 @@ class SecurityHardeningTest extends TestCase
         $response = $this->get('/this-route-does-not-exist-phase14');
         $response->assertNotFound();
         $response->assertSee('404');
-        $response->assertSee('Not Found');
+        $response->assertSee('Tidak Ditemukan');
     }
 
     public function test_403_page_renders_for_forbidden_route(): void
@@ -559,7 +559,7 @@ class SecurityHardeningTest extends TestCase
 
         $response->assertForbidden();
         $response->assertSee('403');
-        $response->assertSee('Forbidden');
+        $response->assertSee('Ditolak');
     }
 
     public function test_403_page_has_dashboard_link_for_authenticated_user(): void
@@ -575,7 +575,7 @@ class SecurityHardeningTest extends TestCase
     {
         $response = $this->get('/this-route-definitely-does-not-exist');
         $response->assertNotFound();
-        $response->assertSee('Login');
+        $response->assertSee('Masuk');
     }
 
     public function test_error_pages_do_not_expose_stack_traces(): void

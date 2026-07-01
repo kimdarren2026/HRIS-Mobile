@@ -34,15 +34,15 @@ class LeaveApprovalController extends Controller
         if ($leaveRequest->employee?->user) {
             $this->notifications->create(
                 $leaveRequest->employee->user,
-                'Leave approved',
-                'Your leave request has been approved.',
+                'Cuti disetujui',
+                'Pengajuan cuti Anda telah disetujui.',
                 'leave',
                 '/leave/history',
                 $leaveRequest,
             );
         }
 
-        return back()->with('success', 'Leave request approved.');
+        return back()->with('success', 'Pengajuan cuti berhasil disetujui.');
     }
 
     public function reject(Request $request, LeaveRequest $leaveRequest): RedirectResponse
@@ -52,8 +52,8 @@ class LeaveApprovalController extends Controller
         $request->validate([
             'approval_note' => ['required', 'string', 'min:10', 'max:1000'],
         ], [
-            'approval_note.required' => 'Rejection reason is required.',
-            'approval_note.min'      => 'Rejection reason must be at least 10 characters.',
+            'approval_note.required' => 'Alasan penolakan wajib diisi.',
+            'approval_note.min'      => 'Alasan penolakan minimal 10 karakter.',
         ]);
 
         $this->leaveService->reject($leaveRequest, auth()->user(), $request->approval_note);
@@ -70,14 +70,14 @@ class LeaveApprovalController extends Controller
         if ($leaveRequest->employee?->user) {
             $this->notifications->create(
                 $leaveRequest->employee->user,
-                'Leave rejected',
-                'Your leave request has been rejected.',
+                'Cuti ditolak',
+                'Pengajuan cuti Anda telah ditolak.',
                 'leave',
                 '/leave/history',
                 $leaveRequest,
             );
         }
 
-        return back()->with('success', 'Leave request rejected.');
+        return back()->with('success', 'Pengajuan cuti berhasil ditolak.');
     }
 }

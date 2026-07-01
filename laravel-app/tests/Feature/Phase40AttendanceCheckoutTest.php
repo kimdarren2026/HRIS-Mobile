@@ -104,7 +104,7 @@ class Phase40AttendanceCheckoutTest extends TestCase
             ->assertOk()
             // id="checkout-form" (double-quoted HTML attr) is distinct from JS getElementById('checkout-form')
             ->assertSee('id="checkout-form"', false)
-            ->assertSee('Check Out')
+            ->assertSee('Absen Pulang')
             ->assertDontSee('id="checkin-form"', false);
     }
 
@@ -116,8 +116,8 @@ class Phase40AttendanceCheckoutTest extends TestCase
             ->get('/attendance/checkin')
             ->assertOk()
             ->assertSee('id="checkout-form"', false)
-            ->assertSee('Check Out')
-            ->assertSee('Pending Review');
+            ->assertSee('Absen Pulang')
+            ->assertSee('Menunggu Review HR');
     }
 
     public function test_checkin_page_shows_done_state_when_already_checked_out(): void

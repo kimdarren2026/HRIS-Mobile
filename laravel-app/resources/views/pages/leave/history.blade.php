@@ -1,7 +1,7 @@
-<!DOCTYPE html><html lang="en"><head>
+<!DOCTYPE html><html lang="id"><head>
 <meta charset="utf-8">
 <meta content="width=device-width, initial-scale=1.0" name="viewport">
-<title>Leave History - HRIS Mobile App</title>
+<title>Riwayat Cuti - HRIS Mobile App</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
@@ -82,8 +82,8 @@
 <main class="flex-grow pt-[88px] px-container-margin pb-unit-xl">
 
     <div class="mb-unit-lg">
-        <h1 class="font-headline-lg text-headline-lg text-on-surface mb-unit-xs">Leave History</h1>
-        <p class="font-body-md text-body-md text-on-surface-variant">Track your leave and permission requests.</p>
+        <h1 class="font-headline-lg text-headline-lg text-on-surface mb-unit-xs">Riwayat Cuti</h1>
+        <p class="font-body-md text-body-md text-on-surface-variant">Pantau pengajuan cuti dan izin Anda.</p>
     </div>
 
     {{-- Flash --}}
@@ -93,10 +93,10 @@
     <div class="flex overflow-x-auto gap-unit-sm mb-unit-lg pb-2 no-scrollbar -mx-container-margin px-container-margin">
         @php
             $filters = [
-                null        => 'All',
-                'PENDING_HR' => 'Pending',
-                'APPROVED'  => 'Approved',
-                'REJECTED'  => 'Rejected',
+                null        => 'Semua',
+                'PENDING_HR' => 'Menunggu',
+                'APPROVED'  => 'Disetujui',
+                'REJECTED'  => 'Ditolak',
             ];
         @endphp
         @foreach($filters as $val => $label)
@@ -123,9 +123,9 @@
                 default    => 'text-warning bg-warning/10',
             };
             $badgeLabel = match($req->status) {
-                'APPROVED' => 'Approved',
-                'REJECTED' => 'Rejected',
-                default    => 'Pending HR',
+                'APPROVED' => 'Disetujui',
+                'REJECTED' => 'Ditolak',
+                default    => 'Menunggu HR',
             };
             $icon = match(true) {
                 str_contains(strtolower($req->leaveType->name ?? ''), 'sick')     => 'medical_services',
@@ -151,7 +151,7 @@
                     </div>
                 </div>
                 <div class="text-right">
-                    <div class="font-label-md text-label-md text-on-surface">{{ $days }} {{ $days === 1 ? 'Day' : 'Days' }}</div>
+                    <div class="font-label-md text-label-md text-on-surface">{{ $days }} Hari</div>
                 </div>
             </div>
             <div class="pl-2">
@@ -159,13 +159,13 @@
                 <p class="font-body-md text-body-md text-on-surface-variant italic truncate">"{{ $req->reason }}"</p>
                 @if($req->approval_note)
                 <p class="font-label-sm text-label-sm text-on-surface-variant mt-1 border-t border-outline-variant pt-1">
-                    HR note: {{ $req->approval_note }}
+                    Catatan HR: {{ $req->approval_note }}
                 </p>
                 @endif
                 @if($req->attachment_path)
                 <a href="/leave/attachment/{{ $req->id }}" target="_blank"
                    class="inline-flex items-center gap-1 mt-1 text-primary font-label-sm text-label-sm hover:underline">
-                    <span class="material-symbols-outlined text-[14px]">attach_file</span> View Attachment
+                    <span class="material-symbols-outlined text-[14px]">attach_file</span> Lihat Lampiran
                 </a>
                 @endif
             </div>
@@ -173,7 +173,7 @@
         @empty
         <div class="flex flex-col items-center justify-center py-unit-xl opacity-40 select-none">
             <span class="material-symbols-outlined text-[64px]">event_busy</span>
-            <p class="font-label-md mt-2 text-on-surface-variant">No leave requests found.</p>
+            <p class="font-label-md mt-2 text-on-surface-variant">Belum ada pengajuan cuti.</p>
         </div>
         @endforelse
     </div>
@@ -196,23 +196,23 @@
 <nav class="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[390px] z-50 flex justify-around items-center px-2 py-3 bg-surface border-t border-border backdrop-blur-md shadow-lg mx-auto">
     <a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 hover:bg-surface-container-high active:scale-90 transition-all duration-200" href="/employee/dashboard">
         <span class="material-symbols-outlined mb-1">home</span>
-        <span class="font-label-sm text-label-sm">Home</span>
+        <span class="font-label-sm text-label-sm">Beranda</span>
     </a>
     <a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 hover:bg-surface-container-high active:scale-90 transition-all duration-200" href="/attendance/checkin">
         <span class="material-symbols-outlined mb-1">schedule</span>
-        <span class="font-label-sm text-label-sm">Attendance</span>
+        <span class="font-label-sm text-label-sm">Presensi</span>
     </a>
     <a class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-full px-4 py-1 active:scale-90 transition-all duration-200" href="/leave/history">
         <span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 1;">event_note</span>
-        <span class="font-label-sm text-label-sm">Leave</span>
+        <span class="font-label-sm text-label-sm">Cuti</span>
     </a>
     <a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 hover:bg-surface-container-high active:scale-90 transition-all duration-200" href="/payslip/detail">
         <span class="material-symbols-outlined mb-1">payments</span>
-        <span class="font-label-sm text-label-sm">Payslip</span>
+        <span class="font-label-sm text-label-sm">Slip Gaji</span>
     </a>
     <a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 hover:bg-surface-container-high active:scale-90 transition-all duration-200" href="{{ route('my.profile') }}">
         <span class="material-symbols-outlined mb-1">person</span>
-        <span class="font-label-sm text-label-sm">Profile</span>
+        <span class="font-label-sm text-label-sm">Profil</span>
     </a>
 </nav>
 </body></html>

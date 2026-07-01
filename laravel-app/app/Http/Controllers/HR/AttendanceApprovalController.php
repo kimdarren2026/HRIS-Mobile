@@ -52,8 +52,8 @@ class AttendanceApprovalController extends Controller
         if ($attendanceRecord->employee?->user) {
             $this->notifications->create(
                 $attendanceRecord->employee->user,
-                'Attendance approved',
-                'Your attendance submission has been approved.',
+                'Presensi disetujui',
+                'Presensi Anda telah disetujui.',
                 'attendance',
                 '/attendance/history',
                 $attendanceRecord,
@@ -94,8 +94,8 @@ class AttendanceApprovalController extends Controller
         if ($attendanceRecord->employee?->user) {
             $this->notifications->create(
                 $attendanceRecord->employee->user,
-                'Attendance rejected',
-                'Your attendance submission has been rejected.',
+                'Presensi ditolak',
+                'Presensi Anda telah ditolak.',
                 'attendance',
                 '/attendance/history',
                 $attendanceRecord,

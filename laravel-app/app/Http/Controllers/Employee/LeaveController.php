@@ -58,14 +58,14 @@ class LeaveController extends Controller
 
         $this->notifications->notifyRoles(
             ['admin_hr', 'super_admin'],
-            'Leave request needs review',
-            'A leave request is waiting for HR review.',
+            'Pengajuan cuti perlu ditinjau',
+            'Ada pengajuan cuti yang menunggu review HR.',
             'leave',
             '/hr/approval-queue',
             $leaveRequest,
         );
 
-        return redirect('/leave/history')->with('success', 'Leave request submitted successfully.');
+        return redirect('/leave/history')->with('success', 'Pengajuan cuti berhasil dikirim.');
     }
 
     public function attachment(LeaveRequest $leaveRequest): Response
