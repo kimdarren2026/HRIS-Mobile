@@ -27,15 +27,17 @@ class AttendanceController extends Controller
         $employee = $user->employee;
         $office   = $this->attendanceService->getActiveOffice();
 
-        $alreadyCheckedIn = $employee
+        $todayRecord = $employee
             ? AttendanceRecord::where('employee_id', $employee->id)
                 ->whereDate('attendance_date', today())
-                ->exists()
-            : false;
+                ->first()
+            : null;
 
         return view('pages.attendance.checkin', [
-            'alreadyCheckedIn' => $alreadyCheckedIn,
-            'officeLocation'   => $office,
+            'alreadyCheckedIn'  => $todayRecord !== null,
+            'alreadyCheckedOut' => $todayRecord?->check_out_time !== null,
+            'todayRecord'       => $todayRecord,
+            'officeLocation'    => $office,
         ]);
     }
 
@@ -121,9 +123,6 @@ class AttendanceController extends Controller
         return redirect('/attendance/history')->with('success', $message);
     }
 
-    // TODO (Phase 38): Add checkout selfie photo (mirroring check-in photo flow).
-    // TODO (Phase 38): Evaluate whether checkout outside office radius should trigger HR review.
-    // TODO (Phase 38): Decide whether PENDING_REVIEW records should be blocked from checkout.
     public function checkOut(AttendanceCheckOutRequest $request): RedirectResponse
     {
         $user     = auth()->user();
@@ -145,6 +144,8 @@ class AttendanceController extends Controller
             return back()->withErrors(['general' => 'Anda sudah melakukan check-out hari ini.']);
         }
 
+        // Status is intentionally NOT changed on checkout — PENDING_REVIEW records
+        // remain under HR review regardless of when the employee checks out.
         $record->update([
             'check_out_time' => now(),
             'check_out_lat'  => (float) $request->lat,
