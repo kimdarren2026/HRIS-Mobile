@@ -181,20 +181,117 @@
 </head>
 <body class="bg-background text-on-surface font-body-md min-h-screen flex flex-col antialiased w-full max-w-[390px] mx-auto overflow-x-hidden pb-24">
 
-@if($alreadyCheckedIn)
-<!-- Already checked in today -->
+@if($alreadyCheckedIn && $alreadyCheckedOut)
+<!-- Done for today: checked in AND checked out -->
 <header class="fixed top-0 left-1/2 -translate-x-1/2 w-full max-w-[390px] z-50 flex items-center px-container-margin h-16 bg-surface border-b border-border shadow-sm">
 <a href="/employee/dashboard" class="p-2 -ml-2 rounded-full hover:bg-surface-container active:scale-95 transition-all text-on-surface-variant"><span class="material-symbols-outlined">arrow_back</span></a>
-<h1 class="font-headline-md text-headline-md text-primary ml-2 flex-1">Check In</h1>
+<h1 class="font-headline-md text-headline-md text-primary ml-2 flex-1">Attendance</h1>
 </header>
 <main class="flex-1 mt-16 px-container-margin py-unit-md flex flex-col items-center justify-center gap-unit-lg">
 <div class="flex flex-col items-center gap-4 py-12">
-<span class="material-symbols-outlined text-success text-[64px]" style="font-variation-settings:'FILL' 1;">check_circle</span>
-<h2 class="font-headline-md text-headline-md text-on-surface">Sudah Check-In Hari Ini</h2>
-<p class="font-body-md text-body-md text-on-surface-variant text-center">Anda sudah melakukan check-in untuk hari ini. Silakan cek riwayat presensi Anda.</p>
+<span class="material-symbols-outlined text-success text-[64px]" style="font-variation-settings:'FILL' 1;">task_alt</span>
+<h2 class="font-headline-md text-headline-md text-on-surface">Presensi Selesai</h2>
+<p class="font-body-md text-body-md text-on-surface-variant text-center">Anda sudah melakukan check-in dan check-out hari ini.</p>
 <a href="/attendance/history" class="mt-4 bg-primary text-on-primary font-label-md text-label-md px-6 py-3 rounded-xl">Lihat Riwayat</a>
 </div>
 </main>
+
+@elseif($alreadyCheckedIn)
+<!-- Checked in but not yet checked out — show checkout form -->
+@if($errors->has('general'))
+<div class="fixed top-0 left-1/2 -translate-x-1/2 w-full max-w-[390px] z-[60] px-container-margin pt-2">
+<div class="bg-error-container text-on-error-container rounded-lg px-4 py-3 font-body-md text-body-md flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px] shrink-0">error</span>
+<span>{{ $errors->first('general') }}</span>
+</div>
+</div>
+@endif
+<header class="fixed top-0 left-1/2 -translate-x-1/2 w-full max-w-[390px] z-50 flex items-center px-container-margin h-16 bg-surface border-b border-border shadow-sm">
+<a href="/employee/dashboard" class="p-2 -ml-2 rounded-full hover:bg-surface-container active:scale-95 transition-all text-on-surface-variant"><span class="material-symbols-outlined" style="font-variation-settings:'FILL' 0;">arrow_back</span></a>
+<h1 class="font-headline-md text-headline-md text-primary ml-2 flex-1">Check Out</h1>
+</header>
+<form id="checkout-form" method="POST" action="/attendance/check-out">
+@csrf
+<input type="hidden" id="co-lat" name="lat">
+<input type="hidden" id="co-lng" name="lng">
+<main class="flex-1 mt-16 px-container-margin py-unit-md flex flex-col gap-unit-lg">
+<!-- Clock -->
+<section class="flex flex-col items-center justify-center pt-unit-sm">
+<p class="font-body-md text-body-md text-on-surface-variant mb-1" id="current-date">—</p>
+<div class="flex items-baseline gap-1">
+<span class="font-headline-lg text-4xl font-bold tracking-tight text-on-surface" id="current-time">--:--</span>
+<span class="font-label-md text-label-md text-on-surface-variant font-bold" id="ampm">--</span>
+</div>
+</section>
+<!-- Today's check-in summary -->
+<section class="bg-surface rounded-xl border border-border shadow-sm p-4">
+<div class="flex items-center justify-between mb-3">
+<h2 class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Check-in Today</h2>
+@php
+$coStatusCls  = $todayRecord->status === 'APPROVED' ? 'bg-success/10 text-success' : 'bg-warning/10 text-warning';
+$coStatusIcon = $todayRecord->status === 'APPROVED' ? 'check_circle' : 'pending';
+$coStatusLbl  = $todayRecord->status === 'APPROVED' ? 'Approved' : 'Pending Review';
+@endphp
+<span class="px-2 py-1 rounded-full {{ $coStatusCls }} text-status-badge font-status-badge flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">{{ $coStatusIcon }}</span> {{ $coStatusLbl }}
+</span>
+</div>
+<p class="font-headline-md text-headline-md text-on-background">{{ $todayRecord->check_in_time->format('h:i A') }}</p>
+@if($todayRecord->status === 'PENDING_REVIEW')
+<p class="font-body-md text-body-md text-on-surface-variant mt-2 flex items-start gap-1.5">
+<span class="material-symbols-outlined text-warning text-[16px] mt-0.5 shrink-0">info</span>
+Check-out akan dicatat. Status Pending Review tetap menunggu keputusan HR.
+</p>
+@endif
+</section>
+<!-- GPS Location -->
+<section class="bg-surface rounded-xl border border-border shadow-sm overflow-hidden flex flex-col">
+<div class="p-4 border-b border-border flex justify-between items-center bg-surface-container-low">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-xl">location_on</span>
+<h2 class="font-label-md text-label-md text-on-surface">Your Location</h2>
+</div>
+<div id="co-radius-badge" class="flex items-center gap-1.5 px-2 py-1 rounded-full bg-surface-container border border-outline-variant/50">
+<div class="w-1.5 h-1.5 rounded-full bg-outline animate-pulse"></div>
+<span class="font-status-badge text-status-badge text-on-surface-variant">Detecting GPS...</span>
+</div>
+</div>
+<div class="relative w-full h-32 bg-surface-container overflow-hidden flex items-center justify-center">
+<div id="co-gps-loading" class="flex flex-col items-center justify-center gap-2 text-on-surface-variant">
+<div class="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+<span class="font-label-sm text-label-sm">Mengambil lokasi...</span>
+</div>
+<div id="co-gps-error-msg" class="hidden flex-col items-center gap-2 text-center px-4">
+<span class="material-symbols-outlined text-error text-[32px]">location_off</span>
+<p class="font-label-sm text-label-sm text-error" id="co-gps-error-text">Izin lokasi ditolak. Aktifkan GPS di pengaturan browser.</p>
+<button type="button" onclick="retryCoGps()" class="mt-1 text-primary font-label-sm text-label-sm underline">Coba lagi</button>
+</div>
+<div id="co-gps-ok" class="hidden items-center justify-center w-full h-full">
+<div class="relative flex items-center justify-center">
+<div class="absolute w-12 h-12 rounded-full bg-primary/20 animate-pin-pulse"></div>
+<div class="absolute w-4 h-4 rounded-full bg-primary shadow-sm border-2 border-white z-10"></div>
+<span class="material-symbols-outlined absolute -top-8 text-primary drop-shadow-md" style="font-variation-settings:'FILL' 1; font-size:32px;">location_on</span>
+</div>
+</div>
+</div>
+<div class="p-3 bg-surface text-center">
+<p class="font-label-sm text-label-sm text-on-surface-variant flex items-center justify-center gap-1">
+<span class="material-symbols-outlined text-[14px]">my_location</span>
+<span id="co-gps-detail">Waiting for location...</span>
+</p>
+</div>
+</section>
+</main>
+</form>
+<!-- Fixed checkout submit button -->
+<div class="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[390px] px-container-margin pb-unit-md pt-unit-sm bg-surface/90 backdrop-blur-md border-t border-border z-40">
+<button id="co-submit-btn" type="submit" form="checkout-form" disabled
+    class="w-full bg-primary hover:bg-primary/90 disabled:opacity-40 disabled:cursor-not-allowed text-on-primary font-headline-md text-body-lg font-semibold py-3.5 rounded-xl shadow-sm active:scale-[0.98] transition-all flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-xl" style="font-variation-settings:'FILL' 1;">logout</span>
+<span>Confirm Check Out</span>
+</button>
+</div>
+
 @else
 
 {{-- Session error --}}
@@ -606,6 +703,96 @@ Alasan absen di luar radius <span class="text-danger">*</span>
     if (document.getElementById('checkin-form')) {
         startGps();
         startCamera();
+    }
+
+    // ── Check-out GPS ──────────────────────────────────────────────────────
+    if (document.getElementById('checkout-form')) {
+        let coGpsReady = false;
+
+        function updateCoSubmit() {
+            const btn = document.getElementById('co-submit-btn');
+            if (!btn) return;
+            btn.disabled = !coGpsReady;
+        }
+
+        function startCoGps() {
+            if (!navigator.geolocation) {
+                showCoGpsError('Perangkat/browser ini tidak mendukung GPS.');
+                return;
+            }
+            const loadEl = document.getElementById('co-gps-loading');
+            const okEl   = document.getElementById('co-gps-ok');
+            const errDiv = document.getElementById('co-gps-error-msg');
+            if (errDiv) { errDiv.classList.add('hidden'); errDiv.classList.remove('flex'); }
+            if (okEl)   { okEl.classList.add('hidden'); okEl.classList.remove('flex'); }
+            if (loadEl) loadEl.classList.remove('hidden');
+
+            navigator.geolocation.getCurrentPosition(
+                function(pos) {
+                    const lat = pos.coords.latitude;
+                    const lng = pos.coords.longitude;
+                    const acc = Math.round(pos.coords.accuracy);
+
+                    document.getElementById('co-lat').value = lat;
+                    document.getElementById('co-lng').value = lng;
+
+                    if (loadEl) loadEl.classList.add('hidden');
+                    if (okEl)   { okEl.classList.remove('hidden'); okEl.classList.add('flex'); }
+
+                    coGpsReady = true;
+                    updateCoSubmit();
+
+                    const badge  = document.getElementById('co-radius-badge');
+                    const detail = document.getElementById('co-gps-detail');
+
+                    if (OFFICE_LAT !== null) {
+                        const dist        = haversine(lat, lng, OFFICE_LAT, OFFICE_LNG);
+                        const withinRadius = dist <= OFFICE_RADIUS;
+                        const distM       = Math.round(dist);
+
+                        if (withinRadius) {
+                            badge.className = 'flex items-center gap-1.5 px-2 py-1 rounded-full bg-success/10 border border-success/20';
+                            badge.innerHTML = '<div class="w-1.5 h-1.5 rounded-full bg-success animate-pulse"></div><span class="font-status-badge text-status-badge text-success">Dalam radius kantor</span>';
+                        } else {
+                            badge.className = 'flex items-center gap-1.5 px-2 py-1 rounded-full bg-warning/10 border border-warning/20';
+                            badge.innerHTML = '<div class="w-1.5 h-1.5 rounded-full bg-warning animate-pulse"></div><span class="font-status-badge text-status-badge text-warning">Di luar radius</span>';
+                        }
+                        if (detail) detail.innerText = 'Akurasi: ' + acc + 'm' + (withinRadius ? '' : ' • ' + distM + 'm dari kantor');
+                    } else {
+                        if (detail) detail.innerText = 'Akurasi: ' + acc + 'm';
+                    }
+                },
+                function(err) {
+                    const msgs = {
+                        1: 'Izin lokasi ditolak. Aktifkan akses lokasi di pengaturan browser.',
+                        2: 'Posisi tidak tersedia. Pastikan GPS perangkat aktif.',
+                        3: 'Timeout GPS. Periksa koneksi dan tekan "Coba lagi".',
+                    };
+                    showCoGpsError(msgs[err.code] || 'Gagal mendapatkan lokasi.');
+                },
+                { enableHighAccuracy: true, timeout: 12000, maximumAge: 0 }
+            );
+        }
+
+        window.retryCoGps = function() { startCoGps(); };
+
+        function showCoGpsError(msg) {
+            const loadEl = document.getElementById('co-gps-loading');
+            const errDiv = document.getElementById('co-gps-error-msg');
+            const okDiv  = document.getElementById('co-gps-ok');
+            const errTxt = document.getElementById('co-gps-error-text');
+            if (loadEl) loadEl.classList.add('hidden');
+            if (errDiv) { errDiv.classList.remove('hidden'); errDiv.classList.add('flex'); }
+            if (okDiv)  { okDiv.classList.add('hidden'); okDiv.classList.remove('flex'); }
+            if (errTxt) errTxt.innerText = msg;
+            const badge = document.getElementById('co-radius-badge');
+            if (badge) {
+                badge.className = 'flex items-center gap-1.5 px-2 py-1 rounded-full bg-error-container border border-error/20';
+                badge.innerHTML = '<span class="material-symbols-outlined text-error text-[14px]">location_off</span><span class="font-status-badge text-status-badge text-error">GPS tidak tersedia</span>';
+            }
+        }
+
+        startCoGps();
     }
 })();
 </script>

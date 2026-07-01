@@ -210,6 +210,9 @@ $badgeLabel = match($record->status) {
 <div>
 <p class="text-label-sm font-label-sm text-on-surface-variant mb-1 uppercase">Check-out</p>
 <p class="text-body-md font-body-md text-on-background font-medium">{{ $record->check_out_time ? $record->check_out_time->format('h:i A') : '--:--' }}</p>
+@if($record->check_out_lat && $record->check_out_lng)
+<p class="text-label-sm font-label-sm text-on-surface-variant mt-0.5 opacity-70">{{ number_format((float)$record->check_out_lat, 5) }}, {{ number_format((float)$record->check_out_lng, 5) }}</p>
+@endif
 </div>
 </div>
 @if($record->status === 'PENDING_REVIEW' && $record->out_of_radius_reason)
