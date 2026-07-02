@@ -85,11 +85,11 @@ class DatabaseSeeder extends Seeder
         );
 
         OfficeLocation::updateOrCreate(
-            ['name' => 'Main Office'],
+            ['name' => 'STIKes Advaita Tabanan'],
             [
-                'latitude' => -6.2000000,
-                'longitude' => 106.8166660,
-                'radius_meters' => 100,
+                'latitude' => -8.5320882,
+                'longitude' => 115.1248781,
+                'radius_meters' => 150,
                 'is_active' => true,
             ]
         );
