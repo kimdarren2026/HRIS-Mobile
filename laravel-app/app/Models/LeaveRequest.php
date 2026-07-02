@@ -13,6 +13,7 @@ class LeaveRequest extends Model
         'start_date',
         'end_date',
         'total_days',
+        'chargeable_days',
         'reason',
         'attachment_path',
         'status',
@@ -27,6 +28,7 @@ class LeaveRequest extends Model
             'start_date' => 'date',
             'end_date' => 'date',
             'total_days' => 'decimal:2',
+            'chargeable_days' => 'decimal:2',
             'approved_at' => 'datetime',
         ];
     }

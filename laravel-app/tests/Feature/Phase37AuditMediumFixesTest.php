@@ -43,12 +43,17 @@ class Phase37AuditMediumFixesTest extends TestCase
             'nik'               => 'P37-EMP-001',
             'department_id'     => $dept->id,
             'position_id'       => $position->id,
-            'join_date'         => '2026-01-01',
+            // Well over 12 months of service so annual-leave eligibility (STIKES
+            // policy point 1) doesn't interfere with these overlap-validation tests.
+            'join_date'         => '2020-01-01',
             'employment_status' => 'active',
             'phone_number'      => '+62812345678',
         ]);
 
-        $this->leaveType = LeaveType::create(['name' => 'Annual Leave', 'deducts_balance' => false]);
+        // Not named "Annual Leave"/"Personal Leave" on purpose: these tests exercise
+        // generic overlap validation and should not be subject to the STIKES
+        // annual-leave eligibility/monthly-cap policy checks (see LeaveService).
+        $this->leaveType = LeaveType::create(['name' => 'Special Leave', 'deducts_balance' => false]);
     }
 
     // ── Fix 1: Profile fallback shows real user data, not mock ──────────────

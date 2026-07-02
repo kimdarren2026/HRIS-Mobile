@@ -211,9 +211,26 @@
         </div>
     </form>
 
-    <p class="text-label-sm font-label-sm text-on-surface-variant text-center px-unit-md">
-        Saldo cuti akan dikurangi hanya setelah disetujui HR.
-    </p>
+    <div class="bg-surface-container-low border border-outline-variant rounded-lg p-unit-md flex flex-col gap-1">
+        <p class="text-label-sm font-label-sm text-on-surface-variant">
+            Saldo cuti akan dikurangi hanya setelah disetujui HR.
+        </p>
+        <p class="text-label-sm font-label-sm text-on-surface-variant">
+            Cuti tahunan hanya dapat digunakan setelah masa kerja minimal 12 bulan.
+        </p>
+        <p class="text-label-sm font-label-sm text-on-surface-variant">
+            Penggunaan cuti tahunan maksimal 2 hari kerja per bulan, kecuali dengan persetujuan khusus.
+        </p>
+        <p class="text-label-sm font-label-sm text-on-surface-variant">
+            Hari Sabtu, Minggu, dan Libur Nasional tidak dihitung sebagai pengurang saldo cuti tahunan.
+        </p>
+        <p class="text-label-sm font-label-sm text-on-surface-variant">
+            Tidak tersedia cuti setengah hari.
+        </p>
+        <p class="text-label-sm font-label-sm text-on-surface-variant">
+            Sisa cuti tahunan yang tidak digunakan akan gugur pada akhir tahun kalender.
+        </p>
+    </div>
 
     <button class="w-full h-12 bg-primary-container text-on-primary-container rounded-lg text-body-lg font-body-lg font-semibold shadow-sm hover:bg-secondary-container active:scale-95 transition-all flex items-center justify-center gap-unit-sm"
             type="button" onclick="document.querySelector('form').submit()">

@@ -7,8 +7,12 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class LeaveBalance extends Model
 {
-    // TODO: replace with leave balance module config once implemented
-    public const DEFAULT_ANNUAL_QUOTA = 12;
+    // STIKES Advaita policy: annual leave entitlement is 18 working days/year
+    // (policy point 1), applied 12 months after join_date. This constant is
+    // also used as the first-time default quota for any other balance-deducting
+    // leave type, matching the pre-existing generic behavior of this module —
+    // that is a known limitation, not new in this change.
+    public const DEFAULT_ANNUAL_QUOTA = 18;
 
     protected $fillable = [
         'employee_id',

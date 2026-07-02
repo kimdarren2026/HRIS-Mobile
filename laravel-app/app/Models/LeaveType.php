@@ -13,12 +13,14 @@ class LeaveType extends Model
     protected $fillable = [
         'name',
         'deducts_balance',
+        'counts_calendar_days',
     ];
 
     protected function casts(): array
     {
         return [
-            'deducts_balance' => 'boolean',
+            'deducts_balance'       => 'boolean',
+            'counts_calendar_days'  => 'boolean',
         ];
     }
 

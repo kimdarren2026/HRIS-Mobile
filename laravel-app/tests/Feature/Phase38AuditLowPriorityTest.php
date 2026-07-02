@@ -157,7 +157,8 @@ class Phase38AuditLowPriorityTest extends TestCase
 
     public function test_leave_balance_has_default_annual_quota_constant(): void
     {
-        $this->assertSame(12, LeaveBalance::DEFAULT_ANNUAL_QUOTA);
+        // STIKES Advaita policy point 1: annual leave entitlement is 18 working days/year.
+        $this->assertSame(18, LeaveBalance::DEFAULT_ANNUAL_QUOTA);
     }
 
     public function test_approve_creates_balance_with_default_annual_quota(): void

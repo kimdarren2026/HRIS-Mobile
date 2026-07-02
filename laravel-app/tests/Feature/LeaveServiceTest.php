@@ -99,7 +99,7 @@ class LeaveServiceTest extends TestCase
 
     public function test_approve_creates_balance_record_if_none_exists(): void
     {
-        // No pre-seeded balance
+        // No pre-seeded balance. Default quota is 18 per STIKES policy point 1.
         $request = $this->makeRequest($this->balanceType, days: 2);
 
         $this->service->approve($request, $this->hrUser, null);
@@ -110,7 +110,7 @@ class LeaveServiceTest extends TestCase
 
         $this->assertNotNull($balance);
         $this->assertSame('2.00', $balance->used);
-        $this->assertSame('10.00', $balance->remaining);
+        $this->assertSame('16.00', $balance->remaining);
     }
 
     public function test_non_balance_leave_type_does_not_touch_balance(): void
