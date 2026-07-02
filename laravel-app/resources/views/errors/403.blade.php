@@ -8,7 +8,8 @@
 </head>
 <body class="min-h-screen bg-slate-100 flex items-center justify-center px-4">
     <div class="w-full max-w-sm bg-white rounded-2xl shadow-md p-8 text-center">
-        <div class="text-6xl font-bold text-red-500 mb-2">403</div>
+        <div id="error-state-anim" class="w-40 h-40 mx-auto" aria-hidden="true"></div>
+        <div class="text-sm font-semibold text-red-500 tracking-wider mb-2">ERROR 403</div>
         <h1 class="text-xl font-semibold text-slate-800 mb-2">Akses Ditolak</h1>
         <p class="text-slate-500 text-sm mb-6">
             Anda tidak memiliki izin untuk mengakses halaman ini.
@@ -32,5 +33,10 @@
             </a>
         @endauth
     </div>
+    <script src="/assets/lottie/vendor/lottie-web.min.js"></script>
+    <script src="/assets/lottie/lottie-helper.js"></script>
+    <script>
+        mountLottie('error-state-anim', '/assets/lottie/error-state.json', { loop: false, autoplay: true });
+    </script>
 </body>
 </html>

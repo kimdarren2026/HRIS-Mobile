@@ -122,10 +122,15 @@
             </div>
         </a>
         @empty
-        <div class="flex flex-col items-center justify-center py-unit-xl opacity-40 select-none mt-unit-xl">
-            <span class="material-symbols-outlined text-[64px]">notifications_off</span>
+        <div class="flex flex-col items-center justify-center py-unit-xl select-none mt-unit-xl">
+            <div id="notif-empty-anim" class="w-32 h-32" aria-hidden="true"></div>
             <p class="font-label-md mt-2 text-on-surface-variant">Belum ada notifikasi.</p>
         </div>
+        <script src="/assets/lottie/vendor/lottie-web.min.js"></script>
+        <script src="/assets/lottie/lottie-helper.js"></script>
+        <script>
+            mountLottie('notif-empty-anim', '/assets/lottie/empty-notification.json', { loop: true, autoplay: true });
+        </script>
         @endforelse
     </div>
 
