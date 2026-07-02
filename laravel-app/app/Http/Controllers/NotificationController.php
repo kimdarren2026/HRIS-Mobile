@@ -25,6 +25,10 @@ class NotificationController extends Controller
     {
         abort_unless($notification->user_id === auth()->id(), 404);
 
+        if (! $notification->is_read) {
+            $notification->update(['is_read' => true]);
+        }
+
         $returnUrl = $this->safeReturnUrl($request->query('return_url'));
 
         return view('pages.notifications.show', compact('notification', 'returnUrl'));

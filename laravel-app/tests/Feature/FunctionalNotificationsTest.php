@@ -114,6 +114,7 @@ class FunctionalNotificationsTest extends TestCase
             ->assertNotFound();                                       // 1
 
         $this->assertDatabaseHas('notifications', ['id' => $other->id]); // 2
+        $this->assertFalse($other->fresh()->is_read);                 // 3 — not auto-marked read via someone else's request
     }
 
     // ── Read / mark-read ───────────────────────────────────────────────────────
@@ -164,6 +165,63 @@ class FunctionalNotificationsTest extends TestCase
         $response->assertSee('Your payslip for June 2026 is available.'); // 3
     }
 
+    // ── Auto-read on open ──────────────────────────────────────────────────────
+
+    public function test_opening_unread_notification_marks_it_as_read(): void
+    {
+        $n = $this->makeNotification($this->employeeUser);
+        $this->assertFalse($n->is_read);
+
+        $this->actingAs($this->employeeUser)
+            ->get("/notifications/{$n->id}")
+            ->assertOk();                                               // 1
+
+        $this->assertTrue($n->fresh()->is_read);                       // 2
+    }
+
+    public function test_opening_already_read_notification_keeps_read_state_unchanged(): void
+    {
+        \Illuminate\Support\Facades\Date::setTestNow('2026-07-01 10:00:00');
+        $n = $this->makeNotification($this->employeeUser, ['is_read' => true]);
+        $originalUpdatedAt = $n->fresh()->updated_at;
+
+        \Illuminate\Support\Facades\Date::setTestNow('2026-07-01 10:05:00');
+
+        $this->actingAs($this->employeeUser)
+            ->get("/notifications/{$n->id}")
+            ->assertOk();                                               // 1
+
+        $fresh = $n->fresh();
+        $this->assertTrue($fresh->is_read);                            // 2
+        $this->assertTrue($originalUpdatedAt->equalTo($fresh->updated_at)); // 3 — untouched, no redundant write
+
+        \Illuminate\Support\Facades\Date::setTestNow();
+    }
+
+    public function test_unread_count_decreases_after_opening_notification(): void
+    {
+        $n1 = $this->makeNotification($this->employeeUser);
+        $this->makeNotification($this->employeeUser);
+
+        $this->assertSame(2, Notification::where('user_id', $this->employeeUser->id)
+            ->where('is_read', false)->count());                        // 1
+
+        $this->actingAs($this->employeeUser)
+            ->get("/notifications/{$n1->id}")
+            ->assertOk();                                               // 2
+
+        $this->assertSame(1, Notification::where('user_id', $this->employeeUser->id)
+            ->where('is_read', false)->count());                        // 3
+
+        // Badge on another page reflects the updated unread count.
+        $dashboard = $this->actingAs($this->employeeUser)->get('/employee/dashboard');
+        $dashboard->assertOk();                                         // 4
+        $this->assertMatchesRegularExpression(
+            '/bg-danger[^>]*>\s*1\s*<\/span>/',
+            $dashboard->getContent()
+        );                                                               // 5
+    }
+
     // ── Return URL navigation ──────────────────────────────────────────────────
 
     public function test_notification_index_accepts_safe_return_url(): void
@@ -182,6 +240,8 @@ class FunctionalNotificationsTest extends TestCase
             ->get("/notifications/{$n->id}?return_url=/employee/dashboard")
             ->assertOk()
             ->assertSee('/employee/dashboard', false);                  // 1
+
+        $this->assertTrue($n->fresh()->is_read);                       // 2 — auto-read does not interfere with return_url
     }
 
     public function test_mark_read_preserves_return_url(): void
