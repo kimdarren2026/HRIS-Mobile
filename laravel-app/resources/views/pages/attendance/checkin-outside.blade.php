@@ -160,8 +160,8 @@ Di luar radius kantor
 </div>
 <!-- Map Preview -->
 <div class="w-full h-32 rounded-lg relative overflow-hidden mb-3 border border-border flex items-center justify-center bg-surface-container">
-<div id="gps-loading-out" class="flex flex-col items-center justify-center gap-2 text-on-surface-variant">
-<div class="w-8 h-8 border-2 border-danger border-t-transparent rounded-full animate-spin"></div>
+<div id="gps-loading-out" class="flex flex-col items-center justify-center gap-1 text-on-surface-variant">
+<div id="gps-loading-out-anim" class="w-14 h-14" aria-hidden="true"></div>
 <span class="font-label-sm text-label-sm">Mengambil lokasi...</span>
 </div>
 <div id="gps-pin-out" class="hidden absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-danger drop-shadow-md">
@@ -258,8 +258,12 @@ Kirim untuk Review HR
 </button>
 </nav>
 </div>
+<script src="/assets/lottie/vendor/lottie-web.min.js"></script>
+<script src="/assets/lottie/lottie-helper.js"></script>
 <script>
 (function() {
+    mountLottie('gps-loading-out-anim', '/assets/lottie/gps-loading.json', { loop: true, autoplay: true });
+
     let gpsOk = false, photoOk = false;
     function trySubmit() {
         const btn = document.getElementById('submit-btn-out');

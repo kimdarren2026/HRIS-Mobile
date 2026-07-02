@@ -236,11 +236,16 @@ $badgeLabel = match($record->status) {
 @endif
 </div>
 @empty
-<div class="flex flex-col items-center justify-center py-16 text-center opacity-50 select-none">
-<span class="material-symbols-outlined text-[48px] mb-2">event_busy</span>
+<div class="flex flex-col items-center justify-center py-16 text-center select-none">
+<div id="attendance-empty-anim" class="w-32 h-32" aria-hidden="true"></div>
 <p class="font-body-md text-body-md text-on-surface-variant">Belum ada data presensi.</p>
 <a href="/attendance/checkin" class="mt-4 text-primary font-label-md text-label-md hover:underline">Check in sekarang</a>
 </div>
+<script src="/assets/lottie/vendor/lottie-web.min.js"></script>
+<script src="/assets/lottie/lottie-helper.js"></script>
+<script>
+    mountLottie('attendance-empty-anim', '/assets/lottie/empty-state.json', { loop: true, autoplay: true });
+</script>
 @endforelse
 </div>
 @if(method_exists($records, 'hasPages') && $records->hasPages())

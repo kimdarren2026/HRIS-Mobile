@@ -88,6 +88,16 @@
 
     {{-- Flash --}}
     <x-flash-message />
+    @if(session('success') === 'Pengajuan cuti berhasil dikirim.')
+    <div class="flex justify-center -mt-unit-sm mb-unit-md">
+        <div id="leave-submitted-anim" class="w-16 h-16" aria-hidden="true"></div>
+    </div>
+    <script src="/assets/lottie/vendor/lottie-web.min.js"></script>
+    <script src="/assets/lottie/lottie-helper.js"></script>
+    <script>
+        mountLottie('leave-submitted-anim', '/assets/lottie/leave-submitted.json', { loop: false, autoplay: true });
+    </script>
+    @endif
 
     {{-- Filter Chips --}}
     <div class="flex overflow-x-auto gap-unit-sm mb-unit-lg pb-2 no-scrollbar -mx-container-margin px-container-margin">
@@ -171,10 +181,15 @@
             </div>
         </div>
         @empty
-        <div class="flex flex-col items-center justify-center py-unit-xl opacity-40 select-none">
-            <span class="material-symbols-outlined text-[64px]">event_busy</span>
+        <div class="flex flex-col items-center justify-center py-unit-xl select-none">
+            <div id="leave-empty-anim" class="w-32 h-32" aria-hidden="true"></div>
             <p class="font-label-md mt-2 text-on-surface-variant">Belum ada pengajuan cuti.</p>
         </div>
+        <script src="/assets/lottie/vendor/lottie-web.min.js"></script>
+        <script src="/assets/lottie/lottie-helper.js"></script>
+        <script>
+            mountLottie('leave-empty-anim', '/assets/lottie/empty-state.json', { loop: true, autoplay: true });
+        </script>
         @endforelse
     </div>
 
