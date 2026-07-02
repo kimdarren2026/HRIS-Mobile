@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html class="light" lang="en"><head>
+<html class="light" lang="id"><head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Add Leave Type - HRIS</title>
+<title>Tambah Jenis Cuti - HRIS</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
@@ -34,7 +34,7 @@ tailwind.config = {
 <a href="{{ route('settings.leave-types.index') }}" class="p-2 rounded-full hover:bg-surface-container transition-colors active:scale-95">
   <span class="material-symbols-outlined text-primary">arrow_back</span>
 </a>
-<h1 class="ml-3 font-bold text-primary text-headline-md-mobile">Add Leave Type</h1>
+<h1 class="ml-3 font-bold text-primary text-headline-md-mobile">Tambah Jenis Cuti</h1>
 </header>
 
 <main class="w-full max-w-[390px] mt-16 mb-8 px-4 py-4">
@@ -45,10 +45,10 @@ tailwind.config = {
 
     <div class="bg-white border border-border rounded-xl shadow-sm p-4 flex flex-col gap-4">
       <div class="flex flex-col gap-1">
-        <label class="font-label-md text-label-md text-on-surface-variant" for="name">Leave Type Name</label>
+        <label class="font-label-md text-label-md text-on-surface-variant" for="name">Nama Jenis Cuti</label>
         <input type="text" id="name" name="name" value="{{ old('name') }}"
           class="border border-outline-variant rounded-lg px-3 py-2 text-body-md focus:outline-none focus:ring-2 focus:ring-primary/30"
-          maxlength="100" placeholder="e.g. Annual Leave" required/>
+          maxlength="100" placeholder="mis. Cuti Tahunan" required/>
         @error('name')<p class="text-error text-label-md mt-1">{{ $message }}</p>@enderror
       </div>
 
@@ -57,19 +57,29 @@ tailwind.config = {
           {{ old('deducts_balance', '1') ? 'checked' : '' }}
           class="w-5 h-5 rounded border-outline-variant text-primary focus:ring-primary/30"/>
         <div class="flex flex-col">
-          <span class="font-body-md text-body-md">Deducts from balance</span>
-          <span class="font-label-md text-label-md text-on-surface-variant mt-0.5">Tracks remaining quota for this leave type</span>
+          <span class="font-body-md text-body-md">Mengurangi saldo cuti</span>
+          <span class="font-label-md text-label-md text-on-surface-variant mt-0.5">Mencatat sisa kuota untuk jenis cuti ini</span>
+        </div>
+      </label>
+
+      <label class="flex items-center gap-3 cursor-pointer">
+        <input type="checkbox" name="counts_calendar_days" value="1"
+          {{ old('counts_calendar_days') ? 'checked' : '' }}
+          class="w-5 h-5 rounded border-outline-variant text-primary focus:ring-primary/30"/>
+        <div class="flex flex-col">
+          <span class="font-body-md text-body-md">Menghitung hari kalender</span>
+          <span class="font-label-md text-label-md text-on-surface-variant mt-0.5">Hitung Sabtu, Minggu, dan Libur Nasional sebagai bagian dari durasi cuti. Cocok untuk cuti melahirkan/keguguran. Kosongkan jika hanya ingin menghitung hari kerja.</span>
         </div>
       </label>
     </div>
 
     <button type="submit"
       class="w-full bg-primary text-on-primary font-label-md text-label-md py-3 rounded-xl active:scale-95 transition-transform">
-      Create Leave Type
+      Buat Jenis Cuti
     </button>
     <a href="{{ route('settings.leave-types.index') }}"
       class="block text-center border border-outline-variant text-on-surface-variant font-label-md text-label-md py-3 rounded-xl hover:bg-surface-container transition-colors">
-      Cancel
+      Batal
     </a>
   </form>
 </main>

@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html class="light" lang="en"><head>
+<html class="light" lang="id"><head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Leave Types - HRIS</title>
+<title>Jenis Cuti - HRIS</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
@@ -39,7 +39,7 @@ tailwind.config = {
 <a href="{{ route('settings.index') }}" class="p-2 rounded-full hover:bg-surface-container transition-colors active:scale-95">
   <span class="material-symbols-outlined text-primary">arrow_back</span>
 </a>
-<h1 class="font-bold text-primary text-headline-md-mobile">Leave Types</h1>
+<h1 class="font-bold text-primary text-headline-md-mobile">Jenis Cuti</h1>
 <a href="{{ route('settings.leave-types.create') }}" class="p-2 rounded-full hover:bg-surface-container transition-colors active:scale-95">
   <span class="material-symbols-outlined text-primary">add</span>
 </a>
@@ -63,7 +63,8 @@ tailwind.config = {
     <div class="flex flex-col">
       <span class="font-body-md text-body-md font-medium">{{ $leaveType->name }}</span>
       <span class="font-label-sm text-label-sm text-on-surface-variant mt-0.5">
-        {{ $leaveType->deducts_balance ? 'Balance tracked' : 'No quota deduction' }}
+        {{ $leaveType->deducts_balance ? 'Saldo cuti dicatat' : 'Tidak mengurangi kuota' }}
+        @if($leaveType->counts_calendar_days) &middot; Hari kalender @endif
       </span>
     </div>
     <div class="flex items-center gap-2">
@@ -72,7 +73,7 @@ tailwind.config = {
         <span class="material-symbols-outlined text-primary text-[20px]">edit</span>
       </a>
       <form method="POST" action="{{ route('settings.leave-types.destroy', $leaveType) }}"
-        onsubmit="return confirm('Delete {{ $leaveType->name }}? This cannot be undone.')">
+        onsubmit="return confirm('Hapus {{ $leaveType->name }}? Tindakan ini tidak dapat dibatalkan.')">
         @csrf
         @method('DELETE')
         <button type="submit" class="p-2 rounded-lg hover:bg-red-50 transition-colors active:scale-95">
@@ -84,17 +85,17 @@ tailwind.config = {
   @empty
   <div class="bg-white border border-border rounded-xl shadow-sm p-6 text-center">
     <span class="material-symbols-outlined text-on-surface-variant text-[40px]">event_busy</span>
-    <p class="font-body-md text-on-surface-variant mt-2">No leave types configured yet.</p>
+    <p class="font-body-md text-on-surface-variant mt-2">Belum ada jenis cuti yang diatur.</p>
     <a href="{{ route('settings.leave-types.create') }}"
       class="inline-block mt-3 px-4 py-2 bg-primary text-on-primary font-label-md text-label-md rounded-lg">
-      Add First Leave Type
+      Tambah Jenis Cuti Pertama
     </a>
   </div>
   @endforelse
 
   <a href="{{ route('settings.leave-types.create') }}"
     class="block text-center border border-primary text-primary font-label-md text-label-md py-2.5 rounded-xl hover:bg-primary/5 transition-colors mt-1">
-    + Add Leave Type
+    + Tambah Jenis Cuti
   </a>
 </main>
 </body></html>
