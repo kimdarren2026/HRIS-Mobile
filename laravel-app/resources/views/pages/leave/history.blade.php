@@ -90,7 +90,7 @@
     <x-flash-message />
     @if(session('success') === 'Pengajuan cuti berhasil dikirim.')
     <div class="flex justify-center -mt-unit-sm mb-unit-md">
-        <div id="leave-submitted-anim" class="w-16 h-16" aria-hidden="true"></div>
+        <div id="leave-submitted-anim" class="w-28 h-28" aria-hidden="true"></div>
     </div>
     <script src="/assets/lottie/vendor/lottie-web.min.js"></script>
     <script src="/assets/lottie/lottie-helper.js"></script>
