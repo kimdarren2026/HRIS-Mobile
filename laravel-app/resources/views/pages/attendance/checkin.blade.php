@@ -189,7 +189,7 @@
 </header>
 <main class="flex-1 mt-16 px-container-margin py-unit-md flex flex-col items-center justify-center gap-unit-lg">
 <div class="flex flex-col items-center gap-4 py-12">
-<div id="done-success-anim" class="w-20 h-20" aria-hidden="true"></div>
+<div id="done-success-anim" class="w-28 h-28" aria-hidden="true"></div>
 <h2 class="font-headline-md text-headline-md text-on-surface">Presensi Selesai</h2>
 <p class="font-body-md text-body-md text-on-surface-variant text-center">Anda sudah melakukan check-in dan check-out hari ini.</p>
 <a href="/attendance/history" class="mt-4 bg-primary text-on-primary font-label-md text-label-md px-6 py-3 rounded-xl">Lihat Riwayat</a>
@@ -239,7 +239,7 @@ $coStatusLbl  = $todayRecord->status === 'APPROVED' ? 'Disetujui' : 'Menunggu Re
 <p class="font-headline-md text-headline-md text-on-background">{{ $todayRecord->check_in_time->format('h:i A') }}</p>
 @if($todayRecord->status === 'PENDING_REVIEW')
 <p class="font-body-md text-body-md text-on-surface-variant mt-2 flex items-start gap-1.5">
-<span id="pending-review-anim" class="w-5 h-5 shrink-0" aria-hidden="true"></span>
+<span id="pending-review-anim" class="w-6 h-6 shrink-0" aria-hidden="true"></span>
 Absen pulang akan dicatat. Status Menunggu Review HR tetap menunggu keputusan HR.
 </p>
 @endif
@@ -258,7 +258,7 @@ Absen pulang akan dicatat. Status Menunggu Review HR tetap menunggu keputusan HR
 </div>
 <div class="relative w-full h-32 bg-surface-container overflow-hidden flex items-center justify-center">
 <div id="co-gps-loading" class="flex flex-col items-center justify-center gap-1 text-on-surface-variant">
-<div id="co-gps-loading-anim" class="w-14 h-14" aria-hidden="true"></div>
+<div id="co-gps-loading-anim" class="w-16 h-16" aria-hidden="true"></div>
 <span class="font-label-sm text-label-sm">Mengambil lokasi...</span>
 </div>
 <div id="co-gps-error-msg" class="hidden flex-col items-center gap-2 text-center px-4">
@@ -346,7 +346,7 @@ Absen pulang akan dicatat. Status Menunggu Review HR tetap menunggu keputusan HR
 </div>
 <div class="relative w-full h-32 bg-surface-container overflow-hidden flex items-center justify-center">
 <div id="gps-loading" class="flex flex-col items-center justify-center gap-1 text-on-surface-variant">
-<div id="gps-loading-anim" class="w-14 h-14" aria-hidden="true"></div>
+<div id="gps-loading-anim" class="w-16 h-16" aria-hidden="true"></div>
 <span class="font-label-sm text-label-sm">Mengambil lokasi...</span>
 </div>
 <div id="gps-error-msg" class="hidden flex-col items-center gap-2 text-center px-4">
