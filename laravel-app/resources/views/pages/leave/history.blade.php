@@ -1,7 +1,7 @@
 <!DOCTYPE html><html lang="id"><head>
 <meta charset="utf-8">
 <meta content="width=device-width, initial-scale=1.0" name="viewport">
-<title>Riwayat Cuti - HRIS Mobile App</title>
+<title>Riwayat Cuti - Hadir</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
@@ -73,7 +73,7 @@
     <button class="text-on-surface-variant hover:bg-surface-container active:scale-95 transition-transform duration-150 p-2 rounded-full flex items-center justify-center">
         <span class="material-symbols-outlined text-headline-md font-headline-md">menu</span>
     </button>
-    <div class="text-headline-md font-headline-md font-bold text-primary whitespace-nowrap truncate">HRIS Mobile App</div>
+    <div class="text-headline-md font-headline-md font-bold text-primary whitespace-nowrap truncate">Hadir</div>
 	    @include('partials.notification-bell', [
 	        'class' => 'relative text-on-surface-variant hover:bg-surface-container active:scale-95 transition-transform duration-150 p-2 rounded-full flex items-center justify-center',
 	    ])

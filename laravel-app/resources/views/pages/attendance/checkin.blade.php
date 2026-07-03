@@ -2,7 +2,7 @@
 <meta charset="utf-8">
 <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
 <meta name="csrf-token" content="{{ csrf_token() }}">
-<title>Absen Masuk - HRIS Mobile App</title>
+<title>Absen Masuk - Hadir</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
@@ -189,7 +189,7 @@
 </header>
 <main class="flex-1 mt-16 px-container-margin py-unit-md flex flex-col items-center justify-center gap-unit-lg">
 <div class="flex flex-col items-center gap-4 py-12">
-<div id="done-success-anim" class="w-[320px] h-[320px] max-w-[85vw] max-h-[85vw]" aria-hidden="true"></div>
+<div id="checkout-success-anim" class="w-[320px] h-[320px] max-w-[85vw] max-h-[85vw]" aria-hidden="true"></div>
 <h2 class="font-headline-md text-headline-md text-on-surface">Presensi Selesai</h2>
 <p class="font-body-md text-body-md text-on-surface-variant text-center">Anda sudah melakukan check-in dan check-out hari ini.</p>
 <a href="/attendance/history" class="mt-4 bg-primary text-on-primary font-label-md text-label-md px-6 py-3 rounded-xl">Lihat Riwayat</a>
@@ -215,6 +215,9 @@
 <input type="hidden" id="co-lat" name="lat">
 <input type="hidden" id="co-lng" name="lng">
 <main class="flex-1 mt-16 px-container-margin py-unit-md flex flex-col gap-unit-lg">
+<div class="flex justify-center -mt-unit-sm -mb-unit-sm">
+<div id="checkin-success-anim" class="w-[320px] h-[320px] max-w-[85vw] max-h-[85vw]" aria-hidden="true"></div>
+</div>
 <!-- Clock -->
 <section class="flex flex-col items-center justify-center pt-unit-sm">
 <p class="font-body-md text-body-md text-on-surface-variant mb-1" id="current-date">—</p>
@@ -436,7 +439,8 @@ Alasan absen di luar radius <span class="text-danger">*</span>
 <script src="/assets/lottie/lottie-helper.js"></script>
 <script>
 (function() {
-    mountLottie('done-success-anim', '/assets/lottie/success-check.json', { loop: false, autoplay: true });
+    mountLottie('checkout-success-anim', '/assets/lottie/leave-submitted.json', { loop: true, autoplay: true, hideAfterMs: 3000 });
+    mountLottie('checkin-success-anim', '/assets/lottie/success-check.json', { loop: true, autoplay: true, hideAfterMs: 3000 });
     mountLottie('gps-loading-anim', '/assets/lottie/gps-loading.json', { loop: true, autoplay: true });
     mountLottie('co-gps-loading-anim', '/assets/lottie/gps-loading.json', { loop: true, autoplay: true });
     mountLottie('pending-review-anim', '/assets/lottie/waiting-approval.json', { loop: true, autoplay: true });
