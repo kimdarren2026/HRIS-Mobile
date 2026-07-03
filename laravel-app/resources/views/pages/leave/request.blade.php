@@ -132,18 +132,25 @@
 
     {{-- Leave Balance Card --}}
     <section class="bg-primary-container text-on-primary-container p-unit-md rounded-xl shadow-sm flex flex-col gap-unit-sm">
-        <h2 class="text-label-md font-label-md uppercase tracking-wider opacity-90">Saldo Cuti {{ now()->year }}</h2>
-        @if($balances->isEmpty())
-        <p class="text-body-md font-body-md opacity-80">Belum ada data saldo. Saldo akan ditetapkan setelah persetujuan pertama.</p>
+        <h2 class="text-label-md font-label-md uppercase tracking-wider opacity-90">Saldo Cuti {{ $year }}</h2>
+        @if($balanceRows->isEmpty())
+            @if($annualLeaveEligible)
+            <p class="text-body-md font-body-md opacity-80">Belum ada data saldo cuti.</p>
+            @else
+            <p class="text-body-md font-body-md opacity-80">Cuti tahunan tersedia setelah masa kerja minimal 12 bulan.</p>
+            @endif
         @else
         <div class="flex flex-col gap-1" id="balance-list">
-            @foreach($balances as $typeId => $bal)
-            <div class="balance-row flex items-center justify-between" data-type-id="{{ $typeId }}">
-                <span class="text-body-md opacity-90">{{ $bal->leaveType->name }}</span>
-                <span class="text-headline-md font-bold">{{ (int) $bal->remaining }} hari tersisa</span>
+            @foreach($balanceRows as $row)
+            <div class="balance-row flex items-center justify-between">
+                <span class="text-body-md opacity-90">{{ $row['label'] }}</span>
+                <span class="text-headline-md font-bold">{{ $row['remaining'] }} hari tersisa</span>
             </div>
             @endforeach
         </div>
+            @if(! $annualLeaveEligible)
+            <p class="text-label-sm font-label-sm opacity-80">Cuti tahunan tersedia setelah masa kerja minimal 12 bulan.</p>
+            @endif
         @endif
     </section>
 
@@ -161,7 +168,7 @@
                     <option value="">Pilih jenis cuti...</option>
                     @foreach($leaveTypes as $type)
                     <option value="{{ $type->id }}" {{ old('leave_type_id') == $type->id ? 'selected' : '' }}>
-                        {{ $type->name }}
+                        {{ $type->display_name }}
                     </option>
                     @endforeach
                 </select>
