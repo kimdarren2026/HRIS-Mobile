@@ -156,7 +156,7 @@
                         <span class="material-symbols-outlined">{{ $icon }}</span>
                     </div>
                     <div>
-                        <h3 class="font-label-md text-label-md text-on-surface">{{ $req->leaveType->name }}</h3>
+                        <h3 class="font-label-md text-label-md text-on-surface">{{ $req->leaveType->display_name }}</h3>
                         <span class="font-status-badge text-status-badge {{ $badgeColor }} px-2 py-1 rounded-full mt-1 inline-block">{{ $badgeLabel }}</span>
                     </div>
                 </div>

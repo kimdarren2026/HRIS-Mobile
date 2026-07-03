@@ -28,14 +28,42 @@ class LeaveController extends Controller
         $employee = auth()->user()->employee;
         abort_if($employee === null, 403);
 
+        $year       = now()->year;
         $leaveTypes = LeaveType::all();
         $balances   = LeaveBalance::with('leaveType')
             ->where('employee_id', $employee->id)
-            ->where('year', now()->year)
+            ->where('year', $year)
             ->get()
             ->keyBy('leave_type_id');
 
-        return view('pages.leave.request', compact('leaveTypes', 'balances'));
+        $annualLeaveEligible = $this->leaveService->isEligibleForAnnualLeave($employee);
+
+        $balanceRows = $balances->map(fn (LeaveBalance $balance) => [
+            'label'     => $balance->leaveType->display_name,
+            'remaining' => (int) $balance->remaining,
+        ])->values();
+
+        // No approved leave yet this year means no LeaveBalance row exists (it is
+        // created lazily on first approval). Show the entitlement as a preview
+        // instead of persisting a row just because the employee opened this page.
+        $hasAnnualBalanceRow = $balances->contains(
+            fn (LeaveBalance $balance) => $balance->leaveType->isAnnualEntitlementType()
+        );
+
+        if ($annualLeaveEligible && ! $hasAnnualBalanceRow) {
+            $annualType = $leaveTypes->first(fn (LeaveType $type) => $type->isAnnualEntitlementType());
+
+            if ($annualType) {
+                $balanceRows->push([
+                    'label'     => $annualType->display_name,
+                    'remaining' => LeaveBalance::DEFAULT_ANNUAL_QUOTA,
+                ]);
+            }
+        }
+
+        return view('pages.leave.request', compact(
+            'leaveTypes', 'balanceRows', 'annualLeaveEligible', 'year'
+        ));
     }
 
     public function store(StoreLeaveRequest $request): RedirectResponse

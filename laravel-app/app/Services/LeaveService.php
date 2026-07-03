@@ -14,13 +14,6 @@ use Illuminate\Validation\ValidationException;
 
 class LeaveService
 {
-    // STIKES Advaita policy point 1 & 5: Personal Leave is chargeable against
-    // the same annual entitlement as Annual Leave. Matched case-insensitively
-    // by name since leave types have no dedicated "category" field. NOTE:
-    // ProductionSeeder seeds a type named "Permission" (not "Personal Leave"),
-    // so that seeder's data is NOT recognized as annual-entitlement here.
-    private const ANNUAL_ENTITLEMENT_TYPE_NAMES = ['annual leave', 'personal leave'];
-
     // Policy point 1: annual leave applies only after 12 consecutive months of service.
     private const MIN_SERVICE_MONTHS = 12;
 
@@ -89,15 +82,22 @@ class LeaveService
 
     private function isAnnualEntitlementType(LeaveType $leaveType): bool
     {
-        return in_array(strtolower($leaveType->name), self::ANNUAL_ENTITLEMENT_TYPE_NAMES, true);
+        return $leaveType->isAnnualEntitlementType();
     }
 
     // Policy point 1: "at least 12 consecutive months" — validated against join_date.
-    private function assertEligibleForAnnualLeave(Employee $employee, Carbon $startDate): void
+    // Exposed publicly so the request-page balance preview can check eligibility
+    // without duplicating the rule (and without throwing, unlike the submit-time guard).
+    public function isEligibleForAnnualLeave(Employee $employee, ?Carbon $asOf = null): bool
     {
         $eligibleFrom = $employee->join_date->copy()->addMonths(self::MIN_SERVICE_MONTHS);
 
-        if ($startDate->lt($eligibleFrom)) {
+        return ($asOf ?? Carbon::now())->gte($eligibleFrom);
+    }
+
+    private function assertEligibleForAnnualLeave(Employee $employee, Carbon $startDate): void
+    {
+        if (! $this->isEligibleForAnnualLeave($employee, $startDate)) {
             throw ValidationException::withMessages([
                 'start_date' => 'Cuti tahunan hanya dapat digunakan setelah masa kerja minimal 12 bulan.',
             ]);
