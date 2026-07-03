@@ -1,7 +1,7 @@
 <!DOCTYPE html><html lang="id"><head>
 <meta charset="utf-8">
 <meta content="width=device-width, initial-scale=1.0" name="viewport">
-<title>Notifikasi - HRIS Mobile App</title>
+<title>Notifikasi - Hadir</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
@@ -129,7 +129,7 @@
         <script src="/assets/lottie/vendor/lottie-web.min.js"></script>
         <script src="/assets/lottie/lottie-helper.js"></script>
         <script>
-            mountLottie('notif-empty-anim', '/assets/lottie/empty-notification.json', { loop: true, autoplay: true });
+            mountLottie('notif-empty-anim', '/assets/lottie/empty-notification.json', { loop: true, autoplay: true, hideAfterMs: 2000 });
         </script>
         @endforelse
     </div>
