@@ -7,8 +7,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="min-h-screen bg-slate-100 flex items-center justify-center px-4">
-    <div class="w-full max-w-sm bg-white rounded-2xl shadow-md p-8 text-center">
-        <div id="error-state-anim" class="w-40 h-40 mx-auto" aria-hidden="true"></div>
+    <div class="w-full max-w-md bg-white rounded-2xl shadow-md p-4 sm:p-8 text-center">
+        <div id="error-state-anim" class="w-[380px] h-[380px] max-w-[80vw] max-h-[80vw] mx-auto" aria-hidden="true"></div>
         <div class="text-sm font-semibold text-slate-400 tracking-wider mb-2">ERROR 404</div>
         <h1 class="text-xl font-semibold text-slate-800 mb-2">Halaman Tidak Ditemukan</h1>
         <p class="text-slate-500 text-sm mb-6">

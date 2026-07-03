@@ -90,7 +90,7 @@
     <x-flash-message />
     @if(session('success') === 'Pengajuan cuti berhasil dikirim.')
     <div class="flex justify-center -mt-unit-sm mb-unit-md">
-        <div id="leave-submitted-anim" class="w-28 h-28" aria-hidden="true"></div>
+        <div id="leave-submitted-anim" class="w-[320px] h-[320px] max-w-[85vw] max-h-[85vw]" aria-hidden="true"></div>
     </div>
     <script src="/assets/lottie/vendor/lottie-web.min.js"></script>
     <script src="/assets/lottie/lottie-helper.js"></script>
@@ -182,7 +182,7 @@
         </div>
         @empty
         <div class="flex flex-col items-center justify-center py-unit-xl select-none">
-            <div id="leave-empty-anim" class="w-32 h-32" aria-hidden="true"></div>
+            <div id="leave-empty-anim" class="w-[340px] h-[340px] max-w-[85vw] max-h-[85vw]" aria-hidden="true"></div>
             <p class="font-label-md mt-2 text-on-surface-variant">Belum ada pengajuan cuti.</p>
         </div>
         <script src="/assets/lottie/vendor/lottie-web.min.js"></script>
