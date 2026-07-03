@@ -237,7 +237,7 @@ $badgeLabel = match($record->status) {
 </div>
 @empty
 <div class="flex flex-col items-center justify-center py-16 text-center select-none">
-<div id="attendance-empty-anim" class="w-32 h-32" aria-hidden="true"></div>
+<div id="attendance-empty-anim" class="w-[340px] h-[340px] max-w-[85vw] max-h-[85vw]" aria-hidden="true"></div>
 <p class="font-body-md text-body-md text-on-surface-variant">Belum ada data presensi.</p>
 <a href="/attendance/checkin" class="mt-4 text-primary font-label-md text-label-md hover:underline">Check in sekarang</a>
 </div>

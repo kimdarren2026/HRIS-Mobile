@@ -123,7 +123,7 @@
         </a>
         @empty
         <div class="flex flex-col items-center justify-center py-unit-xl select-none mt-unit-xl">
-            <div id="notif-empty-anim" class="w-32 h-32" aria-hidden="true"></div>
+            <div id="notif-empty-anim" class="w-[340px] h-[340px] max-w-[85vw] max-h-[85vw]" aria-hidden="true"></div>
             <p class="font-label-md mt-2 text-on-surface-variant">Belum ada notifikasi.</p>
         </div>
         <script src="/assets/lottie/vendor/lottie-web.min.js"></script>
