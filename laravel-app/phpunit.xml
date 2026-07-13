@@ -26,6 +26,10 @@
         <env name="DB_CONNECTION" value="sqlite"/>
         <env name="DB_DATABASE" value=":memory:"/>
         <env name="DB_URL" value=""/>
+        <env name="GOOGLE_CLIENT_ID" value="test-google-client-id"/>
+        <env name="GOOGLE_CLIENT_SECRET" value="test-google-client-secret"/>
+        <env name="GOOGLE_REDIRECT_URI" value="http://127.0.0.1:8000/auth/google/callback"/>
+        <env name="GOOGLE_ALLOWED_DOMAINS" value="stikesadvaitamedika.ac.id,advaita.ac.id"/>
         <env name="MAIL_MAILER" value="array"/>
         <env name="QUEUE_CONNECTION" value="sync"/>
         <env name="SESSION_DRIVER" value="array"/>
