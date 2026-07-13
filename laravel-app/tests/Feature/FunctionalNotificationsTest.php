@@ -407,20 +407,31 @@ class FunctionalNotificationsTest extends TestCase
 
     public function test_leave_submission_notifies_hr_roles(): void
     {
-        $employee  = $this->makeEmployee($this->employeeUser);
+        // Annual leave requires >= 12 months of service (policy point 1) and
+        // start_date must not be in the past, so both are derived from "now"
+        // rather than hardcoded so the test keeps passing regardless of when it runs.
+        $employee = $this->makeEmployee($this->employeeUser);
+        $employee->update(['join_date' => now()->subMonths(13)->startOfMonth()]);
+
         $leaveType = LeaveType::create(['name' => 'Annual', 'days_allowed' => 12]);
         \App\Models\LeaveBalance::create([
             'employee_id'   => $employee->id,
             'leave_type_id' => $leaveType->id,
             'year'          => now()->year,
-            'total_days'    => 12,
-            'used_days'     => 0,
+            'total_quota'   => 12,
+            'used'          => 0,
+            'remaining'     => 12,
         ]);
+
+        // addWeekday() lands on a future Mon-Fri date, satisfying both the
+        // "not in the past" validation rule and the 2-working-day monthly cap
+        // (a single weekday request never exceeds it).
+        $startDate = now()->addWeekday()->toDateString();
 
         $this->actingAs($this->employeeUser)->post('/leave/request', [
             'leave_type_id' => $leaveType->id,
-            'start_date'    => '2026-07-10',
-            'end_date'      => '2026-07-10',
+            'start_date'    => $startDate,
+            'end_date'      => $startDate,
             'reason'        => 'Personal matter',
         ])->assertRedirect();                                               // 1
 

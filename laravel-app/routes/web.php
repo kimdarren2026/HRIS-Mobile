@@ -50,6 +50,13 @@ Route::post('/logout', [AuthController::class, 'logout'])
     ->middleware('auth')
     ->name('logout');
 
+Route::get('/auth/google/redirect', [AuthController::class, 'redirectToGoogle'])
+    ->middleware('throttle:10,1')
+    ->name('auth.google.redirect');
+Route::get('/auth/google/callback', [AuthController::class, 'handleGoogleCallback'])
+    ->middleware('throttle:10,1')
+    ->name('auth.google.callback');
+
 // ── Protected selfie + leave attachment (auth only; policy in controller) ────
 Route::middleware('auth')->group(function (): void {
     Route::get('/attendance/photo/{attendanceRecord}', [AttendanceController::class, 'photo']);
