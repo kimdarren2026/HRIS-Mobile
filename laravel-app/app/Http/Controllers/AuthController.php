@@ -2,23 +2,30 @@
 
 namespace App\Http\Controllers;
 
+use App\Exceptions\Authentication\ExternalAuthenticationException;
 use App\Models\User;
+use App\Services\AuditLogService;
+use App\Services\Authentication\GoogleSsoService;
+use App\Services\Authentication\UserAccessValidator;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 use Laravel\Socialite\Facades\Socialite;
-use Laravel\Socialite\Two\InvalidStateException;
-use Laravel\Socialite\Two\User as SocialiteUser;
 
 class AuthController extends Controller
 {
+    public function __construct(
+        private readonly GoogleSsoService $googleSsoService,
+        private readonly UserAccessValidator $userAccessValidator,
+    ) {}
+
     public function showLogin(): View|RedirectResponse
     {
         if (Auth::check()) {
-            return redirect($this->redirectPathForRole(Auth::user()->role));
+            return redirect(Auth::user()->dashboardPath() ?? '/login');
         }
 
         return view('pages.auth.login');
@@ -27,7 +34,7 @@ class AuthController extends Controller
     public function login(Request $request): RedirectResponse
     {
         if (Auth::check()) {
-            return redirect($this->redirectPathForRole(Auth::user()->role));
+            return redirect(Auth::user()->dashboardPath() ?? '/login');
         }
 
         $credentials = $request->validate([
@@ -36,9 +43,13 @@ class AuthController extends Controller
         ]);
 
         $remember = $request->boolean('remember');
+        $email = strtolower(trim($credentials['email']));
+        $matchedUser = User::query()
+            ->whereRaw('LOWER(email) = ?', [$email])
+            ->first();
 
         if (! Auth::attempt([
-            'email' => $credentials['email'],
+            'email' => $matchedUser?->email ?? $email,
             'password' => $credentials['password'],
             'is_active' => true,
         ], $remember)) {
@@ -47,10 +58,21 @@ class AuthController extends Controller
             ]);
         }
 
-        $request->session()->regenerate();
-        $request->user()->forceFill(['last_login_at' => now()])->save();
+        try {
+            $user = $request->user()->loadMissing('employee');
+            $this->userAccessValidator->validate($user);
+            $this->finalizeSuccessfulLogin($request, $user, 'password');
+        } catch (ExternalAuthenticationException $exception) {
+            Auth::logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
 
-        return redirect($this->redirectPathForRole($request->user()->role));
+            throw ValidationException::withMessages([
+                'email' => $exception->userMessage(),
+            ]);
+        }
+
+        return redirect($request->user()->dashboardPath() ?? '/login');
     }
 
     public function logout(Request $request): RedirectResponse
@@ -65,83 +87,88 @@ class AuthController extends Controller
 
     public function redirectToGoogle(): RedirectResponse
     {
+        if (! $this->googleSsoService->isConfigured()) {
+            return redirect('/login')->withErrors([
+                'email' => 'Konfigurasi login Google belum siap. Silakan hubungi Admin HR.',
+            ]);
+        }
+
         return Socialite::driver('google')->redirect();
     }
 
     public function handleGoogleCallback(Request $request): RedirectResponse
     {
         try {
-            /** @var SocialiteUser $googleUser */
-            $googleUser = Socialite::driver('google')->user();
-        } catch (InvalidStateException) {
-            return redirect('/login')->withErrors([
-                'email' => 'Sesi login Google tidak valid atau kedaluwarsa. Silakan coba lagi.',
-            ]);
-        }
+            ['user' => $user, 'linked' => $linked] = $this->googleSsoService->authenticate();
+            Auth::login($user);
+            $this->finalizeSuccessfulLogin($request, $user, 'google');
 
-        $email = $googleUser->getEmail();
-
-        if (! $email || ! $this->isAllowedGoogleDomain($email)) {
-            return redirect('/login')->withErrors([
-                'email' => 'Domain email Google Anda tidak diizinkan untuk masuk ke HRIS.',
-            ]);
-        }
-
-        $user = User::where('email', $email)->first();
-
-        if (! $user) {
-            return redirect('/login')->withErrors([
-                'email' => 'Akun Google Anda belum terdaftar di HRIS. Silakan hubungi HR/Admin.',
-            ]);
-        }
-
-        if (! $user->is_active) {
-            return redirect('/login')->withErrors([
-                'email' => 'Akun Anda tidak aktif. Silakan hubungi HR/Admin.',
-            ]);
-        }
-
-        if (! $user->google_id) {
-            $user->forceFill(['google_id' => $googleUser->getId()])->save();
-        }
-
-        Auth::login($user);
-
-        $request->session()->regenerate();
-        $user->forceFill(['last_login_at' => now()])->save();
-
-        return redirect($this->redirectPathForRole($user->role));
-    }
-
-    private function isAllowedGoogleDomain(string $email): bool
-    {
-        $allowedDomains = array_filter(array_map(
-            'trim',
-            explode(',', (string) config('services.google.allowed_domains'))
-        ));
-
-        if (empty($allowedDomains)) {
-            return false;
-        }
-
-        $emailDomain = Str::lower(Str::after($email, '@'));
-
-        foreach ($allowedDomains as $domain) {
-            if (Str::lower($domain) === $emailDomain) {
-                return true;
+            if ($linked) {
+                AuditLogService::log(
+                    $user,
+                    'google_account_linked',
+                    'auth',
+                    'Akun Google berhasil dihubungkan ke akun HRIS.',
+                    ['provider' => 'google'],
+                );
             }
-        }
 
-        return false;
+            AuditLogService::log(
+                $user,
+                'google_login_success',
+                'auth',
+                'Login Google berhasil.',
+                ['provider' => 'google'],
+            );
+
+            Log::info('google_sso_login_success', [
+                'user_id' => $user->id,
+                'provider' => 'google',
+                'ip_address' => $request->ip(),
+            ]);
+
+            return redirect($user->dashboardPath() ?? '/login');
+        } catch (ExternalAuthenticationException $exception) {
+            Log::warning('google_sso_login_failed', [
+                'reason' => $exception->reason(),
+                'context' => $exception->context(),
+                'ip_address' => $request->ip(),
+            ]);
+
+            AuditLogService::log(
+                isset($user) && $user instanceof User ? $user : null,
+                'google_login_failed',
+                'auth',
+                'Login Google gagal.',
+                [
+                    'provider' => 'google',
+                    'reason' => $exception->reason(),
+                ] + $exception->context(),
+            );
+
+            if ($exception->reason() === 'google_id_conflict') {
+                AuditLogService::log(
+                    isset($user) && $user instanceof User ? $user : null,
+                    'google_account_link_rejected',
+                    'auth',
+                    'Penghubungan akun Google ditolak karena konflik identitas.',
+                    ['provider' => 'google'],
+                );
+            }
+
+            return redirect('/login')->withErrors([
+                'email' => $exception->userMessage(),
+            ]);
+        }
     }
 
-    private function redirectPathForRole(string $role): string
+    private function finalizeSuccessfulLogin(Request $request, User $user, string $provider): void
     {
-        return match ($role) {
-            'employee' => '/employee/dashboard',
-            'finance' => '/finance/dashboard',
-            'admin_hr', 'super_admin' => '/admin/dashboard',
-            default => '/login',
-        };
+        $request->session()->regenerate();
+        $user->forceFill([
+            'last_login_at' => now(),
+            'last_login_ip' => $request->ip(),
+            'last_login_provider' => $provider,
+        ])->save();
     }
 }

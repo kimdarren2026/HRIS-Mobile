@@ -39,7 +39,10 @@ return [
         'client_id' => env('GOOGLE_CLIENT_ID'),
         'client_secret' => env('GOOGLE_CLIENT_SECRET'),
         'redirect' => env('GOOGLE_REDIRECT_URI'),
-        'allowed_domains' => env('GOOGLE_ALLOWED_DOMAINS'),
+        'allowed_domains' => array_values(array_filter(array_unique(array_map(
+            static fn (string $domain): string => strtolower(trim($domain)),
+            explode(',', (string) env('GOOGLE_ALLOWED_DOMAINS', ''))
+        )))),
     ],
 
 ];
