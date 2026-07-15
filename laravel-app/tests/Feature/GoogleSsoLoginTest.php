@@ -39,7 +39,7 @@ class GoogleSsoLoginTest extends TestCase
 
     public function test_redirect_route_rejects_when_google_configuration_is_incomplete(): void
     {
-        config()->set('services.google.allowed_domains', []);
+        config()->set('services.google.client_id', null);
 
         $response = $this->get('/auth/google/redirect');
 
@@ -98,9 +98,9 @@ class GoogleSsoLoginTest extends TestCase
         $this->assertAuthenticatedAs($user);
     }
 
-    public function test_callback_rejects_unallowed_email_domain(): void
+    public function test_registered_gmail_account_can_login(): void
     {
-        $this->createActiveEmployeeUser([
+        $user = $this->createActiveEmployeeUser([
             'email' => 'user@gmail.com',
             'role' => User::ROLE_EMPLOYEE,
         ]);
@@ -112,13 +112,27 @@ class GoogleSsoLoginTest extends TestCase
 
         $response = $this->get('/auth/google/callback');
 
-        $response->assertRedirect('/login');
-        $response->assertSessionHasErrors('email');
-        $this->assertGuest();
-        $this->assertDatabaseHas('audit_logs', [
-            'action' => 'google_login_failed',
-            'module' => 'auth',
+        $response->assertRedirect('/employee/dashboard');
+        $this->assertAuthenticatedAs($user);
+        $this->assertSame('google-456', $user->fresh()->google_id);
+    }
+
+    public function test_registered_company_email_account_can_login(): void
+    {
+        $user = $this->createActiveEmployeeUser([
+            'email' => 'pegawai@company.com',
+            'role' => User::ROLE_EMPLOYEE,
         ]);
+
+        Socialite::fake('google', $this->fakeGoogleUser([
+            'id' => 'google-company-1',
+            'email' => 'pegawai@company.com',
+        ]));
+
+        $response = $this->get('/auth/google/callback');
+
+        $response->assertRedirect('/employee/dashboard');
+        $this->assertAuthenticatedAs($user);
     }
 
     public function test_callback_rejects_invalid_google_email_format(): void

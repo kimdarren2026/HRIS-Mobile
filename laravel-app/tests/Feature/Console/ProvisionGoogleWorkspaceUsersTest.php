@@ -19,7 +19,7 @@ class ProvisionGoogleWorkspaceUsersTest extends TestCase
     {
         parent::setUp();
 
-        config()->set('services.google.allowed_domains', ['stikesadvaitamedika.ac.id']);
+        config()->set('google_workspace_provisioning.allowed_domains', ['stikesadvaitamedika.ac.id']);
     }
 
     public function test_dry_run_does_not_write_to_database(): void

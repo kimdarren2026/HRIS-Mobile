@@ -77,7 +77,7 @@ class ProvisionGoogleWorkspaceUsers extends Command
                 continue;
             }
 
-            if (! $this->googleSsoService->isAllowedDomain($normalized)) {
+            if (! $this->isAllowedWorkspaceDomain($normalized)) {
                 $invalid[] = ['email' => $normalized, 'reason' => 'domain_not_allowed'];
 
                 continue;
@@ -181,6 +181,40 @@ class ProvisionGoogleWorkspaceUsers extends Command
         }
 
         return $emails;
+    }
+
+    private function isAllowedWorkspaceDomain(string $email): bool
+    {
+        $allowedDomains = $this->allowedWorkspaceDomains();
+
+        if ($allowedDomains === []) {
+            return false;
+        }
+
+        $domain = $this->extractDomain($email);
+
+        return $domain !== null && in_array($domain, $allowedDomains, true);
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function allowedWorkspaceDomains(): array
+    {
+        $domains = config('google_workspace_provisioning.allowed_domains', []);
+
+        return is_array($domains) ? $domains : [];
+    }
+
+    private function extractDomain(string $email): ?string
+    {
+        if (! str_contains($email, '@')) {
+            return null;
+        }
+
+        $domain = strtolower(substr(strrchr($email, '@'), 1));
+
+        return $domain !== '' ? $domain : null;
     }
 
     /**

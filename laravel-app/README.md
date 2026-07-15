@@ -29,6 +29,31 @@ In addition, [Laracasts](https://laracasts.com) contains thousands of video tuto
 
 You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
 
+## Authentication (Google SSO)
+
+Google OAuth verifies **identity only**. Authorization is decided solely by
+whether the verified Google email exists in the `users` table — there is
+**no email domain restriction**. Gmail, Google Workspace, or any other
+domain is accepted as long as the account is pre-registered in HRIS.
+
+```
+Google Login
+  → Google verifies the account
+  → App receives the verified Google email
+  → User::where('email', $googleEmail)->first()
+      not found → reject, "This Google account is not registered in HRIS."
+      found     → login (role, is_active, and employee-status checks still apply)
+```
+
+- User provisioning is manual only — no account is auto-created on login.
+  See `App\Services\Authentication\GoogleSsoService`.
+- `App\Console\Commands\ProvisionGoogleWorkspaceUsers`
+  (`hris:provision-google-users`) is a separate, optional bulk-import tool
+  for pre-registering Google Workspace emails. Its `GOOGLE_WORKSPACE_ALLOWED_DOMAINS`
+  filter only controls *which emails that command is willing to bulk-create*
+  — it has no effect on who can log in.
+- Password login remains available as a fallback (`App\Http\Controllers\AuthController::login`).
+
 ## Agentic Development
 
 Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:

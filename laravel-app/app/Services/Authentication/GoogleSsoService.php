@@ -20,8 +20,7 @@ class GoogleSsoService
     {
         return filled(config('services.google.client_id'))
             && filled(config('services.google.client_secret'))
-            && filled(config('services.google.redirect'))
-            && count($this->allowedDomains()) > 0;
+            && filled(config('services.google.redirect'));
     }
 
     /**
@@ -80,14 +79,6 @@ class GoogleSsoService
             );
         }
 
-        if (! $this->isAllowedDomain($email)) {
-            throw new ExternalAuthenticationException(
-                'Domain email Google Anda tidak diizinkan untuk masuk ke HRIS.',
-                'google_domain_not_allowed',
-                ['domain' => $this->extractDomain($email)],
-            );
-        }
-
         [$user, $linked] = DB::transaction(function () use ($googleId, $email): array {
             $linkedUser = User::with('employee')
                 ->where('google_id', $googleId)
@@ -131,29 +122,6 @@ class GoogleSsoService
         return ['user' => $user, 'linked' => $linked];
     }
 
-    /**
-     * @return list<string>
-     */
-    public function allowedDomains(): array
-    {
-        $domains = config('services.google.allowed_domains', []);
-
-        return is_array($domains) ? $domains : [];
-    }
-
-    public function isAllowedDomain(string $email): bool
-    {
-        $allowedDomains = $this->allowedDomains();
-
-        if ($allowedDomains === []) {
-            return false;
-        }
-
-        $domain = $this->extractDomain($email);
-
-        return $domain !== null && in_array($domain, $allowedDomains, true);
-    }
-
     public function normalizeEmail(?string $email): ?string
     {
         if (! is_string($email)) {
@@ -163,17 +131,6 @@ class GoogleSsoService
         $normalized = strtolower(trim($email));
 
         return filter_var($normalized, FILTER_VALIDATE_EMAIL) ? $normalized : null;
-    }
-
-    private function extractDomain(string $email): ?string
-    {
-        if (! str_contains($email, '@')) {
-            return null;
-        }
-
-        $domain = strtolower(substr(strrchr($email, '@'), 1));
-
-        return $domain !== '' ? $domain : null;
     }
 
     private function isEmailVerificationAvailable(SocialiteUser $googleUser): bool
