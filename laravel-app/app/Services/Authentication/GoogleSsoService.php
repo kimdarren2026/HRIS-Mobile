@@ -5,6 +5,7 @@ namespace App\Services\Authentication;
 use App\Exceptions\Authentication\ExternalAuthenticationException;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Laravel\Socialite\Facades\Socialite;
 use Laravel\Socialite\Two\InvalidStateException;
 use Laravel\Socialite\Two\User as SocialiteUser;
@@ -79,7 +80,7 @@ class GoogleSsoService
             );
         }
 
-        [$user, $linked] = DB::transaction(function () use ($googleId, $email): array {
+        [$user, $linked] = DB::transaction(function () use ($googleId, $email, $googleUser): array {
             $linkedUser = User::with('employee')
                 ->where('google_id', $googleId)
                 ->first();
@@ -92,6 +93,15 @@ class GoogleSsoService
             $emailUser = User::with('employee')
                 ->whereRaw('LOWER(email) = ?', [$email])
                 ->first();
+
+            // TEMP diagnostic logging for Phase 52 SSO investigation — remove once root cause confirmed in production.
+            Log::info('google_sso_lookup_debug', [
+                'google_raw_email' => $googleUser->getEmail(),
+                'google_id' => $googleId,
+                'normalized_email' => $email,
+                'user_found' => $emailUser !== null,
+                'user_id' => $emailUser?->id,
+            ]);
 
             if (! $emailUser) {
                 throw new ExternalAuthenticationException(
