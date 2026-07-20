@@ -492,4 +492,20 @@ class FunctionalNotificationsTest extends TestCase
         // Checker (different finance user) should receive one
         $this->assertSame(1, Notification::where('user_id', $checker->id)->count()); // 5
     }
+
+    public function test_notification_type_column_accepts_expense_value(): void
+    {
+        $notification = app(NotificationService::class)->create(
+            $this->financeUser,
+            'Uji notifikasi expense',
+            'Memastikan kolom type mengizinkan nilai expense.',
+            'expense',
+        );
+
+        $this->assertSame('expense', $notification->fresh()->type);
+        $this->assertDatabaseHas('notifications', [
+            'id'   => $notification->id,
+            'type' => 'expense',
+        ]);
+    }
 }
