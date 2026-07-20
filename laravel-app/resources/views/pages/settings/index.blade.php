@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html class="light" lang="en"><head>
+<html class="light" lang="id"><head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>System Settings - HRIS Mobile App</title>
+<title>Pengaturan Sistem - HRIS Mobile App</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
@@ -121,7 +121,7 @@
 <button class="p-2 rounded-full hover:bg-surface-container-low transition-colors active:scale-95 duration-150" onclick="window.location.href='/admin/dashboard'">
 <span class="material-symbols-outlined text-primary">menu</span>
 </button>
-<h1 class="font-headline-md text-headline-md-mobile font-bold text-primary">System Settings</h1>
+<h1 class="font-headline-md text-headline-md-mobile font-bold text-primary">Pengaturan Sistem</h1>
 <div class="w-10"></div>
 </header>
 
@@ -140,29 +140,29 @@
 <section class="bg-white border border-border rounded-xl shadow-[0px_1px_2px_0px_rgba(0,0,0,0.05)] p-unit-md flex flex-col gap-unit-sm">
 <div class="flex items-center gap-2 text-primary">
 <span class="material-symbols-outlined text-[20px]">location_on</span>
-<h2 class="font-headline-md text-headline-md-mobile">Office Location &amp; Radius</h2>
+<h2 class="font-headline-md text-headline-md-mobile">Lokasi Kantor &amp; Radius</h2>
 </div>
 @if($office)
 <div class="flex flex-col gap-1">
 <div class="flex items-center justify-between">
 <span class="font-label-md text-label-md text-on-surface-variant">{{ $office->name }}</span>
 <span class="font-status-badge text-status-badge text-success bg-success/10 px-2 py-1 rounded-full flex items-center gap-1">
-<span class="material-symbols-outlined text-[14px]" style="font-variation-settings:'FILL' 1;">check_circle</span> Active
+<span class="material-symbols-outlined text-[14px]" style="font-variation-settings:'FILL' 1;">check_circle</span> {{ __('common.status_active') }}
 </span>
 </div>
 <p class="font-body-md text-body-md text-on-surface">Lat: {{ $office->latitude }}, Lng: {{ $office->longitude }}</p>
 <div class="mt-2 py-2 px-3 bg-surface-container-low rounded-lg flex justify-between items-center">
-<span class="font-body-md text-body-md">Check-in radius</span>
-<span class="font-status-badge text-status-badge text-primary bg-primary-container/20 px-2 py-1 rounded">{{ $office->radius_meters }} meters</span>
+<span class="font-body-md text-body-md">Radius absensi</span>
+<span class="font-status-badge text-status-badge text-primary bg-primary-container/20 px-2 py-1 rounded">{{ $office->radius_meters }} meter</span>
 </div>
 </div>
 <a href="{{ route('settings.locations.edit', $office) }}" class="mt-2 block text-center border border-primary text-primary font-label-md text-label-md py-2.5 rounded-lg active:scale-95 transition-transform hover:bg-primary/5">
-    Edit Office Location
+    Ubah Lokasi Kantor
 </a>
 @else
-<p class="font-body-md text-body-md text-on-surface-variant">No active office location configured. Employee check-in will be blocked until a location is set.</p>
+<p class="font-body-md text-body-md text-on-surface-variant">Belum ada lokasi kantor aktif. Absen masuk pegawai akan diblokir sampai lokasi diatur.</p>
 <a href="{{ route('settings.locations.create') }}" class="mt-2 block text-center bg-primary text-on-primary font-label-md text-label-md py-2.5 rounded-lg active:scale-95 transition-transform hover:bg-primary/90">
-    Set Office Location
+    Atur Lokasi Kantor
 </a>
 @endif
 </section>
@@ -171,22 +171,22 @@
 <section class="bg-white border border-border rounded-xl shadow-[0px_1px_2px_0px_rgba(0,0,0,0.05)] p-unit-md flex flex-col gap-unit-sm">
 <div class="flex items-center gap-2 text-primary">
 <span class="material-symbols-outlined text-[20px]">event_busy</span>
-<h2 class="font-headline-md text-headline-md-mobile">Leave Settings</h2>
+<h2 class="font-headline-md text-headline-md-mobile">Pengaturan Cuti</h2>
 </div>
 @if($leaveTypes->isNotEmpty())
 <div class="grid grid-cols-2 gap-2">
 @foreach($leaveTypes as $leaveType)
 <div class="p-3 border border-outline-variant rounded-lg flex flex-col gap-1">
 <span class="font-label-sm text-label-sm text-outline">{{ $leaveType->name }}</span>
-<span class="font-body-md text-body-md font-semibold">{{ $leaveType->deducts_balance ? 'Balance tracked' : 'No quota' }}</span>
+<span class="font-body-md text-body-md font-semibold">{{ $leaveType->deducts_balance ? 'Saldo dicatat' : 'Tanpa kuota' }}</span>
 </div>
 @endforeach
 </div>
 @else
-<p class="font-body-md text-body-md text-on-surface-variant">No leave types configured.</p>
+<p class="font-body-md text-body-md text-on-surface-variant">Belum ada jenis cuti yang diatur.</p>
 @endif
 <a href="{{ route('settings.leave-types.index') }}" class="mt-2 block text-center border border-primary text-primary font-label-md text-label-md py-2.5 rounded-lg active:scale-95 transition-transform hover:bg-primary/5">
-    Manage Leave Types
+    Kelola Jenis Cuti
 </a>
 </section>
 
@@ -194,26 +194,26 @@
 <section class="bg-white border border-border rounded-xl shadow-[0px_1px_2px_0px_rgba(0,0,0,0.05)] p-unit-md flex flex-col gap-unit-sm">
 <div class="flex items-center gap-2 text-primary">
 <span class="material-symbols-outlined text-[20px]">payments</span>
-<h2 class="font-headline-md text-headline-md-mobile">Payroll Settings</h2>
+<h2 class="font-headline-md text-headline-md-mobile">Pengaturan Penggajian</h2>
 </div>
 <div class="relative pl-6 flex flex-col gap-3">
 <div class="absolute left-2 top-0 bottom-0 w-[2px] bg-outline-variant"></div>
 <div class="relative flex items-center gap-3">
 <div class="absolute -left-5 w-4 h-4 rounded-full bg-success ring-4 ring-white"></div>
-<span class="font-body-md text-body-md font-medium">Payroll workflow</span>
+<span class="font-body-md text-body-md font-medium">Alur penggajian</span>
 </div>
 <div class="flex flex-wrap gap-1.5 mt-1">
-<span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase bg-surface-container-high text-outline">Draft</span>
-<span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase bg-surface-container-high text-outline">Calculated</span>
-<span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase bg-primary-container/20 text-primary">HR Review</span>
-<span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase bg-surface-container-high text-outline">Finance Approval</span>
-<span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase bg-surface-container-high text-outline">Locked</span>
-<span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase bg-surface-container-high text-outline">Paid</span>
+<span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase bg-surface-container-high text-outline">Draf</span>
+<span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase bg-surface-container-high text-outline">Terhitung</span>
+<span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase bg-primary-container/20 text-primary">Tinjauan HR</span>
+<span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase bg-surface-container-high text-outline">Persetujuan Keuangan</span>
+<span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase bg-surface-container-high text-outline">Terkunci</span>
+<span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase bg-surface-container-high text-outline">Dibayar</span>
 </div>
 </div>
 <div class="mt-2 p-3 bg-surface-container-low rounded-lg flex items-center gap-2 text-on-surface-variant">
 <span class="material-symbols-outlined text-[16px]">info</span>
-<span class="font-body-md text-body-md">Payroll rules are managed by system configuration</span>
+<span class="font-body-md text-body-md">Aturan penggajian dikelola melalui konfigurasi sistem</span>
 </div>
 </section>
 
@@ -221,7 +221,7 @@
 <section class="bg-white border border-border rounded-xl shadow-[0px_1px_2px_0px_rgba(0,0,0,0.05)] p-unit-md flex flex-col gap-unit-sm">
 <div class="flex items-center gap-2 text-primary">
 <span class="material-symbols-outlined text-[20px]">shield_person</span>
-<h2 class="font-headline-md text-headline-md-mobile">User &amp; Role Access</h2>
+<h2 class="font-headline-md text-headline-md-mobile">Akses Pengguna &amp; Peran</h2>
 </div>
 <ul class="flex flex-col gap-2">
 <li class="flex justify-between items-center py-2 border-b border-outline-variant/30">
@@ -229,9 +229,9 @@
 <div class="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center">
 <span class="material-symbols-outlined text-on-surface-variant text-[18px]">badge</span>
 </div>
-<span class="font-body-md text-body-md">Employee</span>
+<span class="font-body-md text-body-md">Pegawai</span>
 </div>
-<span class="font-label-sm text-label-sm text-outline">Self-service</span>
+<span class="font-label-sm text-label-sm text-outline">Layanan mandiri</span>
 </li>
 <li class="flex justify-between items-center py-2 border-b border-outline-variant/30">
 <div class="flex items-center gap-3">
@@ -240,16 +240,16 @@
 </div>
 <span class="font-body-md text-body-md">Admin HR</span>
 </div>
-<span class="font-label-sm text-label-sm text-outline">HR + self-service</span>
+<span class="font-label-sm text-label-sm text-outline">HR + layanan mandiri</span>
 </li>
 <li class="flex justify-between items-center py-2 border-b border-outline-variant/30">
 <div class="flex items-center gap-3">
 <div class="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center">
 <span class="material-symbols-outlined text-on-surface-variant text-[18px]">account_balance</span>
 </div>
-<span class="font-body-md text-body-md">Finance</span>
+<span class="font-body-md text-body-md">Keuangan</span>
 </div>
-<span class="font-label-sm text-label-sm text-outline">Finance + self-service</span>
+<span class="font-label-sm text-label-sm text-outline">Keuangan + layanan mandiri</span>
 </li>
 <li class="flex justify-between items-center py-2">
 <div class="flex items-center gap-3">
@@ -258,19 +258,19 @@
 </div>
 <span class="font-body-md text-body-md font-semibold">Super Admin</span>
 </div>
-<span class="font-label-sm text-label-sm text-outline">Full access</span>
+<span class="font-label-sm text-label-sm text-outline">Akses penuh</span>
 </li>
 </ul>
 <div class="mt-2 p-3 bg-surface-container-low rounded-lg flex items-center gap-2 text-on-surface-variant">
 <span class="material-symbols-outlined text-[16px]">info</span>
-<span class="font-body-md text-body-md">Role management is handled by system administration</span>
+<span class="font-body-md text-body-md">Pengelolaan peran ditangani oleh administrasi sistem</span>
 </div>
 @if(auth()->user()?->role === 'super_admin')
 <a href="{{ route('admin.users.index') }}"
    class="mt-1 flex items-center justify-between p-3 bg-primary/5 border border-primary/20 rounded-lg hover:bg-primary/10 active:scale-95 transition-transform">
   <div class="flex items-center gap-2 text-primary">
     <span class="material-symbols-outlined text-[18px]">manage_accounts</span>
-    <span class="font-body-md text-body-md font-semibold">Manage Users & Roles</span>
+    <span class="font-body-md text-body-md font-semibold">Kelola Pengguna &amp; Peran</span>
   </div>
   <span class="material-symbols-outlined text-primary text-[18px]">chevron_right</span>
 </a>
@@ -281,11 +281,11 @@
 <section class="bg-white border border-border rounded-xl shadow-[0px_1px_2px_0px_rgba(0,0,0,0.05)] p-unit-md flex flex-col gap-unit-sm">
 <div class="flex items-center gap-2 text-primary">
 <span class="material-symbols-outlined text-[20px]">notifications_active</span>
-<h2 class="font-headline-md text-headline-md-mobile">Notification Settings</h2>
+<h2 class="font-headline-md text-headline-md-mobile">Pengaturan Notifikasi</h2>
 </div>
 <div class="flex flex-col gap-4 mt-2">
 <label class="flex items-center justify-between cursor-pointer">
-<span class="font-body-md text-body-md">Attendance approval</span>
+<span class="font-body-md text-body-md">Persetujuan kehadiran</span>
 <div class="relative inline-block w-10 h-6 align-middle select-none transition duration-200 ease-in">
 <input checked="" class="sr-only peer" id="toggle-1" name="toggle" type="checkbox"/>
 <div class="w-full h-full bg-outline-variant peer-checked:bg-primary rounded-full transition-colors"></div>
@@ -293,7 +293,7 @@
 </div>
 </label>
 <label class="flex items-center justify-between cursor-pointer">
-<span class="font-body-md text-body-md">Leave approval</span>
+<span class="font-body-md text-body-md">Persetujuan cuti</span>
 <div class="relative inline-block w-10 h-6 align-middle select-none transition duration-200 ease-in">
 <input checked="" class="sr-only peer" id="toggle-2" name="toggle" type="checkbox"/>
 <div class="w-full h-full bg-outline-variant peer-checked:bg-primary rounded-full transition-colors"></div>
@@ -301,7 +301,7 @@
 </div>
 </label>
 <label class="flex items-center justify-between cursor-pointer">
-<span class="font-body-md text-body-md">Payslip available</span>
+<span class="font-body-md text-body-md">Slip gaji tersedia</span>
 <div class="relative inline-block w-10 h-6 align-middle select-none transition duration-200 ease-in">
 <input class="sr-only peer" id="toggle-3" name="toggle" type="checkbox"/>
 <div class="w-full h-full bg-outline-variant peer-checked:bg-primary rounded-full transition-colors"></div>
@@ -315,47 +315,47 @@
 <section class="bg-white border border-border rounded-xl shadow-[0px_1px_2px_0px_rgba(0,0,0,0.05)] p-unit-md flex flex-col gap-unit-sm">
 <div class="flex items-center gap-2 text-primary">
 <span class="material-symbols-outlined text-[20px]">security</span>
-<h2 class="font-headline-md text-headline-md-mobile">Security Settings</h2>
+<h2 class="font-headline-md text-headline-md-mobile">Pengaturan Keamanan</h2>
 </div>
 <div class="grid grid-cols-1 gap-3 mt-1">
 <div class="flex items-center justify-between p-3 bg-surface rounded-lg border border-outline-variant/20">
 <div class="flex items-center gap-3">
 <span class="material-symbols-outlined text-primary">location_searching</span>
-<span class="font-body-md text-body-md">GPS validation</span>
+<span class="font-body-md text-body-md">Validasi GPS</span>
 </div>
 <div class="flex items-center gap-1.5 text-success">
 <span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">check_circle</span>
-<span class="font-status-badge text-status-badge">Enabled</span>
+<span class="font-status-badge text-status-badge">Aktif</span>
 </div>
 </div>
 <div class="flex items-center justify-between p-3 bg-surface rounded-lg border border-outline-variant/20">
 <div class="flex items-center gap-3">
 <span class="material-symbols-outlined text-primary">face</span>
-<span class="font-body-md text-body-md">Selfie required</span>
+<span class="font-body-md text-body-md">Selfie wajib</span>
 </div>
 <div class="flex items-center gap-1.5 text-success">
 <span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">check_circle</span>
-<span class="font-status-badge text-status-badge">Active</span>
+<span class="font-status-badge text-status-badge">Aktif</span>
 </div>
 </div>
 <div class="flex items-center justify-between p-3 bg-surface rounded-lg border border-outline-variant/20">
 <div class="flex items-center gap-3">
 <span class="material-symbols-outlined text-primary">history_edu</span>
-<span class="font-body-md text-body-md">Audit log enabled</span>
+<span class="font-body-md text-body-md">Log audit aktif</span>
 </div>
 <div class="flex items-center gap-1.5 text-success">
 <span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">check_circle</span>
-<span class="font-status-badge text-status-badge">Active</span>
+<span class="font-status-badge text-status-badge">Aktif</span>
 </div>
 </div>
 <div class="flex items-center justify-between p-3 bg-surface rounded-lg border border-outline-variant/20">
 <div class="flex items-center gap-3">
 <span class="material-symbols-outlined text-primary">visibility_off</span>
-<span class="font-body-md text-body-md">Data masking enabled</span>
+<span class="font-body-md text-body-md">Penyamaran data aktif</span>
 </div>
 <div class="flex items-center gap-1.5 text-success">
 <span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">check_circle</span>
-<span class="font-status-badge text-status-badge">Active</span>
+<span class="font-status-badge text-status-badge">Aktif</span>
 </div>
 </div>
 </div>
@@ -366,23 +366,23 @@
 <nav class="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[390px] z-50 h-18 pb-safe bg-surface/80 backdrop-blur-md border-t border-outline-variant flex justify-around items-center mx-auto py-2">
 <a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-all active:scale-90 duration-200" href="/admin/dashboard">
 <span class="material-symbols-outlined">home</span>
-<span class="font-label-sm text-label-sm mt-1">Home</span>
+<span class="font-label-sm text-label-sm mt-1">{{ __('common.nav_home') }}</span>
 </a>
 <a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-all active:scale-90 duration-200" href="/employees">
 <span class="material-symbols-outlined">group</span>
-<span class="font-label-sm text-label-sm mt-1">Employees</span>
+<span class="font-label-sm text-label-sm mt-1">{{ __('common.nav_employees') }}</span>
 </a>
 <a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-all active:scale-90 duration-200" href="/hr/approval-queue">
 <span class="material-symbols-outlined">rule</span>
-<span class="font-label-sm text-label-sm mt-1">Approvals</span>
+<span class="font-label-sm text-label-sm mt-1">{{ __('common.nav_approvals') }}</span>
 </a>
 <a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-all active:scale-90 duration-200" href="/reports">
 <span class="material-symbols-outlined">assessment</span>
-<span class="font-label-sm text-label-sm mt-1">Reports</span>
+<span class="font-label-sm text-label-sm mt-1">{{ __('common.nav_reports') }}</span>
 </a>
 <a class="flex flex-col items-center justify-center text-primary bg-primary-container/20 rounded-xl px-3 py-1 active:scale-90 duration-200" href="/settings">
 <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">settings</span>
-<span class="font-label-sm text-label-sm mt-1">Settings</span>
+<span class="font-label-sm text-label-sm mt-1">{{ __('common.nav_settings') }}</span>
 </a>
 </nav>
 </body></html>

@@ -1,7 +1,7 @@
-<!DOCTYPE html><html class="light" lang="en"><head>
+<!DOCTYPE html><html class="light" lang="id"><head>
 <meta charset="utf-8">
 <meta content="width=device-width, initial-scale=1.0" name="viewport">
-<title>Employee Directory - HRIS Mobile App</title>
+<title>Direktori Pegawai - HRIS Mobile App</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
@@ -49,7 +49,7 @@ tailwind.config = {
     <a href="/admin/dashboard" class="text-on-surface-variant hover:bg-surface-container-low transition-colors p-2 rounded-full active:scale-95 duration-150">
       <span class="material-symbols-outlined">arrow_back</span>
     </a>
-    <h1 class="font-headline-md text-headline-md font-bold text-primary">Employee Directory</h1>
+    <h1 class="font-headline-md text-headline-md font-bold text-primary">Direktori Pegawai</h1>
   </div>
   <a href="{{ route('employees.create') }}" class="text-primary hover:bg-surface-container-low p-2 rounded-full transition-colors active:scale-95">
     <span class="material-symbols-outlined">person_add</span>
@@ -71,13 +71,13 @@ tailwind.config = {
       <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant group-focus-within:text-primary transition-colors">search</span>
       <input name="search" value="{{ request('search') }}"
         class="w-full pl-12 pr-4 py-3 bg-surface-container-lowest border border-outline-variant rounded-2xl focus:ring-2 focus:ring-primary focus:border-transparent outline-none font-body-md shadow-sm"
-        placeholder="Search by name, email, NIK or position" type="text">
+        placeholder="Cari nama, email, NIK, atau posisi" type="text">
     </div>
     <div class="flex gap-3">
       <div class="flex-1 relative">
         <select name="department_id" onchange="this.form.submit()"
           class="w-full appearance-none bg-surface-container-lowest border border-outline-variant rounded-xl px-3 py-2.5 font-body-md text-on-surface focus:ring-2 focus:ring-primary outline-none shadow-sm">
-          <option value="">All Departments</option>
+          <option value="">Semua Departemen</option>
           @foreach($departments as $dept)
             <option value="{{ $dept->id }}" {{ request('department_id') == $dept->id ? 'selected' : '' }}>{{ $dept->name }}</option>
           @endforeach
@@ -87,22 +87,22 @@ tailwind.config = {
       <div class="flex-1 relative">
         <select name="status" onchange="this.form.submit()"
           class="w-full appearance-none bg-surface-container-lowest border border-outline-variant rounded-xl px-3 py-2.5 font-body-md text-on-surface focus:ring-2 focus:ring-primary outline-none shadow-sm">
-          <option value="">All Status</option>
-          <option value="active"     {{ request('status') === 'active'     ? 'selected' : '' }}>Active</option>
-          <option value="probation"  {{ request('status') === 'probation'  ? 'selected' : '' }}>Probation</option>
-          <option value="resigned"   {{ request('status') === 'resigned'   ? 'selected' : '' }}>Resigned</option>
-          <option value="terminated" {{ request('status') === 'terminated' ? 'selected' : '' }}>Terminated</option>
+          <option value="">Semua Status</option>
+          <option value="active"     {{ request('status') === 'active'     ? 'selected' : '' }}>Aktif</option>
+          <option value="probation"  {{ request('status') === 'probation'  ? 'selected' : '' }}>Masa Percobaan</option>
+          <option value="resigned"   {{ request('status') === 'resigned'   ? 'selected' : '' }}>Mengundurkan Diri</option>
+          <option value="terminated" {{ request('status') === 'terminated' ? 'selected' : '' }}>Diberhentikan</option>
         </select>
         <span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-on-surface-variant text-[18px]">expand_more</span>
       </div>
     </div>
     @if(request()->hasAny(['search','department_id','status']))
-      <a href="{{ route('employees.index') }}" class="text-body-md text-primary underline">Clear filters</a>
+      <a href="{{ route('employees.index') }}" class="text-body-md text-primary underline">Hapus filter</a>
     @endif
   </form>
 
   {{-- Employee Count --}}
-  <p class="font-label-sm text-on-surface-variant">{{ $employees->total() }} employee{{ $employees->total() !== 1 ? 's' : '' }}</p>
+  <p class="font-label-sm text-on-surface-variant">{{ $employees->total() }} pegawai</p>
 
   {{-- Employee Cards --}}
   <div class="space-y-card-gap">
@@ -115,6 +115,13 @@ tailwind.config = {
           'terminated' => 'text-on-surface-variant bg-surface-container',
           default      => 'text-on-surface-variant bg-surface-container',
         };
+        $statusLabel = match($emp->employment_status) {
+          'active'     => 'Aktif',
+          'probation'  => 'Masa Percobaan',
+          'resigned'   => 'Mengundurkan Diri',
+          'terminated' => 'Diberhentikan',
+          default      => $emp->employment_status,
+        };
       @endphp
       <div class="bg-surface-container-lowest border border-outline-variant rounded-2xl p-unit-md shadow-sm hover:shadow-md transition-all">
         <div class="flex items-center gap-unit-md">
@@ -125,8 +132,8 @@ tailwind.config = {
              class="flex-1 min-w-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-lg">
             <div class="flex items-center justify-between gap-2">
               <h3 class="font-headline-md text-on-surface text-[16px] truncate">{{ $emp->user?->name ?? '—' }}</h3>
-              <span class="inline-flex items-center px-2 py-0.5 rounded-full {{ $statusColor }} font-status-badge text-[11px] shrink-0 capitalize">
-                {{ $emp->employment_status }}
+              <span class="inline-flex items-center px-2 py-0.5 rounded-full {{ $statusColor }} font-status-badge text-[11px] shrink-0">
+                {{ $statusLabel }}
               </span>
             </div>
             <p class="font-body-md text-on-surface-variant text-[13px] truncate">{{ $emp->position?->name ?? '—' }}</p>
@@ -144,12 +151,12 @@ tailwind.config = {
               <a href="{{ route('employees.show', $emp) }}"
                  class="flex items-center gap-3 px-4 py-3 font-body-md text-on-surface hover:bg-surface-container transition-colors">
                 <span class="material-symbols-outlined text-[18px]" aria-hidden="true">visibility</span>
-                View Detail
+                Lihat Detail
               </a>
               <a href="{{ route('employees.edit', $emp) }}"
                  class="flex items-center gap-3 px-4 py-3 font-body-md text-on-surface hover:bg-surface-container transition-colors">
                 <span class="material-symbols-outlined text-[18px]" aria-hidden="true">edit</span>
-                Edit
+                Ubah
               </a>
             </div>
           </details>
@@ -158,13 +165,13 @@ tailwind.config = {
     @empty
       <div class="bg-surface-container-lowest border border-outline-variant rounded-2xl shadow-sm text-center py-10 px-4 text-on-surface-variant">
         <span class="material-symbols-outlined text-[48px] block mb-2 opacity-50">group_off</span>
-        <p class="font-body-md text-on-surface font-semibold">No employees found</p>
-        <p class="font-label-sm text-on-surface-variant mt-1">Try clearing filters or add a new employee.</p>
+        <p class="font-body-md text-on-surface font-semibold">Tidak ada pegawai ditemukan</p>
+        <p class="font-label-sm text-on-surface-variant mt-1">Coba hapus filter atau tambah pegawai baru.</p>
         <div class="flex justify-center gap-2 mt-4">
           @if(request()->hasAny(['search','department_id','status']))
-            <a href="{{ route('employees.index') }}" class="px-3 py-2 rounded-xl border border-outline-variant text-primary font-label-md text-label-md">Clear</a>
+            <a href="{{ route('employees.index') }}" class="px-3 py-2 rounded-xl border border-outline-variant text-primary font-label-md text-label-md">Hapus</a>
           @endif
-          <a href="{{ route('employees.create') }}" class="px-3 py-2 rounded-xl bg-primary text-on-primary font-label-md text-label-md">Add Employee</a>
+          <a href="{{ route('employees.create') }}" class="px-3 py-2 rounded-xl bg-primary text-on-primary font-label-md text-label-md">Tambah Pegawai</a>
         </div>
       </div>
     @endforelse
@@ -174,15 +181,15 @@ tailwind.config = {
   @if($employees->hasPages())
     <div class="flex justify-between items-center pt-2 pb-4">
       @if($employees->onFirstPage())
-        <span class="px-4 py-2 text-on-surface-variant font-body-md opacity-50">Previous</span>
+        <span class="px-4 py-2 text-on-surface-variant font-body-md opacity-50">Sebelumnya</span>
       @else
-        <a href="{{ $employees->previousPageUrl() }}" class="px-4 py-2 bg-surface-container rounded-xl font-body-md text-primary">Previous</a>
+        <a href="{{ $employees->previousPageUrl() }}" class="px-4 py-2 bg-surface-container rounded-xl font-body-md text-primary">Sebelumnya</a>
       @endif
-      <span class="font-label-sm text-on-surface-variant">Page {{ $employees->currentPage() }} of {{ $employees->lastPage() }}</span>
+      <span class="font-label-sm text-on-surface-variant">Halaman {{ $employees->currentPage() }} dari {{ $employees->lastPage() }}</span>
       @if($employees->hasMorePages())
-        <a href="{{ $employees->nextPageUrl() }}" class="px-4 py-2 bg-surface-container rounded-xl font-body-md text-primary">Next</a>
+        <a href="{{ $employees->nextPageUrl() }}" class="px-4 py-2 bg-surface-container rounded-xl font-body-md text-primary">Berikutnya</a>
       @else
-        <span class="px-4 py-2 text-on-surface-variant font-body-md opacity-50">Next</span>
+        <span class="px-4 py-2 text-on-surface-variant font-body-md opacity-50">Berikutnya</span>
       @endif
     </div>
   @endif
@@ -192,23 +199,23 @@ tailwind.config = {
 <nav class="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[390px] z-50 bg-surface/80 backdrop-blur-md border-t border-outline-variant shadow-sm flex justify-around items-center h-[72px] px-unit-sm">
   <a href="/admin/dashboard" class="flex flex-col items-center justify-center text-on-surface-variant px-3 py-1.5 hover:bg-surface-container transition-all active:scale-90 duration-200">
     <span class="material-symbols-outlined">home</span>
-    <span class="font-label-md text-label-md">Home</span>
+    <span class="font-label-md text-label-md">{{ __('common.nav_home') }}</span>
   </a>
   <a href="{{ route('employees.index') }}" class="flex flex-col items-center justify-center bg-secondary-container text-on-secondary-container rounded-xl px-3 py-1.5 active:scale-90 duration-200">
     <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">groups</span>
-    <span class="font-label-md text-label-md">Employees</span>
+    <span class="font-label-md text-label-md">{{ __('common.nav_employees') }}</span>
   </a>
   <a href="/hr/approval-queue" class="flex flex-col items-center justify-center text-on-surface-variant px-3 py-1.5 hover:bg-surface-container transition-all active:scale-90 duration-200">
     <span class="material-symbols-outlined">rule</span>
-    <span class="font-label-md text-label-md">Approvals</span>
+    <span class="font-label-md text-label-md">{{ __('common.nav_approvals') }}</span>
   </a>
   <a href="/reports" class="flex flex-col items-center justify-center text-on-surface-variant px-3 py-1.5 hover:bg-surface-container transition-all active:scale-90 duration-200">
     <span class="material-symbols-outlined">assessment</span>
-    <span class="font-label-md text-label-md">Reports</span>
+    <span class="font-label-md text-label-md">{{ __('common.nav_reports') }}</span>
   </a>
   <a href="/profile" class="flex flex-col items-center justify-center text-on-surface-variant px-3 py-1.5 hover:bg-surface-container transition-all active:scale-90 duration-200">
     <span class="material-symbols-outlined">person</span>
-    <span class="font-label-md text-label-md">Profile</span>
+    <span class="font-label-md text-label-md">{{ __('common.nav_profile') }}</span>
   </a>
 </nav>
 

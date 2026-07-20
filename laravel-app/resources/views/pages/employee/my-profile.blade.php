@@ -133,7 +133,7 @@ tailwind.config = {
         </div>
         <div class="flex flex-col">
           <span class="text-[10px] text-outline font-semibold uppercase">Tanggal Bergabung</span>
-          <span class="text-body-md font-body-md text-on-surface">{{ $employee->join_date?->format('M d, Y') }}</span>
+          <span class="text-body-md font-body-md text-on-surface">{{ $employee->join_date?->translatedFormat('M d, Y') }}</span>
         </div>
       </div>
       @if($employee->address)

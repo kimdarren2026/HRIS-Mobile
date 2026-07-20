@@ -1,4 +1,4 @@
-<!DOCTYPE html><html class="light" lang="en"><head>
+<!DOCTYPE html><html class="light" lang="id"><head>
 <meta charset="utf-8">
 <meta content="width=device-width, initial-scale=1.0" name="viewport">
 <title>Slip Gaji – {{ $payrollRecord->payrollPeriod->name }} - HRIS Mobile App</title>
@@ -65,7 +65,7 @@
   <div class="flex-1 min-w-0">
     <h1 class="font-headline-md text-headline-md font-bold text-primary truncate">{{ $period->name }}</h1>
     <p class="font-label-sm text-label-sm text-on-surface-variant">
-      {{ $period->start_date->format('M d') }} – {{ $period->end_date->format('M d, Y') }}
+      {{ $period->start_date->translatedFormat('M d') }} – {{ $period->end_date->translatedFormat('M d, Y') }}
     </p>
   </div>
 </header>
@@ -83,7 +83,7 @@
     </h2>
     @if($period->pay_date)
       <p class="font-label-sm text-label-sm text-on-primary-container/60 z-10">
-        Pay Date: {{ $period->pay_date->format('M d, Y') }}
+        Tanggal Bayar: {{ $period->pay_date->translatedFormat('d M Y') }}
       </p>
     @endif
   </section>
@@ -128,7 +128,7 @@
             'Gaji Pokok'   => (float) $payrollRecord->basic_salary,
             'Tunjangan'    => (float) $payrollRecord->allowance,
             'Bonus'        => (float) $payrollRecord->bonus,
-            'Overtime'     => (float) $payrollRecord->overtime,
+            'Lembur'       => (float) $payrollRecord->overtime,
         ];
       @endphp
       @foreach($earnings as $label => $amount)
@@ -183,7 +183,7 @@
   <a href="{{ route('my.payroll.print', $payrollRecord) }}"
      class="flex items-center justify-center gap-2 w-full bg-primary text-white py-3.5 rounded-xl font-label-md text-label-md active:opacity-90 transition-opacity">
     <span class="material-symbols-outlined">print</span>
-    Print Payslip
+    Cetak Slip Gaji
   </a>
 
 </main>
@@ -192,23 +192,23 @@
 <nav class="bg-surface fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[390px] z-50 flex justify-around items-center px-2 py-3 border-t border-border backdrop-blur-md mx-auto">
   <a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 rounded-full active:scale-90 transition-all duration-200" href="/employee/dashboard">
     <span class="material-symbols-outlined">home</span>
-    <span class="font-label-sm text-label-sm mt-0.5">Home</span>
+    <span class="font-label-sm text-label-sm mt-0.5">{{ __('common.nav_home') }}</span>
   </a>
   <a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 rounded-full active:scale-90 transition-all duration-200" href="/attendance/checkin">
     <span class="material-symbols-outlined">schedule</span>
-    <span class="font-label-sm text-label-sm mt-0.5">Attendance</span>
+    <span class="font-label-sm text-label-sm mt-0.5">{{ __('common.nav_attendance') }}</span>
   </a>
   <a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 rounded-full active:scale-90 transition-all duration-200" href="/leave/history">
     <span class="material-symbols-outlined">event_note</span>
-    <span class="font-label-sm text-label-sm mt-0.5">Leave</span>
+    <span class="font-label-sm text-label-sm mt-0.5">{{ __('common.nav_leave') }}</span>
   </a>
   <a class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container px-4 py-1 rounded-full active:scale-90 transition-all duration-200" href="/my/payroll">
     <span class="material-symbols-outlined">payments</span>
-    <span class="font-label-sm text-label-sm mt-0.5">Payslip</span>
+    <span class="font-label-sm text-label-sm mt-0.5">{{ __('common.nav_payslip') }}</span>
   </a>
   <a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 rounded-full active:scale-90 transition-all duration-200" href="{{ route('my.profile') }}">
     <span class="material-symbols-outlined">person</span>
-    <span class="font-label-sm text-label-sm mt-0.5">Profile</span>
+    <span class="font-label-sm text-label-sm mt-0.5">{{ __('common.nav_profile') }}</span>
   </a>
 </nav>
 

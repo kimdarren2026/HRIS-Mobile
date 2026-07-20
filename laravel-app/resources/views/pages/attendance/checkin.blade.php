@@ -239,7 +239,7 @@ $coStatusLbl  = $todayRecord->status === 'APPROVED' ? 'Disetujui' : 'Menunggu Re
 <span class="material-symbols-outlined text-[14px]">{{ $coStatusIcon }}</span> {{ $coStatusLbl }}
 </span>
 </div>
-<p class="font-headline-md text-headline-md text-on-background">{{ $todayRecord->check_in_time->format('h:i A') }}</p>
+<p class="font-headline-md text-headline-md text-on-background">{{ $todayRecord->check_in_time->format('H:i') }}</p>
 @if($todayRecord->status === 'PENDING_REVIEW')
 <p class="font-body-md text-body-md text-on-surface-variant mt-2 flex items-center gap-2">
 <span id="pending-review-anim" class="w-14 h-14 shrink-0" aria-hidden="true"></span>

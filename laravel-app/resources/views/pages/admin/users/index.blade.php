@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html class="light" lang="en">
+<html class="light" lang="id">
 <head>
 <meta charset="utf-8">
 <meta content="width=device-width, initial-scale=1.0" name="viewport">
-<title>User & Role Management - HRIS Mobile App</title>
+<title>Manajemen Pengguna & Peran - HRIS Mobile App</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
@@ -68,7 +68,7 @@
   <a href="/admin/dashboard" class="text-primary p-1">
     <span class="material-symbols-outlined">arrow_back</span>
   </a>
-  <h1 class="font-headline-md text-headline-md font-bold text-primary flex-1 truncate">User Management</h1>
+  <h1 class="font-headline-md text-headline-md font-bold text-primary flex-1 truncate">Manajemen Pengguna</h1>
   <span class="font-label-sm text-label-sm text-on-surface-variant">Super Admin</span>
 </header>
 
@@ -92,7 +92,7 @@
   {{-- Summary chip --}}
   <div class="flex items-center gap-2 text-on-surface-variant">
     <span class="material-symbols-outlined text-primary text-[20px]">manage_accounts</span>
-    <span class="font-label-md text-label-md uppercase tracking-wide">{{ $users->count() }} Users</span>
+    <span class="font-label-md text-label-md uppercase tracking-wide">{{ $users->count() }} Pengguna</span>
   </div>
 
   {{-- User cards --}}
@@ -118,25 +118,25 @@
           <div class="flex items-center gap-2 flex-wrap">
             <span class="font-body-lg text-body-lg font-semibold text-on-surface truncate">{{ $user->name }}</span>
             @if($isCurrentUser)
-              <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-primary text-white">YOU</span>
+              <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-primary text-white">ANDA</span>
             @endif
           </div>
           <span class="font-body-md text-body-md text-on-surface-variant truncate block">{{ $user->email }}</span>
           @if($user->employee)
             <span class="font-label-sm text-label-sm text-outline">NIK: {{ $user->employee->nik }}</span>
           @else
-            <span class="font-label-sm text-label-sm text-outline italic">No linked employee</span>
+            <span class="font-label-sm text-label-sm text-outline italic">Tidak ada pegawai terkait</span>
           @endif
         </div>
         {{-- Active status badge --}}
         <div>
           @if($user->is_active)
             <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-bold bg-success/10 text-success border border-success/20">
-              <span class="material-symbols-outlined text-[12px]" style="font-variation-settings:'FILL' 1">check_circle</span>Active
+              <span class="material-symbols-outlined text-[12px]" style="font-variation-settings:'FILL' 1">check_circle</span>Aktif
             </span>
           @else
             <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-bold bg-danger/10 text-danger border border-danger/20">
-              <span class="material-symbols-outlined text-[12px]">cancel</span>Inactive
+              <span class="material-symbols-outlined text-[12px]">cancel</span>Tidak Aktif
             </span>
           @endif
         </div>
@@ -144,36 +144,36 @@
 
       {{-- Current role badge --}}
       <div class="flex items-center gap-2">
-        <span class="font-label-md text-label-md text-on-surface-variant uppercase">Current role:</span>
+        <span class="font-label-md text-label-md text-on-surface-variant uppercase">Peran saat ini:</span>
         <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-bold border {{ $roleColor }}">
-          {{ str_replace('_', ' ', strtoupper($user->role)) }}
+          {{ strtoupper(__('common.role_labels')[$user->role] ?? $user->role) }}
         </span>
       </div>
 
       {{-- Update role form --}}
       <form method="POST" action="{{ route('admin.users.update-role', $user) }}"
             class="flex items-center gap-2 mt-1"
-            onsubmit="return confirm('Change role for {{ addslashes($user->name) }}?')">
+            onsubmit="return confirm('Ubah peran untuk {{ addslashes($user->name) }}?')">
         @csrf
         @method('PATCH')
         <select name="role"
                 class="flex-1 border border-border rounded-lg px-3 py-2 font-body-md text-body-md bg-white focus:outline-none focus:ring-2 focus:ring-primary text-sm">
           @foreach(['employee','admin_hr','finance','super_admin'] as $role)
             <option value="{{ $role }}" @selected($user->role === $role)>
-              {{ str_replace('_', ' ', ucfirst($role)) }}
+              {{ __('common.role_labels')[$role] ?? $role }}
             </option>
           @endforeach
         </select>
         <button type="submit"
                 class="shrink-0 bg-primary text-white px-3 py-2 rounded-lg font-label-md text-label-md active:opacity-80 transition-opacity">
-          Update
+          Perbarui
         </button>
       </form>
 
       {{-- Toggle active status --}}
       <form method="POST" action="{{ route('admin.users.update-status', $user) }}"
             class="mt-1"
-            onsubmit="return confirm('{{ $user->is_active ? 'Deactivate' : 'Activate' }} {{ addslashes($user->name) }}?')">
+            onsubmit="return confirm('{{ $user->is_active ? 'Nonaktifkan' : 'Aktifkan' }} {{ addslashes($user->name) }}?')">
         @csrf
         @method('PATCH')
         <input type="hidden" name="is_active" value="{{ $user->is_active ? '0' : '1' }}">
@@ -183,7 +183,7 @@
                       ? 'border-danger/30 bg-danger/5 text-danger'
                       : 'border-success/30 bg-success/5 text-success' }}">
           <span class="material-symbols-outlined text-[16px]">{{ $user->is_active ? 'person_off' : 'person' }}</span>
-          {{ $user->is_active ? 'Deactivate User' : 'Activate User' }}
+          {{ $user->is_active ? 'Nonaktifkan Pengguna' : 'Aktifkan Pengguna' }}
         </button>
       </form>
     </section>
@@ -195,19 +195,19 @@
 <nav class="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[390px] z-50 bg-surface/80 backdrop-blur-md border-t border-border shadow-lg flex justify-around items-center h-18 pb-safe px-unit-xs">
   <a href="/admin/dashboard" class="flex flex-col items-center justify-center text-on-surface-variant transition-transform active:scale-95 duration-150 py-2">
     <span class="material-symbols-outlined">home</span>
-    <span class="font-label-sm text-label-sm">Home</span>
+    <span class="font-label-sm text-label-sm">{{ __('common.nav_home') }}</span>
   </a>
   <a href="{{ route('admin.users.index') }}" class="flex flex-col items-center justify-center text-primary bg-secondary-fixed rounded-xl px-3 py-1 transition-transform active:scale-95 duration-150">
     <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1">manage_accounts</span>
-    <span class="font-label-sm text-label-sm">Users</span>
+    <span class="font-label-sm text-label-sm">{{ __('common.nav_users') }}</span>
   </a>
   <a href="{{ route('audit-logs.index') }}" class="flex flex-col items-center justify-center text-on-surface-variant transition-transform active:scale-95 duration-150 py-2">
     <span class="material-symbols-outlined">shield</span>
-    <span class="font-label-sm text-label-sm">Audit</span>
+    <span class="font-label-sm text-label-sm">{{ __('common.nav_audit') }}</span>
   </a>
   <a href="/profile" class="flex flex-col items-center justify-center text-on-surface-variant transition-transform active:scale-95 duration-150 py-2">
     <span class="material-symbols-outlined">person</span>
-    <span class="font-label-sm text-label-sm">Profile</span>
+    <span class="font-label-sm text-label-sm">{{ __('common.nav_profile') }}</span>
   </a>
 </nav>
 

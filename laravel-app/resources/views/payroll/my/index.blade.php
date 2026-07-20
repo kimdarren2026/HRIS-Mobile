@@ -1,4 +1,4 @@
-<!DOCTYPE html><html class="light" lang="en"><head>
+<!DOCTYPE html><html class="light" lang="id"><head>
 <meta charset="utf-8">
 <meta content="width=device-width, initial-scale=1.0" name="viewport">
 <title>Slip Gaji - HRIS Mobile App</title>
@@ -77,14 +77,7 @@
             'PAID'              => 'bg-green-100 text-green-700',
             default             => 'bg-gray-100 text-gray-600',
         };
-        $badgeLabel = match($period->status) {
-            'CALCULATED'        => 'Calculated',
-            'HR_REVIEW'         => 'HR Review',
-            'FINANCE_APPROVAL'  => 'Finance Approval',
-            'LOCKED'            => 'Locked',
-            'PAID'              => 'Paid',
-            default             => $period->status,
-        };
+        $badgeLabel = __('payroll.status_labels')[$period->status] ?? $period->status;
       @endphp
       <a href="{{ route('my.payroll.show', $record) }}"
          class="bg-white rounded-xl border border-border shadow-sm p-4 flex flex-col gap-3 active:bg-surface-container-low transition-colors">
@@ -92,14 +85,14 @@
           <div>
             <h3 class="font-headline-md text-headline-md text-on-surface mb-0.5">{{ $period->name }}</h3>
             <p class="font-body-md text-body-md text-on-surface-variant">
-              {{ $period->start_date->format('M d') }} – {{ $period->end_date->format('M d, Y') }}
+              {{ $period->start_date->translatedFormat('M d') }} – {{ $period->end_date->translatedFormat('M d, Y') }}
             </p>
           </div>
           <span class="{{ $badgeClass }} px-3 py-1 rounded-full font-status-badge text-status-badge">{{ $badgeLabel }}</span>
         </div>
         <div class="border-t border-border pt-3 flex justify-between items-center">
           <div>
-            <p class="font-label-md text-label-md text-on-surface-variant mb-0.5">Net Pay</p>
+            <p class="font-label-md text-label-md text-on-surface-variant mb-0.5">Gaji Bersih</p>
             <p class="font-headline-md text-headline-md text-primary">Rp {{ number_format((float) $record->net_salary, 0, ',', '.') }}</p>
           </div>
           <span class="material-symbols-outlined text-on-surface-variant">chevron_right</span>
@@ -118,14 +111,14 @@
   @if($records->hasPages())
     <div class="flex justify-center gap-unit-sm pt-2">
       @if($records->onFirstPage())
-        <span class="px-4 py-2 rounded-xl border border-border text-on-surface-variant font-label-md text-label-md opacity-40">Prev</span>
+        <span class="px-4 py-2 rounded-xl border border-border text-on-surface-variant font-label-md text-label-md opacity-40">Sebelumnya</span>
       @else
-        <a href="{{ $records->previousPageUrl() }}" class="px-4 py-2 rounded-xl border border-border text-primary font-label-md text-label-md">Prev</a>
+        <a href="{{ $records->previousPageUrl() }}" class="px-4 py-2 rounded-xl border border-border text-primary font-label-md text-label-md">Sebelumnya</a>
       @endif
       @if($records->hasMorePages())
-        <a href="{{ $records->nextPageUrl() }}" class="px-4 py-2 rounded-xl border border-border text-primary font-label-md text-label-md">Next</a>
+        <a href="{{ $records->nextPageUrl() }}" class="px-4 py-2 rounded-xl border border-border text-primary font-label-md text-label-md">Berikutnya</a>
       @else
-        <span class="px-4 py-2 rounded-xl border border-border text-on-surface-variant font-label-md text-label-md opacity-40">Next</span>
+        <span class="px-4 py-2 rounded-xl border border-border text-on-surface-variant font-label-md text-label-md opacity-40">Berikutnya</span>
       @endif
     </div>
   @endif
@@ -136,23 +129,23 @@
 <nav class="bg-surface fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[390px] z-50 flex justify-around items-center px-2 py-3 border-t border-border backdrop-blur-md mx-auto">
   <a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 rounded-full active:scale-90 transition-all duration-200" href="/employee/dashboard">
     <span class="material-symbols-outlined">home</span>
-    <span class="font-label-sm text-label-sm mt-0.5">Home</span>
+    <span class="font-label-sm text-label-sm mt-0.5">{{ __('common.nav_home') }}</span>
   </a>
   <a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 rounded-full active:scale-90 transition-all duration-200" href="/attendance/checkin">
     <span class="material-symbols-outlined">schedule</span>
-    <span class="font-label-sm text-label-sm mt-0.5">Attendance</span>
+    <span class="font-label-sm text-label-sm mt-0.5">{{ __('common.nav_attendance') }}</span>
   </a>
   <a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 rounded-full active:scale-90 transition-all duration-200" href="/leave/history">
     <span class="material-symbols-outlined">event_note</span>
-    <span class="font-label-sm text-label-sm mt-0.5">Leave</span>
+    <span class="font-label-sm text-label-sm mt-0.5">{{ __('common.nav_leave') }}</span>
   </a>
   <a class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container px-4 py-1 rounded-full active:scale-90 transition-all duration-200" href="/my/payroll">
     <span class="material-symbols-outlined">payments</span>
-    <span class="font-label-sm text-label-sm mt-0.5">Payslip</span>
+    <span class="font-label-sm text-label-sm mt-0.5">{{ __('common.nav_payslip') }}</span>
   </a>
   <a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 rounded-full active:scale-90 transition-all duration-200" href="{{ route('my.profile') }}">
     <span class="material-symbols-outlined">person</span>
-    <span class="font-label-sm text-label-sm mt-0.5">Profile</span>
+    <span class="font-label-sm text-label-sm mt-0.5">{{ __('common.nav_profile') }}</span>
   </a>
 </nav>
 

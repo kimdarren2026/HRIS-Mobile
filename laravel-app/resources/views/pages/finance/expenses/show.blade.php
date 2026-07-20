@@ -1,4 +1,4 @@
-<!DOCTYPE html><html class="light" lang="en"><head>
+<!DOCTYPE html><html class="light" lang="id"><head>
 <meta charset="utf-8">
 <meta content="width=device-width, initial-scale=1.0" name="viewport">
 <title>{{ $expense->title }} - HRIS Mobile App</title>
@@ -49,7 +49,7 @@
   <a href="{{ route('finance.expenses.index') }}" class="text-primary p-1">
     <span class="material-symbols-outlined">arrow_back</span>
   </a>
-  <h1 class="font-headline-md text-headline-md font-bold text-primary flex-1 truncate">Expense Detail</h1>
+  <h1 class="font-headline-md text-headline-md font-bold text-primary flex-1 truncate">Detail Pengeluaran</h1>
   @can('update', $expense)
     <a href="{{ route('finance.expenses.edit', $expense) }}" class="text-primary p-1">
       <span class="material-symbols-outlined">edit</span>
@@ -84,32 +84,32 @@
         <p class="font-headline-md text-headline-md text-on-surface">{{ $expense->title }}</p>
         <p class="font-label-sm text-label-sm text-on-surface-variant">{{ $expense->expense_number }}</p>
       </div>
-      <span class="{{ $statusColor }} px-3 py-1 rounded-full font-status-badge text-status-badge flex-shrink-0">{{ $expense->status }}</span>
+      <span class="{{ $statusColor }} px-3 py-1 rounded-full font-status-badge text-status-badge flex-shrink-0">{{ __('finance.status_labels')[$expense->status] ?? $expense->status }}</span>
     </div>
     <div class="flex justify-between items-center border-t border-border pt-3">
-      <p class="font-label-md text-label-md text-on-surface-variant">{{ str_replace('_', ' ', $expense->category) }}</p>
+      <p class="font-label-md text-label-md text-on-surface-variant">{{ __('finance.category_labels')[$expense->category] ?? $expense->category }}</p>
       <p class="font-headline-md text-headline-md text-primary">Rp {{ number_format($expense->amount, 0, ',', '.') }}</p>
     </div>
   </div>
 
   {{-- Details --}}
   <div class="bg-white rounded-xl border border-border shadow-sm p-4 flex flex-col gap-3">
-    <h2 class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wide">Details</h2>
+    <h2 class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wide">Detail</h2>
 
     <div class="grid grid-cols-2 gap-unit-sm">
       <div>
-        <p class="font-label-sm text-label-sm text-on-surface-variant">Expense Date</p>
-        <p class="font-body-md text-body-md text-on-surface">{{ $expense->expense_date->format('M d, Y') }}</p>
+        <p class="font-label-sm text-label-sm text-on-surface-variant">Tanggal Pengeluaran</p>
+        <p class="font-body-md text-body-md text-on-surface">{{ $expense->expense_date->translatedFormat('d M Y') }}</p>
       </div>
       <div>
-        <p class="font-label-sm text-label-sm text-on-surface-variant">Recipient</p>
+        <p class="font-label-sm text-label-sm text-on-surface-variant">Penerima</p>
         <p class="font-body-md text-body-md text-on-surface">{{ $expense->recipient_name }}</p>
       </div>
     </div>
 
     @if($expense->employee)
       <div>
-        <p class="font-label-sm text-label-sm text-on-surface-variant">Linked Employee</p>
+        <p class="font-label-sm text-label-sm text-on-surface-variant">Pegawai Terkait</p>
         <p class="font-body-md text-body-md text-on-surface">{{ $expense->employee->user?->name ?? $expense->employee->nik }}</p>
       </div>
     @endif
@@ -123,24 +123,24 @@
 
     @if($expense->description)
       <div>
-        <p class="font-label-sm text-label-sm text-on-surface-variant">Description</p>
+        <p class="font-label-sm text-label-sm text-on-surface-variant">Deskripsi</p>
         <p class="font-body-md text-body-md text-on-surface">{{ $expense->description }}</p>
       </div>
     @endif
 
     @if($expense->receipt_path)
       <div>
-        <p class="font-label-sm text-label-sm text-on-surface-variant">Receipt</p>
+        <p class="font-label-sm text-label-sm text-on-surface-variant">Kwitansi</p>
         <a href="{{ route('finance.expenses.receipt', $expense) }}" target="_blank"
            class="inline-flex items-center gap-1 text-primary font-label-md text-label-md">
           <span class="material-symbols-outlined text-[16px]">attach_file</span>
-          View Receipt
+          Lihat Kwitansi
         </a>
       </div>
     @endif
 
     <div>
-      <p class="font-label-sm text-label-sm text-on-surface-variant">Created By</p>
+      <p class="font-label-sm text-label-sm text-on-surface-variant">Dibuat Oleh</p>
       <p class="font-body-md text-body-md text-on-surface">{{ $expense->creator?->name ?? '—' }}</p>
     </div>
   </div>
@@ -150,22 +150,22 @@
     <div class="bg-green-50 border border-green-200 rounded-xl p-4 flex flex-col gap-2">
       <div class="flex items-center gap-2">
         <span class="material-symbols-outlined text-success">check_circle</span>
-        <p class="font-label-md text-label-md text-green-800">Payment Recorded</p>
+        <p class="font-label-md text-label-md text-green-800">Pembayaran Tercatat</p>
       </div>
       @if($expense->paid_at)
-        <p class="font-label-sm text-label-sm text-on-surface-variant">Paid: {{ $expense->paid_at->format('M d, Y H:i') }}</p>
+        <p class="font-label-sm text-label-sm text-on-surface-variant">Dibayar: {{ $expense->paid_at->translatedFormat('d M Y, H:i') }}</p>
       @endif
       @if($expense->payment_reference)
-        <p class="font-label-sm text-label-sm text-on-surface-variant">Reference: {{ $expense->payment_reference }}</p>
+        <p class="font-label-sm text-label-sm text-on-surface-variant">Referensi: {{ $expense->payment_reference }}</p>
       @endif
-      <p class="font-label-sm text-label-sm text-amber-700">Payment record only — no real bank transfer was initiated.</p>
+      <p class="font-label-sm text-label-sm text-amber-700">Hanya catatan pembayaran — tidak ada transfer bank nyata yang dilakukan.</p>
     </div>
   @endif
 
   {{-- Rejection Note --}}
   @if($expense->status === 'REJECTED' && $expense->rejection_note)
     <div class="bg-red-50 border border-red-200 rounded-xl p-4">
-      <p class="font-label-md text-label-md text-red-800 mb-1">Rejection Reason</p>
+      <p class="font-label-md text-label-md text-red-800 mb-1">Alasan Penolakan</p>
       <p class="font-body-md text-body-md text-red-700">{{ $expense->rejection_note }}</p>
     </div>
   @endif
@@ -173,10 +173,10 @@
   {{-- Approval Info --}}
   @if($expense->approver && in_array($expense->status, ['APPROVED', 'PAID']))
     <div class="bg-white rounded-xl border border-border shadow-sm p-4 flex flex-col gap-2">
-      <p class="font-label-sm text-label-sm text-on-surface-variant">Approved By</p>
+      <p class="font-label-sm text-label-sm text-on-surface-variant">Disetujui Oleh</p>
       <p class="font-body-md text-body-md text-on-surface">{{ $expense->approver->name }}</p>
       @if($expense->approved_at)
-        <p class="font-label-sm text-label-sm text-on-surface-variant">{{ $expense->approved_at->format('M d, Y H:i') }}</p>
+        <p class="font-label-sm text-label-sm text-on-surface-variant">{{ $expense->approved_at->translatedFormat('d M Y, H:i') }}</p>
       @endif
     </div>
   @endif
@@ -186,33 +186,33 @@
 
     @can('submit', $expense)
       <form method="POST" action="{{ route('finance.expenses.submit', $expense) }}"
-        onsubmit="return confirm('Submit this expense for approval?')">
+        onsubmit="return confirm('Ajukan pengeluaran ini untuk persetujuan?')">
         @csrf
         <button type="submit" class="w-full bg-primary text-white py-3.5 rounded-xl font-label-md text-label-md flex items-center justify-center gap-2 active:opacity-90">
           <span class="material-symbols-outlined">send</span>
-          Submit for Approval
+          Ajukan untuk Persetujuan
         </button>
       </form>
     @endcan
 
     @can('approve', $expense)
       <form method="POST" action="{{ route('finance.expenses.approve', $expense) }}"
-        onsubmit="return confirm('Approve this expense?')">
+        onsubmit="return confirm('Setujui pengeluaran ini?')">
         @csrf
         <button type="submit" class="w-full bg-success text-white py-3.5 rounded-xl font-label-md text-label-md flex items-center justify-center gap-2 active:opacity-90">
           <span class="material-symbols-outlined">thumb_up</span>
-          Approve
+          Setujui
         </button>
       </form>
 
       <form method="POST" action="{{ route('finance.expenses.reject', $expense) }}" class="flex flex-col gap-unit-sm">
         @csrf
         <textarea name="rejection_note" rows="2" required minlength="10" maxlength="1000"
-          placeholder="Rejection reason (required, min 10 chars)"
+          placeholder="Alasan penolakan (wajib, minimal 10 karakter)"
           class="border border-border rounded-xl px-4 py-3 font-body-md text-body-md bg-white focus:outline-none focus:ring-2 focus:ring-danger resize-none"></textarea>
         <button type="submit" class="w-full bg-danger text-white py-3.5 rounded-xl font-label-md text-label-md flex items-center justify-center gap-2 active:opacity-90">
           <span class="material-symbols-outlined">thumb_down</span>
-          Reject
+          Tolak
         </button>
       </form>
     @endcan
@@ -220,17 +220,17 @@
     @can('markPaid', $expense)
       <div class="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 font-body-md text-body-md text-amber-800 flex items-start gap-2">
         <span class="material-symbols-outlined text-[18px] mt-0.5 flex-shrink-0">info</span>
-        <span>"Mark as Paid" records payment status only — it does <strong>not</strong> initiate a real bank transfer.</span>
+        <span>"Tandai Sudah Dibayar" hanya mencatat status pembayaran — <strong>tidak</strong> melakukan transfer bank nyata.</span>
       </div>
       <form method="POST" action="{{ route('finance.expenses.mark-paid', $expense) }}"
-        onsubmit="return confirm('Mark this expense as paid? This records status only.')">
+        onsubmit="return confirm('Tandai pengeluaran ini sudah dibayar? Ini hanya mencatat status.')">
         @csrf
         <div class="flex flex-col gap-unit-sm">
-          <input type="text" name="payment_reference" maxlength="100" placeholder="Payment reference (optional)"
+          <input type="text" name="payment_reference" maxlength="100" placeholder="Referensi pembayaran (opsional)"
             class="border border-border rounded-xl px-4 py-3 font-body-md text-body-md bg-white focus:outline-none focus:ring-2 focus:ring-primary">
           <button type="submit" class="w-full bg-success text-white py-3.5 rounded-xl font-label-md text-label-md flex items-center justify-center gap-2 active:opacity-90">
             <span class="material-symbols-outlined">payments</span>
-            Mark as Paid
+            Tandai Sudah Dibayar
           </button>
         </div>
       </form>
@@ -244,15 +244,15 @@
   @php($navRole = auth()->user()->role)
   <a class="flex flex-col items-center justify-center text-on-surface-variant transition-transform active:scale-95 duration-150 py-2" href="{{ $navRole === 'finance' ? '/finance/dashboard' : '/admin/dashboard' }}">
     <span class="material-symbols-outlined">home</span>
-    <span class="font-label-sm text-label-sm">Home</span>
+    <span class="font-label-sm text-label-sm">{{ __('common.nav_home') }}</span>
   </a>
   <a class="flex flex-col items-center justify-center text-primary bg-secondary-fixed rounded-xl px-3 py-1 transition-transform active:scale-95 duration-150" href="{{ route('finance.expenses.index') }}">
     <span class="material-symbols-outlined">account_balance_wallet</span>
-    <span class="font-label-sm text-label-sm">Expenses</span>
+    <span class="font-label-sm text-label-sm">Pengeluaran</span>
   </a>
   <a class="flex flex-col items-center justify-center text-on-surface-variant transition-transform active:scale-95 duration-150 py-2" href="/profile">
     <span class="material-symbols-outlined">person</span>
-    <span class="font-label-sm text-label-sm">Profile</span>
+    <span class="font-label-sm text-label-sm">{{ __('common.nav_profile') }}</span>
   </a>
 </nav>
 

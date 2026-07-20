@@ -1,7 +1,7 @@
-<!DOCTYPE html><html class="light" lang="en"><head>
+<!DOCTYPE html><html class="light" lang="id"><head>
 <meta charset="utf-8">
 <meta content="width=device-width, initial-scale=1.0" name="viewport">
-<title>Company Expenses - HRIS Mobile App</title>
+<title>Pengeluaran Perusahaan - HRIS Mobile App</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
@@ -49,7 +49,7 @@
   <a href="{{ auth()->user()->role === 'admin_hr' ? '/admin/dashboard' : '/finance/dashboard' }}" class="text-primary p-1">
     <span class="material-symbols-outlined">arrow_back</span>
   </a>
-  <h1 class="font-headline-md text-headline-md font-bold text-primary flex-1 truncate">Expenses</h1>
+  <h1 class="font-headline-md text-headline-md font-bold text-primary flex-1 truncate">Pengeluaran</h1>
   @can('create', \App\Models\CompanyExpense::class)
     <a href="{{ route('finance.expenses.create') }}" class="text-primary p-1">
       <span class="material-symbols-outlined">add</span>
@@ -70,10 +70,10 @@
   <div class="grid grid-cols-2 gap-unit-sm">
     @php
       $cards = [
-        ['label' => 'Draft',     'count' => $summary['draft'],     'color' => 'text-gray-600',   'bg' => 'bg-gray-50'],
-        ['label' => 'Submitted', 'count' => $summary['submitted'], 'color' => 'text-blue-700',   'bg' => 'bg-blue-50'],
-        ['label' => 'Approved',  'count' => $summary['approved'],  'color' => 'text-orange-700', 'bg' => 'bg-orange-50'],
-        ['label' => 'Paid',      'count' => $summary['paid'],      'color' => 'text-green-700',  'bg' => 'bg-green-50'],
+        ['label' => 'Draf',      'count' => $summary['draft'],     'color' => 'text-gray-600',   'bg' => 'bg-gray-50'],
+        ['label' => 'Diajukan',  'count' => $summary['submitted'], 'color' => 'text-blue-700',   'bg' => 'bg-blue-50'],
+        ['label' => 'Disetujui', 'count' => $summary['approved'],  'color' => 'text-orange-700', 'bg' => 'bg-orange-50'],
+        ['label' => 'Dibayar',   'count' => $summary['paid'],      'color' => 'text-green-700',  'bg' => 'bg-green-50'],
       ];
     @endphp
     @foreach($cards as $card)
@@ -88,22 +88,22 @@
   <form method="GET" action="{{ route('finance.expenses.index') }}" class="flex flex-col gap-unit-sm">
     <div class="grid grid-cols-2 gap-unit-sm">
       <select name="category" class="border border-border rounded-xl px-3 py-2.5 font-body-md text-body-md bg-white text-on-surface focus:outline-none focus:ring-2 focus:ring-primary">
-        <option value="">All Categories</option>
+        <option value="">Semua Kategori</option>
         @foreach(\App\Models\CompanyExpense::CATEGORIES as $cat)
-          <option value="{{ $cat }}" {{ request('category') === $cat ? 'selected' : '' }}>{{ str_replace('_', ' ', $cat) }}</option>
+          <option value="{{ $cat }}" {{ request('category') === $cat ? 'selected' : '' }}>{{ __('finance.category_labels')[$cat] ?? $cat }}</option>
         @endforeach
       </select>
       <select name="status" class="border border-border rounded-xl px-3 py-2.5 font-body-md text-body-md bg-white text-on-surface focus:outline-none focus:ring-2 focus:ring-primary">
-        <option value="">All Statuses</option>
+        <option value="">Semua Status</option>
         @foreach(\App\Models\CompanyExpense::STATUSES as $st)
-          <option value="{{ $st }}" {{ request('status') === $st ? 'selected' : '' }}>{{ $st }}</option>
+          <option value="{{ $st }}" {{ request('status') === $st ? 'selected' : '' }}>{{ __('finance.status_labels')[$st] ?? $st }}</option>
         @endforeach
       </select>
     </div>
     <div class="grid grid-cols-2 gap-unit-sm">
-      <input type="date" name="from" value="{{ request('from') }}" placeholder="From"
+      <input type="date" name="from" value="{{ request('from') }}" placeholder="Dari"
         class="border border-border rounded-xl px-3 py-2.5 font-body-md text-body-md bg-white focus:outline-none focus:ring-2 focus:ring-primary">
-      <input type="date" name="to" value="{{ request('to') }}" placeholder="To"
+      <input type="date" name="to" value="{{ request('to') }}" placeholder="Sampai"
         class="border border-border rounded-xl px-3 py-2.5 font-body-md text-body-md bg-white focus:outline-none focus:ring-2 focus:ring-primary">
     </div>
     <button type="submit" class="w-full bg-primary text-white py-2.5 rounded-xl font-label-md text-label-md active:opacity-90">Filter</button>
@@ -126,19 +126,19 @@
       <div class="flex justify-between items-start">
         <div class="flex-1 min-w-0">
           <p class="font-label-md text-label-md text-on-surface truncate">{{ $expense->title }}</p>
-          <p class="font-label-sm text-label-sm text-on-surface-variant">{{ str_replace('_', ' ', $expense->category) }}</p>
+          <p class="font-label-sm text-label-sm text-on-surface-variant">{{ __('finance.category_labels')[$expense->category] ?? $expense->category }}</p>
         </div>
-        <span class="{{ $statusColor }} px-2 py-1 rounded-full font-status-badge text-status-badge ml-2 flex-shrink-0">{{ $expense->status }}</span>
+        <span class="{{ $statusColor }} px-2 py-1 rounded-full font-status-badge text-status-badge ml-2 flex-shrink-0">{{ __('finance.status_labels')[$expense->status] ?? $expense->status }}</span>
       </div>
       <div class="flex justify-between items-center">
-        <p class="font-body-md text-body-md text-on-surface-variant">{{ $expense->expense_date->format('M d, Y') }}</p>
+        <p class="font-body-md text-body-md text-on-surface-variant">{{ $expense->expense_date->translatedFormat('d M Y') }}</p>
         <p class="font-label-md text-label-md text-primary">Rp {{ number_format($expense->amount, 0, ',', '.') }}</p>
       </div>
       <p class="font-label-sm text-label-sm text-on-surface-variant">{{ $expense->expense_number }}</p>
     </a>
   @empty
     <div class="bg-white rounded-xl border border-border shadow-sm p-8 text-center text-on-surface-variant font-body-md text-body-md">
-      No expenses found.
+      Belum ada pengeluaran.
     </div>
   @endforelse
 
@@ -150,21 +150,21 @@
   @php($navRole = auth()->user()->role)
   <a class="flex flex-col items-center justify-center text-on-surface-variant transition-transform active:scale-95 duration-150 py-2" href="{{ $navRole === 'finance' ? '/finance/dashboard' : '/admin/dashboard' }}">
     <span class="material-symbols-outlined">home</span>
-    <span class="font-label-sm text-label-sm">Home</span>
+    <span class="font-label-sm text-label-sm">{{ __('common.nav_home') }}</span>
   </a>
   @if(in_array($navRole, ['finance', 'super_admin']))
     <a class="flex flex-col items-center justify-center text-on-surface-variant transition-transform active:scale-95 duration-150 py-2" href="/payroll/periods">
       <span class="material-symbols-outlined">receipt_long</span>
-      <span class="font-label-sm text-label-sm">Payroll</span>
+      <span class="font-label-sm text-label-sm">{{ __('common.nav_payroll') }}</span>
     </a>
   @endif
   <a class="flex flex-col items-center justify-center text-primary bg-secondary-fixed rounded-xl px-3 py-1 transition-transform active:scale-95 duration-150" href="{{ route('finance.expenses.index') }}">
     <span class="material-symbols-outlined">account_balance_wallet</span>
-    <span class="font-label-sm text-label-sm">Expenses</span>
+    <span class="font-label-sm text-label-sm">Pengeluaran</span>
   </a>
   <a class="flex flex-col items-center justify-center text-on-surface-variant transition-transform active:scale-95 duration-150 py-2" href="/profile">
     <span class="material-symbols-outlined">person</span>
-    <span class="font-label-sm text-label-sm">Profile</span>
+    <span class="font-label-sm text-label-sm">{{ __('common.nav_profile') }}</span>
   </a>
 </nav>
 

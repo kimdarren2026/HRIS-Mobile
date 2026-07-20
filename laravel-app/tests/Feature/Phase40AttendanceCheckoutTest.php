@@ -269,7 +269,7 @@ class Phase40AttendanceCheckoutTest extends TestCase
         $this->actingAs($this->employeeUser)
             ->get('/attendance/history')
             ->assertOk()
-            ->assertSee('05:30 PM');
+            ->assertSee('17:30');
     }
 
     public function test_history_shows_checkout_coords_when_present(): void

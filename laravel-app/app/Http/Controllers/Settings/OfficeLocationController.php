@@ -49,7 +49,7 @@ class OfficeLocationController extends Controller
                 .($officeLocation->is_active ? 'yes' : 'no').').'
         );
 
-        return redirect()->route('settings.index')->with('success', 'Office location created successfully.');
+        return redirect()->route('settings.index')->with('success', 'Lokasi kantor berhasil dibuat.');
     }
 
     public function edit(OfficeLocation $officeLocation): View
@@ -79,7 +79,7 @@ class OfficeLocationController extends Controller
                 .($officeLocation->is_active ? 'yes' : 'no').').'
         );
 
-        return redirect()->route('settings.index')->with('success', 'Office location updated successfully.');
+        return redirect()->route('settings.index')->with('success', 'Lokasi kantor berhasil diperbarui.');
     }
 
     private function validatedData(Request $request, ?OfficeLocation $officeLocation = null): array

@@ -47,7 +47,7 @@ class LeaveTypeSettingsController extends Controller
             ['name' => $leaveType->name, 'deducts_balance' => $leaveType->deducts_balance, 'counts_calendar_days' => $leaveType->counts_calendar_days],
         );
 
-        return redirect()->route('settings.leave-types.index')->with('success', 'Leave type created.');
+        return redirect()->route('settings.leave-types.index')->with('success', 'Jenis cuti berhasil dibuat.');
     }
 
     public function edit(LeaveType $leaveType): View
@@ -80,7 +80,7 @@ class LeaveTypeSettingsController extends Controller
             ['name' => $leaveType->name, 'deducts_balance' => $leaveType->deducts_balance, 'counts_calendar_days' => $leaveType->counts_calendar_days],
         );
 
-        return redirect()->route('settings.leave-types.index')->with('success', 'Leave type updated.');
+        return redirect()->route('settings.leave-types.index')->with('success', 'Jenis cuti berhasil diperbarui.');
     }
 
     public function destroy(LeaveType $leaveType): RedirectResponse
@@ -104,6 +104,6 @@ class LeaveTypeSettingsController extends Controller
             null,
         );
 
-        return redirect()->route('settings.leave-types.index')->with('success', 'Leave type deleted.');
+        return redirect()->route('settings.leave-types.index')->with('success', 'Jenis cuti berhasil dihapus.');
     }
 }

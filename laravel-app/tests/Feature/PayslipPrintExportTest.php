@@ -93,7 +93,7 @@ class PayslipPrintExportTest extends TestCase
         $this->actingAs($this->employeeUser)
             ->get("/my/payroll/{$this->ownRecord->id}/print")
             ->assertOk()
-            ->assertSee('PAYSLIP')
+            ->assertSee('SLIP GAJI')
             ->assertSee($this->calculatedPeriod->name);
     }
 
@@ -153,10 +153,10 @@ class PayslipPrintExportTest extends TestCase
 
         $response->assertSee($this->employee->nik);
         $response->assertSee($this->employeeUser->name);
-        $response->assertSee('Basic Salary');
-        $response->assertSee('NET SALARY');
-        $response->assertSee('Attendance Days');
-        $response->assertSee('Leave Days');
+        $response->assertSee('Gaji Pokok');
+        $response->assertSee('GAJI BERSIH');
+        $response->assertSee('Hari Hadir');
+        $response->assertSee('Hari Cuti');
     }
 
     // ── CSV Export — access ───────────────────────────────────────────────────

@@ -1,7 +1,7 @@
-<!DOCTYPE html><html class="light" lang="en"><head>
+<!DOCTYPE html><html class="light" lang="id"><head>
 <meta charset="utf-8">
 <meta content="width=device-width, initial-scale=1.0" name="viewport">
-<title>Payroll Periods - HRIS Mobile App</title>
+<title>Periode Penggajian - HRIS Mobile App</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
@@ -115,7 +115,7 @@
     <button class="transition-colors duration-200 active:opacity-70 text-primary p-1" onclick="window.location.href='/finance/dashboard'">
       <span class="material-symbols-outlined">menu</span>
     </button>
-    <h1 class="font-headline-md text-headline-md font-bold text-primary">Payroll Periods</h1>
+    <h1 class="font-headline-md text-headline-md font-bold text-primary">Periode Penggajian</h1>
   </div>
 </header>
 
@@ -142,12 +142,12 @@
   <section class="grid grid-cols-2 gap-unit-sm">
     <div class="col-span-2 bg-white p-4 rounded-xl border border-border shadow-sm flex flex-col justify-between h-28 relative overflow-hidden">
       <div class="z-10">
-        <p class="font-label-md text-label-md text-on-surface-variant mb-1">Total Periods</p>
+        <p class="font-label-md text-label-md text-on-surface-variant mb-1">Total Periode</p>
         <h2 class="font-headline-lg text-headline-lg text-primary">{{ $summary['total_periods'] }}</h2>
       </div>
       <div class="z-10 flex items-center text-on-surface-variant font-label-sm text-label-sm gap-1">
         <span class="material-symbols-outlined text-[14px]">calendar_today</span>
-        <span>{{ $summary['draft_count'] }} Draft · {{ $summary['calculated_count'] }} Calculated</span>
+        <span>{{ $summary['draft_count'] }} Draf · {{ $summary['calculated_count'] }} Terhitung</span>
       </div>
       <div class="absolute -right-4 -bottom-4 text-surface-container-high scale-150">
         <span class="material-symbols-outlined text-[96px] opacity-10">receipt_long</span>
@@ -161,44 +161,44 @@
     <button id="toggleCreateForm" onclick="document.getElementById('createForm').classList.toggle('hidden')"
       class="w-full bg-primary-container text-on-primary py-3.5 rounded-xl font-label-md text-label-md flex items-center justify-center gap-2 active:scale-[0.98] transition-transform">
       <span class="material-symbols-outlined">add_circle</span>
-      Create New Period
+      Buat Periode Baru
     </button>
 
     {{-- Create Period Form --}}
     <div id="createForm" class="hidden bg-white rounded-xl border border-border shadow-sm p-4 flex flex-col gap-unit-md">
-      <h3 class="font-headline-md text-headline-md text-on-surface">New Payroll Period</h3>
+      <h3 class="font-headline-md text-headline-md text-on-surface">Periode Penggajian Baru</h3>
       <form method="POST" action="{{ route('payroll.periods.store') }}" class="flex flex-col gap-unit-md">
         @csrf
         <div class="flex flex-col gap-1">
-          <label class="font-label-md text-label-md text-on-surface-variant">Period Name *</label>
-          <input type="text" name="name" value="{{ old('name') }}" placeholder="e.g. July 2026 Payroll"
+          <label class="font-label-md text-label-md text-on-surface-variant">Nama Periode *</label>
+          <input type="text" name="name" value="{{ old('name') }}" placeholder="cth. Penggajian Juli 2026"
             class="w-full bg-white border border-border rounded-xl px-4 py-3 text-body-md font-body-md focus:ring-1 focus:ring-primary outline-none" required maxlength="100">
         </div>
         <div class="grid grid-cols-2 gap-unit-sm">
           <div class="flex flex-col gap-1">
-            <label class="font-label-md text-label-md text-on-surface-variant">Start Date *</label>
+            <label class="font-label-md text-label-md text-on-surface-variant">Tanggal Mulai *</label>
             <input type="date" name="start_date" value="{{ old('start_date') }}"
               class="w-full bg-white border border-border rounded-xl px-3 py-3 text-body-md font-body-md focus:ring-1 focus:ring-primary outline-none" required>
           </div>
           <div class="flex flex-col gap-1">
-            <label class="font-label-md text-label-md text-on-surface-variant">End Date *</label>
+            <label class="font-label-md text-label-md text-on-surface-variant">Tanggal Selesai *</label>
             <input type="date" name="end_date" value="{{ old('end_date') }}"
               class="w-full bg-white border border-border rounded-xl px-3 py-3 text-body-md font-body-md focus:ring-1 focus:ring-primary outline-none" required>
           </div>
         </div>
         <div class="flex flex-col gap-1">
-          <label class="font-label-md text-label-md text-on-surface-variant">Pay Date (optional)</label>
+          <label class="font-label-md text-label-md text-on-surface-variant">Tanggal Bayar (opsional)</label>
           <input type="date" name="pay_date" value="{{ old('pay_date') }}"
             class="w-full bg-white border border-border rounded-xl px-4 py-3 text-body-md font-body-md focus:ring-1 focus:ring-primary outline-none">
         </div>
         <div class="grid grid-cols-2 gap-unit-sm pt-2">
           <button type="button" onclick="document.getElementById('createForm').classList.add('hidden')"
             class="border border-border text-on-surface-variant py-3 rounded-xl font-label-md text-label-md active:bg-surface-variant">
-            Cancel
+            Batal
           </button>
           <button type="submit"
             class="bg-primary text-white py-3 rounded-xl font-label-md text-label-md active:opacity-90">
-            Create
+            Buat
           </button>
         </div>
       </form>
@@ -224,12 +224,12 @@
             default             => 'bg-gray-100 text-gray-600',
         };
         $badgeLabel = match($period->status) {
-            'DRAFT'             => 'Draft',
-            'CALCULATED'        => 'Calculated',
-            'HR_REVIEW'         => 'HR Review',
-            'FINANCE_APPROVAL'  => 'Finance Approval',
-            'LOCKED'            => 'Locked',
-            'PAID'              => 'Paid',
+            'DRAFT'             => 'Draf',
+            'CALCULATED'        => 'Terhitung',
+            'HR_REVIEW'         => 'Tinjauan HR',
+            'FINANCE_APPROVAL'  => 'Persetujuan Keuangan',
+            'LOCKED'            => 'Terkunci',
+            'PAID'              => 'Dibayar',
             default             => $period->status,
         };
         $canCalculate = in_array(auth()->user()->role, ['finance', 'super_admin']) && $period->status === 'DRAFT';
@@ -240,7 +240,7 @@
           <div>
             <h3 class="font-headline-md text-headline-md text-on-surface mb-1">{{ $period->name }}</h3>
             <p class="font-body-md text-body-md text-on-surface-variant">
-              {{ $period->start_date->format('M d') }} – {{ $period->end_date->format('M d, Y') }}
+              {{ $period->start_date->translatedFormat('M d') }} – {{ $period->end_date->translatedFormat('M d, Y') }}
             </p>
           </div>
           <span class="{{ $badgeClass }} px-3 py-1 rounded-full font-status-badge text-status-badge">{{ $badgeLabel }}</span>
@@ -249,12 +249,12 @@
         <div class="flex flex-col gap-1">
           <div class="flex items-center gap-1.5 font-label-md text-label-md text-on-surface-variant">
             <span class="material-symbols-outlined text-[18px]">badge</span>
-            {{ $recordCount }} {{ Str::plural('Employee', $recordCount) }}
+            {{ $recordCount }} Pegawai
           </div>
           @if($recordCount > 0)
           <div class="flex items-center gap-1.5 font-label-md text-label-md text-on-surface-variant">
             <span class="material-symbols-outlined text-[18px]">payments</span>
-            Total Net: Rp {{ number_format($totalNet, 0, ',', '.') }}
+            Total Bersih: Rp {{ number_format($totalNet, 0, ',', '.') }}
           </div>
           @endif
         </div>
@@ -262,21 +262,21 @@
         <div class="flex gap-2 pt-2 border-t border-border">
           <a href="{{ route('payroll.periods.show', $period) }}"
             class="flex-1 text-center bg-surface-container-low text-primary py-2 rounded-lg font-label-sm text-label-sm active:bg-surface-variant">
-            View
+            Lihat
           </a>
           @if($canCalculate)
             <form method="POST" action="{{ route('payroll.periods.calculate', $period) }}" class="flex-1"
-              onsubmit="return confirm('Run payroll calculation for {{ addslashes($period->name) }}?')">
+              onsubmit="return confirm('Jalankan perhitungan penggajian untuk {{ addslashes($period->name) }}?')">
               @csrf
               <button type="submit" class="w-full bg-primary text-white py-2 rounded-lg font-label-sm text-label-sm active:opacity-90">
-                Calculate
+                Hitung
               </button>
             </form>
           @elseif($canSubmitHR)
             <form method="POST" action="{{ route('payroll.periods.submit-hr-review', $period) }}" class="flex-1">
               @csrf
               <button type="submit" class="w-full bg-secondary text-white py-2 rounded-lg font-label-sm text-label-sm active:opacity-90">
-                Submit Review
+                Kirim untuk Ditinjau
               </button>
             </form>
           @endif
@@ -285,9 +285,9 @@
     @empty
       <div class="bg-white rounded-xl border border-border shadow-sm p-8 flex flex-col items-center gap-3 text-center">
         <span class="material-symbols-outlined text-[48px] text-on-surface-variant opacity-30">receipt_long</span>
-        <p class="font-body-md text-body-md text-on-surface-variant">No payroll periods yet.</p>
+        <p class="font-body-md text-body-md text-on-surface-variant">Belum ada periode penggajian.</p>
         @if(in_array(auth()->user()->role, ['finance', 'super_admin']))
-          <p class="font-label-sm text-label-sm text-on-surface-variant">Tap "Create New Period" to get started.</p>
+          <p class="font-label-sm text-label-sm text-on-surface-variant">Ketuk "Buat Periode Baru" untuk memulai.</p>
         @endif
       </div>
     @endforelse
@@ -297,14 +297,14 @@
   @if($periods->hasPages())
     <div class="flex justify-center gap-unit-sm pt-2">
       @if($periods->onFirstPage())
-        <span class="px-4 py-2 rounded-xl border border-border text-on-surface-variant font-label-md text-label-md opacity-40">Prev</span>
+        <span class="px-4 py-2 rounded-xl border border-border text-on-surface-variant font-label-md text-label-md opacity-40">Sebelumnya</span>
       @else
-        <a href="{{ $periods->previousPageUrl() }}" class="px-4 py-2 rounded-xl border border-border text-primary font-label-md text-label-md">Prev</a>
+        <a href="{{ $periods->previousPageUrl() }}" class="px-4 py-2 rounded-xl border border-border text-primary font-label-md text-label-md">Sebelumnya</a>
       @endif
       @if($periods->hasMorePages())
-        <a href="{{ $periods->nextPageUrl() }}" class="px-4 py-2 rounded-xl border border-border text-primary font-label-md text-label-md">Next</a>
+        <a href="{{ $periods->nextPageUrl() }}" class="px-4 py-2 rounded-xl border border-border text-primary font-label-md text-label-md">Berikutnya</a>
       @else
-        <span class="px-4 py-2 rounded-xl border border-border text-on-surface-variant font-label-md text-label-md opacity-40">Next</span>
+        <span class="px-4 py-2 rounded-xl border border-border text-on-surface-variant font-label-md text-label-md opacity-40">Berikutnya</span>
       @endif
     </div>
   @endif
@@ -316,31 +316,31 @@
   @php($role = auth()->user()->role)
   <a class="flex flex-col items-center justify-center text-on-surface-variant transition-transform active:scale-95 duration-150 py-2" href="{{ $role === 'finance' ? '/finance/dashboard' : '/admin/dashboard' }}">
     <span class="material-symbols-outlined">home</span>
-    <span class="font-label-sm text-label-sm">Home</span>
+    <span class="font-label-sm text-label-sm">{{ __('common.nav_home') }}</span>
   </a>
   @if(in_array($role, ['admin_hr', 'super_admin']))
   <a class="flex flex-col items-center justify-center text-on-surface-variant transition-transform active:scale-95 duration-150 py-2" href="/hr/employees">
     <span class="material-symbols-outlined">badge</span>
-    <span class="font-label-sm text-label-sm">Employees</span>
+    <span class="font-label-sm text-label-sm">{{ __('common.nav_employees') }}</span>
   </a>
   <a class="flex flex-col items-center justify-center text-on-surface-variant transition-transform active:scale-95 duration-150 py-2" href="/hr/approval-queue">
     <span class="material-symbols-outlined">fact_check</span>
-    <span class="font-label-sm text-label-sm">Approvals</span>
+    <span class="font-label-sm text-label-sm">{{ __('common.nav_approvals') }}</span>
   </a>
   @endif
   <a class="flex flex-col items-center justify-center text-primary bg-secondary-fixed rounded-xl px-3 py-1 transition-transform active:scale-95 duration-150" href="/payroll/periods">
     <span class="material-symbols-outlined">receipt_long</span>
-    <span class="font-label-sm text-label-sm">Payroll</span>
+    <span class="font-label-sm text-label-sm">{{ __('common.nav_payroll') }}</span>
   </a>
   @if($role === 'finance')
   <a class="flex flex-col items-center justify-center text-on-surface-variant transition-transform active:scale-95 duration-150 py-2" href="/reports">
     <span class="material-symbols-outlined">assessment</span>
-    <span class="font-label-sm text-label-sm">Reports</span>
+    <span class="font-label-sm text-label-sm">{{ __('common.nav_reports') }}</span>
   </a>
   @endif
   <a class="flex flex-col items-center justify-center text-on-surface-variant transition-transform active:scale-95 duration-150 py-2" href="/profile">
     <span class="material-symbols-outlined">person</span>
-    <span class="font-label-sm text-label-sm">Profile</span>
+    <span class="font-label-sm text-label-sm">{{ __('common.nav_profile') }}</span>
   </a>
 </nav>
 

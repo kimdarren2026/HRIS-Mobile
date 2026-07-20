@@ -1,7 +1,7 @@
-<!DOCTYPE html><html class="light" lang="en"><head>
+<!DOCTYPE html><html class="light" lang="id"><head>
 <meta charset="utf-8">
 <meta content="width=device-width, initial-scale=1.0" name="viewport">
-<title>{{ isset($employee) ? 'Edit Employee' : 'Add Employee' }} - HRIS Mobile App</title>
+<title>{{ isset($employee) ? 'Ubah Pegawai' : 'Tambah Pegawai' }} - HRIS Mobile App</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
@@ -49,14 +49,14 @@ tailwind.config = {
   <a href="{{ isset($employee) ? route('employees.show', $employee) : route('employees.index') }}" class="text-primary p-1">
     <span class="material-symbols-outlined">arrow_back</span>
   </a>
-  <h1 class="font-headline-md text-headline-md font-bold text-primary">{{ isset($employee) ? 'Edit Employee' : 'Add Employee' }}</h1>
+  <h1 class="font-headline-md text-headline-md font-bold text-primary">{{ isset($employee) ? 'Ubah Pegawai' : 'Tambah Pegawai' }}</h1>
 </header>
 
 <main class="mt-16 px-container-margin pt-unit-lg pb-unit-xl">
 
   @if($errors->any())
     <div class="bg-red-50 border border-red-200 text-danger rounded-xl px-4 py-3 mb-unit-md">
-      <p class="font-label-md text-label-md mb-1">Please fix the following errors:</p>
+      <p class="font-label-md text-label-md mb-1">Perbaiki kesalahan berikut:</p>
       <ul class="list-disc list-inside space-y-0.5">
         @foreach($errors->all() as $error)
           <li class="font-body-md text-body-md">{{ $error }}</li>
@@ -76,10 +76,10 @@ tailwind.config = {
     {{-- User account section (create only) --}}
     @unless(isset($employee))
     <section class="bg-surface-container-lowest rounded-xl border border-border p-unit-md shadow-sm space-y-unit-md">
-      <h2 class="font-label-md text-label-md text-outline uppercase tracking-widest">Account Details</h2>
+      <h2 class="font-label-md text-label-md text-outline uppercase tracking-widest">Detail Akun</h2>
 
       <div>
-        <label class="field-label" for="name">Full Name *</label>
+        <label class="field-label" for="name">Nama Lengkap *</label>
         <input class="field-input" id="name" name="name" type="text" value="{{ old('name') }}" placeholder="John Doe" required>
         @error('name') <p class="field-error">{{ $message }}</p> @enderror
       </div>
@@ -92,7 +92,7 @@ tailwind.config = {
 
       <div>
         <label class="field-label" for="password">Password *</label>
-        <input class="field-input" id="password" name="password" type="password" placeholder="Min 8 characters" required>
+        <input class="field-input" id="password" name="password" type="password" placeholder="Minimal 8 karakter" required>
         @error('password') <p class="field-error">{{ $message }}</p> @enderror
       </div>
     </section>
@@ -100,20 +100,20 @@ tailwind.config = {
 
     {{-- Employment section --}}
     <section class="bg-surface-container-lowest rounded-xl border border-border p-unit-md shadow-sm space-y-unit-md">
-      <h2 class="font-label-md text-label-md text-outline uppercase tracking-widest">Employment Details</h2>
+      <h2 class="font-label-md text-label-md text-outline uppercase tracking-widest">Detail Kepegawaian</h2>
 
       <div>
-        <label class="field-label" for="nik">NIK (Employee ID) *</label>
+        <label class="field-label" for="nik">NIK (ID Pegawai) *</label>
         <input class="field-input" id="nik" name="nik" type="text"
           value="{{ old('nik', $employee->nik ?? '') }}" placeholder="EMP-2026-001" required>
         @error('nik') <p class="field-error">{{ $message }}</p> @enderror
       </div>
 
       <div>
-        <label class="field-label" for="department_id">Department *</label>
+        <label class="field-label" for="department_id">Departemen *</label>
         <div class="relative">
           <select class="field-input appearance-none pr-8" id="department_id" name="department_id" required>
-            <option value="">Select Department</option>
+            <option value="">Pilih Departemen</option>
             @foreach($departments as $dept)
               <option value="{{ $dept->id }}" {{ old('department_id', $employee->department_id ?? '') == $dept->id ? 'selected' : '' }}>
                 {{ $dept->name }}
@@ -126,10 +126,10 @@ tailwind.config = {
       </div>
 
       <div>
-        <label class="field-label" for="position_id">Position *</label>
+        <label class="field-label" for="position_id">Posisi *</label>
         <div class="relative">
           <select class="field-input appearance-none pr-8" id="position_id" name="position_id" required>
-            <option value="">Select Position</option>
+            <option value="">Pilih Posisi</option>
             @foreach($positions as $pos)
               <option value="{{ $pos->id }}" {{ old('position_id', $employee->position_id ?? '') == $pos->id ? 'selected' : '' }}>
                 {{ $pos->name }} ({{ $pos->department->name }})
@@ -142,7 +142,7 @@ tailwind.config = {
       </div>
 
       <div>
-        <label class="field-label" for="join_date">Join Date *</label>
+        <label class="field-label" for="join_date">Tanggal Bergabung *</label>
         <input class="field-input" id="join_date" name="join_date" type="date"
           value="{{ old('join_date', isset($employee) ? $employee->join_date?->format('Y-m-d') : '') }}" required>
         @error('join_date') <p class="field-error">{{ $message }}</p> @enderror
@@ -152,9 +152,12 @@ tailwind.config = {
         <label class="field-label" for="employment_status">Status *</label>
         <div class="relative">
           <select class="field-input appearance-none pr-8" id="employment_status" name="employment_status" required>
+            @php
+              $statusLabels = ['active' => 'Aktif', 'probation' => 'Masa Percobaan', 'resigned' => 'Mengundurkan Diri', 'terminated' => 'Diberhentikan'];
+            @endphp
             @foreach(['active','probation','resigned','terminated'] as $s)
               <option value="{{ $s }}" {{ old('employment_status', $employee->employment_status ?? 'active') === $s ? 'selected' : '' }}>
-                {{ ucfirst($s) }}
+                {{ $statusLabels[$s] }}
               </option>
             @endforeach
           </select>
@@ -166,39 +169,39 @@ tailwind.config = {
 
     {{-- Contact section --}}
     <section class="bg-surface-container-lowest rounded-xl border border-border p-unit-md shadow-sm space-y-unit-md">
-      <h2 class="font-label-md text-label-md text-outline uppercase tracking-widest">Contact</h2>
+      <h2 class="font-label-md text-label-md text-outline uppercase tracking-widest">Kontak</h2>
 
       <div>
-        <label class="field-label" for="phone_number">Phone Number *</label>
+        <label class="field-label" for="phone_number">Nomor Telepon *</label>
         <input class="field-input" id="phone_number" name="phone_number" type="tel"
           value="{{ old('phone_number', $employee->phone_number ?? '') }}" placeholder="+62812345678" required>
         @error('phone_number') <p class="field-error">{{ $message }}</p> @enderror
       </div>
 
       <div>
-        <label class="field-label" for="address">Address</label>
-        <textarea class="field-input" id="address" name="address" rows="3" placeholder="Street address...">{{ old('address', $employee->address ?? '') }}</textarea>
+        <label class="field-label" for="address">Alamat</label>
+        <textarea class="field-input" id="address" name="address" rows="3" placeholder="Alamat lengkap...">{{ old('address', $employee->address ?? '') }}</textarea>
         @error('address') <p class="field-error">{{ $message }}</p> @enderror
       </div>
     </section>
 
     {{-- Bank section --}}
     <section class="bg-surface-container-lowest rounded-xl border border-border p-unit-md shadow-sm space-y-unit-md">
-      <h2 class="font-label-md text-label-md text-outline uppercase tracking-widest">Bank Account</h2>
+      <h2 class="font-label-md text-label-md text-outline uppercase tracking-widest">Rekening Bank</h2>
 
       <div>
-        <label class="field-label" for="bank_name">Bank Name</label>
+        <label class="field-label" for="bank_name">Nama Bank</label>
         <input class="field-input" id="bank_name" name="bank_name" type="text"
           value="{{ old('bank_name', $employee->bank_name ?? '') }}" placeholder="BCA, Mandiri, BNI...">
         @error('bank_name') <p class="field-error">{{ $message }}</p> @enderror
       </div>
 
       <div>
-        <label class="field-label" for="bank_account_number">Account Number</label>
+        <label class="field-label" for="bank_account_number">Nomor Rekening</label>
         <input class="field-input" id="bank_account_number" name="bank_account_number" type="text"
           value="{{ old('bank_account_number') }}" placeholder="1234567890">
         @if(isset($employee) && $employee->bank_account_number)
-          <p class="text-xs text-on-surface-variant mt-1">Leave blank to keep the existing account number on file.</p>
+          <p class="text-xs text-on-surface-variant mt-1">Biarkan kosong untuk mempertahankan nomor rekening yang sudah tersimpan.</p>
         @endif
         @error('bank_account_number') <p class="field-error">{{ $message }}</p> @enderror
       </div>
@@ -207,7 +210,7 @@ tailwind.config = {
     <button type="submit"
       class="w-full h-14 bg-primary text-on-primary font-semibold rounded-xl shadow-lg flex items-center justify-center gap-2 hover:opacity-90 active:scale-95 transition-all">
       <span class="material-symbols-outlined text-[20px]">{{ isset($employee) ? 'save' : 'person_add' }}</span>
-      {{ isset($employee) ? 'Save Changes' : 'Create Employee' }}
+      {{ isset($employee) ? 'Simpan Perubahan' : 'Tambah Pegawai' }}
     </button>
 
   </form>

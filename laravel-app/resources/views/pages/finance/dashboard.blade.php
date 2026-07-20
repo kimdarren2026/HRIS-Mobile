@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 
-<html class="light" lang="en"><head>
+<html class="light" lang="id"><head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Finance Payroll Dashboard - HRIS Mobile App</title>
+<title>Dasbor Penggajian Keuangan - HRIS Mobile App</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
@@ -141,25 +141,25 @@
 <main class="pt-20 px-container-margin max-w-[390px] mx-auto pb-32">
 <!-- Greeting Section -->
 <section class="mb-unit-lg">
-<h2 class="font-headline-lg text-headline-lg text-on-surface">Hi, {{ auth()->user()->name }}</h2>
-<p class="font-body-md text-body-md text-on-surface-variant">{{ now()->format('l, F d, Y') }}</p>
+<h2 class="font-headline-lg text-headline-lg text-on-surface">Hai, {{ auth()->user()->name }}</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">{{ now()->translatedFormat('l, F d, Y') }}</p>
 </section>
 <!-- Summary Cards 2x2 Grid -->
 <section class="grid grid-cols-2 gap-card-gap mb-unit-lg">
 <div class="bg-surface border border-border p-unit-md rounded-xl shadow-sm">
-<p class="font-label-sm text-label-sm text-on-surface-variant mb-1">Latest Period</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant mb-1">Periode Terakhir</p>
 <p class="font-headline-md text-headline-md text-primary truncate">{{ $latestPeriods->first()?->name ?? 'N/A' }}</p>
 </div>
 <div class="bg-surface border border-border p-unit-md rounded-xl shadow-sm">
-<p class="font-label-sm text-label-sm text-on-surface-variant mb-1">Total Employees</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant mb-1">Total Pegawai</p>
 <p class="font-headline-md text-headline-md text-primary">{{ $totalEmployees }}</p>
 </div>
 <div class="bg-surface border border-border p-unit-md rounded-xl shadow-sm">
-<p class="font-label-sm text-label-sm text-on-surface-variant mb-1">Pending Approval</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant mb-1">Menunggu Persetujuan</p>
 <p class="font-headline-md text-headline-md text-warning">{{ $statusCounts['FINANCE_APPROVAL'] }}</p>
 </div>
 <div class="bg-surface border border-border p-unit-md rounded-xl shadow-sm">
-<p class="font-label-sm text-label-sm text-on-surface-variant mb-1">Paid Periods</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant mb-1">Periode Terbayar</p>
 <p class="font-headline-md text-headline-md text-success">{{ $statusCounts['PAID'] }}</p>
 </div>
 </section>
@@ -167,14 +167,24 @@
 <section class="mb-unit-lg">
 <button class="w-full py-4 bg-primary text-on-primary font-headline-md text-headline-md rounded-xl shadow-sm active:scale-[0.98] transition-transform flex justify-center items-center gap-2" onclick="window.location.href='/payroll/periods'">
 <span class="material-symbols-outlined">payments</span>
-                Process Current Payroll
+                Proses Penggajian Saat Ini
             </button>
 </section>
 <!-- Payroll Status Flow Section - Revised to Vertical -->
 <section class="mb-unit-lg">
-<h3 class="font-label-md text-label-md text-on-surface-variant mb-4 uppercase tracking-widest">Payroll Status Flow</h3>
+<h3 class="font-label-md text-label-md text-on-surface-variant mb-4 uppercase tracking-widest">Alur Status Penggajian</h3>
 <div class="bg-surface border border-border rounded-xl p-unit-md shadow-sm">
 <div class="space-y-0">
+@php
+    $payrollStatusLabels = [
+        'DRAFT'             => 'Draf',
+        'CALCULATED'        => 'Terhitung',
+        'HR_REVIEW'         => 'Tinjauan HR',
+        'FINANCE_APPROVAL'  => 'Persetujuan Keuangan',
+        'LOCKED'            => 'Terkunci',
+        'PAID'              => 'Dibayar',
+    ];
+@endphp
 <!-- Step 1: Draft (Completed) -->
 <div class="flex gap-4">
 <div class="flex flex-col items-center">
@@ -184,7 +194,7 @@
 <div class="w-0.5 h-6 bg-success/30"></div>
 </div>
 <div class="pb-4">
-<p class="font-label-md text-label-md text-on-surface-variant">Draft</p>
+<p class="font-label-md text-label-md text-on-surface-variant">Draf</p>
 </div>
 </div>
 <!-- Step 2: Calculated (Completed) -->
@@ -196,7 +206,7 @@
 <div class="w-0.5 h-6 bg-success/30"></div>
 </div>
 <div class="pb-4">
-<p class="font-label-md text-label-md text-on-surface-variant">Calculated</p>
+<p class="font-label-md text-label-md text-on-surface-variant">Terhitung</p>
 </div>
 </div>
 <!-- Step 3: HR Review (Completed) -->
@@ -208,7 +218,7 @@
 <div class="w-0.5 h-6 bg-primary"></div>
 </div>
 <div class="pb-4">
-<p class="font-label-md text-label-md text-on-surface-variant">HR Review</p>
+<p class="font-label-md text-label-md text-on-surface-variant">Tinjauan HR</p>
 </div>
 </div>
 <!-- Step 4: Finance Approval (Active) -->
@@ -220,8 +230,8 @@
 <div class="w-0.5 h-8 bg-outline-variant"></div>
 </div>
 <div class="pb-6">
-<p class="font-headline-md text-headline-md text-primary -mt-1">Finance Approval</p>
-<p class="font-body-md text-body-md text-on-surface-variant">Awaiting your confirmation</p>
+<p class="font-headline-md text-headline-md text-primary -mt-1">Persetujuan Keuangan</p>
+<p class="font-body-md text-body-md text-on-surface-variant">Menunggu konfirmasi Anda</p>
 </div>
 </div>
 <!-- Step 5: Locked -->
@@ -233,7 +243,7 @@
 <div class="w-0.5 h-6 bg-outline-variant"></div>
 </div>
 <div class="pb-4">
-<p class="font-label-md text-label-md text-on-surface-variant opacity-50">Locked</p>
+<p class="font-label-md text-label-md text-on-surface-variant opacity-50">Terkunci</p>
 </div>
 </div>
 <!-- Step 6: Paid -->
@@ -244,7 +254,7 @@
 </div>
 </div>
 <div>
-<p class="font-label-md text-label-md text-on-surface-variant opacity-50">Paid</p>
+<p class="font-label-md text-label-md text-on-surface-variant opacity-50">Dibayar</p>
 </div>
 </div>
 </div>
@@ -252,12 +262,12 @@
 </section>
 <!-- Payroll Status Summary -->
 <section class="mb-unit-lg">
-<h3 class="font-label-md text-label-md text-on-surface-variant mb-3 uppercase tracking-widest">Status Summary</h3>
+<h3 class="font-label-md text-label-md text-on-surface-variant mb-3 uppercase tracking-widest">Ringkasan Status</h3>
 <div class="bg-surface border border-border rounded-xl p-unit-md shadow-sm grid grid-cols-3 gap-3">
 @foreach ([['DRAFT','outline'],['CALCULATED','primary'],['HR_REVIEW','secondary'],['FINANCE_APPROVAL','warning'],['LOCKED','tertiary'],['PAID','success']] as [$status, $color])
 <div class="text-center">
 <p class="font-headline-md text-{{ $color }}">{{ $statusCounts[$status] }}</p>
-<p class="font-label-sm text-label-sm text-on-surface-variant">{{ str_replace('_',' ', $status) }}</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant">{{ $payrollStatusLabels[$status] }}</p>
 </div>
 @endforeach
 </div>
@@ -265,11 +275,11 @@
 <!-- Recent Payroll Periods Section -->
 <section class="mb-unit-xl">
 <div class="flex justify-between items-center mb-4">
-<h3 class="font-label-md text-label-md text-on-surface-variant uppercase tracking-widest">Recent Payroll Periods</h3>
-<a class="text-primary font-label-md text-label-md hover:underline" href="/payroll/periods">See All</a>
+<h3 class="font-label-md text-label-md text-on-surface-variant uppercase tracking-widest">Periode Penggajian Terbaru</h3>
+<a class="text-primary font-label-md text-label-md hover:underline" href="/payroll/periods">{{ __('common.action_view_all') }}</a>
 </div>
 @if ($latestPeriods->isEmpty())
-<p class="font-body-md text-body-md text-on-surface-variant text-center py-6">No payroll periods yet.</p>
+<p class="font-body-md text-body-md text-on-surface-variant text-center py-6">Belum ada periode penggajian.</p>
 @else
 <div class="space-y-card-gap">
 @foreach ($latestPeriods as $period)
@@ -277,7 +287,7 @@
 <div class="flex justify-between items-start mb-3">
 <div>
 <h4 class="font-headline-md text-headline-md text-on-surface">{{ $period->name }}</h4>
-<p class="font-body-md text-body-md text-on-surface-variant">{{ $period->start_date->format('M d') }} - {{ $period->end_date->format('M d, Y') }}</p>
+<p class="font-body-md text-body-md text-on-surface-variant">{{ $period->start_date->translatedFormat('M d') }} - {{ $period->end_date->translatedFormat('M d, Y') }}</p>
 </div>
 @php
 $badgeClass = match($period->status) {
@@ -288,19 +298,19 @@ $badgeClass = match($period->status) {
     default            => 'bg-surface-container-high text-on-surface-variant',
 };
 @endphp
-<span class="px-3 py-1 {{ $badgeClass }} rounded-full font-status-badge text-status-badge">{{ str_replace('_', ' ', $period->status) }}</span>
+<span class="px-3 py-1 {{ $badgeClass }} rounded-full font-status-badge text-status-badge">{{ $payrollStatusLabels[$period->status] }}</span>
 </div>
 <div class="grid grid-cols-2 gap-4 mb-3">
 <div>
-<p class="font-label-sm text-label-sm text-on-surface-variant">Records</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Data Pegawai</p>
 <p class="font-body-lg text-body-lg font-semibold">{{ $period->payrollRecords()->count() }}</p>
 </div>
 <div>
-<p class="font-label-sm text-label-sm text-on-surface-variant">Pay Date</p>
-<p class="font-body-lg text-body-lg font-semibold">{{ $period->pay_date?->format('M d, Y') ?? '—' }}</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Tanggal Bayar</p>
+<p class="font-body-lg text-body-lg font-semibold">{{ $period->pay_date?->translatedFormat('M d, Y') ?? '—' }}</p>
 </div>
 </div>
-<a class="block w-full py-2 text-center border border-primary text-primary font-label-md text-label-md rounded-lg active:scale-95 transition-transform" href="/payroll/periods/{{ $period->id }}">View Details</a>
+<a class="block w-full py-2 text-center border border-primary text-primary font-label-md text-label-md rounded-lg active:scale-95 transition-transform" href="/payroll/periods/{{ $period->id }}">{{ __('common.action_view_details') }}</a>
 </div>
 @endforeach
 </div>
@@ -312,24 +322,24 @@ $badgeClass = match($period->status) {
 <section class="bg-white border border-border rounded-xl shadow-[0px_1px_2px_0px_rgba(0,0,0,0.05)] p-4 flex flex-col gap-3">
 <div class="flex items-center gap-2">
 <span class="material-symbols-outlined text-primary text-[20px]">person</span>
-<h2 class="font-semibold text-on-surface" style="font-size:16px;line-height:24px;">My Self-Service</h2>
+<h2 class="font-semibold text-on-surface" style="font-size:16px;line-height:24px;">Layanan Mandiri Saya</h2>
 </div>
 <div class="grid grid-cols-2 gap-3">
 <a href="/attendance/checkin" class="flex flex-col items-center gap-2 p-3 rounded-xl border border-outline-variant hover:bg-surface-container-low transition-colors active:scale-95">
 <span class="material-symbols-outlined text-primary">schedule</span>
-<span style="font-size:12px;font-weight:600;color:#464555;">My Attendance</span>
+<span style="font-size:12px;font-weight:600;color:#464555;">Kehadiran Saya</span>
 </a>
 <a href="/leave/request" class="flex flex-col items-center gap-2 p-3 rounded-xl border border-outline-variant hover:bg-surface-container-low transition-colors active:scale-95">
 <span class="material-symbols-outlined text-primary">event_note</span>
-<span style="font-size:12px;font-weight:600;color:#464555;">My Leave</span>
+<span style="font-size:12px;font-weight:600;color:#464555;">Cuti Saya</span>
 </a>
 <a href="/my/payroll" class="flex flex-col items-center gap-2 p-3 rounded-xl border border-outline-variant hover:bg-surface-container-low transition-colors active:scale-95">
 <span class="material-symbols-outlined text-primary">receipt_long</span>
-<span style="font-size:12px;font-weight:600;color:#464555;">My Payslip</span>
+<span style="font-size:12px;font-weight:600;color:#464555;">Slip Gaji Saya</span>
 </a>
 <a href="/my/profile" class="flex flex-col items-center gap-2 p-3 rounded-xl border border-outline-variant hover:bg-surface-container-low transition-colors active:scale-95">
 <span class="material-symbols-outlined text-primary">account_circle</span>
-<span style="font-size:12px;font-weight:600;color:#464555;">My Profile</span>
+<span style="font-size:12px;font-weight:600;color:#464555;">Profil Saya</span>
 </a>
 </div>
 </section>
@@ -339,26 +349,26 @@ $badgeClass = match($period->status) {
 <nav class="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[390px] z-50 flex justify-around items-center h-18 pb-safe px-2 bg-surface/80 border-t border-border backdrop-blur-md shadow-[0_-1px_2px_0_rgba(0,0,0,0.05)] py-2">
 <a class="flex flex-col items-center justify-center bg-secondary-fixed text-on-secondary-fixed rounded-full px-4 py-1 active:scale-90 transition-transform duration-200" href="/finance/dashboard">
 <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">home</span>
-<span class="font-label-md text-label-md">Home</span>
+<span class="font-label-md text-label-md">{{ __('common.nav_home') }}</span>
 </a>
 <a class="flex flex-col items-center justify-center text-on-surface-variant px-2 py-1 hover:text-primary active:scale-90 transition-transform duration-200" href="/payroll/periods">
 <span class="material-symbols-outlined">payments</span>
-<span class="font-label-md text-label-md">Payroll</span>
+<span class="font-label-md text-label-md">{{ __('common.nav_payroll') }}</span>
 </a>
 <a class="flex flex-col items-center justify-center text-on-surface-variant px-2 py-1 hover:text-primary active:scale-90 transition-transform duration-200" href="/reports">
 <span class="material-symbols-outlined">assessment</span>
-<span class="font-label-md text-label-md">Reports</span>
+<span class="font-label-md text-label-md">{{ __('common.nav_reports') }}</span>
 </a>
 	<a class="flex flex-col items-center justify-center text-on-surface-variant px-2 py-1 hover:text-primary active:scale-90 transition-transform duration-200 relative" href="{{ route('notifications.index') }}">
 	<span class="material-symbols-outlined">notifications</span>
 	@if(($unreadNotificationCount ?? 0) > 0)
 	<span class="absolute -top-1 right-1 min-w-5 h-5 px-1 rounded-full bg-danger text-white text-[10px] font-bold flex items-center justify-center">{{ $unreadNotificationCount > 99 ? '99+' : $unreadNotificationCount }}</span>
 	@endif
-	<span class="font-label-md text-label-md">Notifications</span>
+	<span class="font-label-md text-label-md">{{ __('common.nav_notifications') }}</span>
 	</a>
 <a class="flex flex-col items-center justify-center text-on-surface-variant px-2 py-1 hover:text-primary active:scale-90 transition-transform duration-200" href="/profile">
 <span class="material-symbols-outlined">account_circle</span>
-<span class="font-label-md text-label-md">Profile</span>
+<span class="font-label-md text-label-md">{{ __('common.nav_profile') }}</span>
 </a>
 </nav>
 <script>

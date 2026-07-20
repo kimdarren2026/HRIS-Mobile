@@ -1,4 +1,4 @@
-<!DOCTYPE html><html class="light" lang="en"><head>
+<!DOCTYPE html><html class="light" lang="id"><head>
 <meta charset="utf-8">
 <meta content="width=device-width, initial-scale=1.0" name="viewport">
 <title>{{ $payrollPeriod->name }} - HRIS Mobile App</title>
@@ -76,25 +76,25 @@
   <div class="bg-white rounded-xl border border-border shadow-sm p-4 flex flex-col gap-3">
     <div class="flex justify-between items-start">
       <div>
-        <p class="font-label-md text-label-md text-on-surface-variant">Period</p>
+        <p class="font-label-md text-label-md text-on-surface-variant">Periode</p>
         <p class="font-body-md text-body-md text-on-surface">
-          {{ $payrollPeriod->start_date->format('M d') }} – {{ $payrollPeriod->end_date->format('M d, Y') }}
+          {{ $payrollPeriod->start_date->translatedFormat('d M') }} – {{ $payrollPeriod->end_date->translatedFormat('d M Y') }}
         </p>
       </div>
       <span class="{{ $badgeClass }} px-3 py-1 rounded-full font-status-badge text-status-badge">
-        {{ str_replace('_', ' ', $payrollPeriod->status) }}
+        {{ __('payroll.status_labels')[$payrollPeriod->status] ?? $payrollPeriod->status }}
       </span>
     </div>
     @if($payrollPeriod->pay_date)
     <div>
-      <p class="font-label-md text-label-md text-on-surface-variant">Pay Date</p>
-      <p class="font-body-md text-body-md text-on-surface">{{ $payrollPeriod->pay_date->format('M d, Y') }}</p>
+      <p class="font-label-md text-label-md text-on-surface-variant">Tanggal Bayar</p>
+      <p class="font-body-md text-body-md text-on-surface">{{ $payrollPeriod->pay_date->translatedFormat('d M Y') }}</p>
     </div>
     @endif
     @if($payrollPeriod->calculated_at)
     <div>
-      <p class="font-label-md text-label-md text-on-surface-variant">Calculated At</p>
-      <p class="font-body-md text-body-md text-on-surface">{{ $payrollPeriod->calculated_at->format('M d, Y H:i') }}</p>
+      <p class="font-label-md text-label-md text-on-surface-variant">Dihitung Pada</p>
+      <p class="font-body-md text-body-md text-on-surface">{{ $payrollPeriod->calculated_at->translatedFormat('d M Y, H:i') }}</p>
     </div>
     @endif
   </div>
@@ -102,16 +102,16 @@
   {{-- Summary Totals --}}
   <div class="grid grid-cols-3 gap-unit-sm">
     <div class="bg-white rounded-xl border border-border shadow-sm p-3 flex flex-col gap-1">
-      <p class="font-label-sm text-label-sm text-on-surface-variant">Employees</p>
+      <p class="font-label-sm text-label-sm text-on-surface-variant">Pegawai</p>
       <p class="font-headline-md text-headline-md text-on-surface">{{ $totals['employee_count'] }}</p>
     </div>
     <div class="bg-white rounded-xl border border-border shadow-sm p-3 flex flex-col gap-1">
-      <p class="font-label-sm text-label-sm text-on-surface-variant">Gross Pay</p>
-      <p class="font-label-md text-label-md text-on-surface">Rp {{ number_format($totals['gross_pay'] / 1000000, 1) }}M</p>
+      <p class="font-label-sm text-label-sm text-on-surface-variant">Gaji Kotor</p>
+      <p class="font-label-md text-label-md text-on-surface">Rp {{ number_format($totals['gross_pay'] / 1000000, 1) }}Jt</p>
     </div>
     <div class="bg-white rounded-xl border border-border shadow-sm p-3 flex flex-col gap-1">
-      <p class="font-label-sm text-label-sm text-on-surface-variant">Net Pay</p>
-      <p class="font-label-md text-label-md text-primary">Rp {{ number_format($totals['net_pay'] / 1000000, 1) }}M</p>
+      <p class="font-label-sm text-label-sm text-on-surface-variant">Gaji Bersih</p>
+      <p class="font-label-md text-label-md text-primary">Rp {{ number_format($totals['net_pay'] / 1000000, 1) }}Jt</p>
     </div>
   </div>
 
@@ -120,59 +120,59 @@
 
   @if($payrollPeriod->status === 'DRAFT' && in_array($role, ['finance', 'super_admin']))
     <form method="POST" action="{{ route('payroll.periods.calculate', $payrollPeriod) }}"
-      onsubmit="return confirm('Run payroll calculation for {{ addslashes($payrollPeriod->name) }}?')">
+      onsubmit="return confirm('Jalankan perhitungan penggajian untuk {{ addslashes($payrollPeriod->name) }}?')">
       @csrf
       <button type="submit" class="w-full bg-primary text-white py-3.5 rounded-xl font-label-md text-label-md flex items-center justify-center gap-2 active:opacity-90">
         <span class="material-symbols-outlined">calculate</span>
-        Run Calculation
+        Jalankan Perhitungan
       </button>
     </form>
 
   @elseif($payrollPeriod->status === 'CALCULATED' && in_array($role, ['admin_hr', 'super_admin']))
     <form method="POST" action="{{ route('payroll.periods.submit-hr-review', $payrollPeriod) }}"
-      onsubmit="return confirm('Submit {{ addslashes($payrollPeriod->name) }} for HR review?')">
+      onsubmit="return confirm('Kirim {{ addslashes($payrollPeriod->name) }} untuk ditinjau HR?')">
       @csrf
       <button type="submit" class="w-full bg-secondary text-white py-3.5 rounded-xl font-label-md text-label-md flex items-center justify-center gap-2 active:opacity-90">
         <span class="material-symbols-outlined">send</span>
-        Submit for HR Review
+        Kirim untuk Tinjauan HR
       </button>
     </form>
 
   @elseif($payrollPeriod->status === 'HR_REVIEW' && in_array($role, ['finance', 'super_admin']))
     <form method="POST" action="{{ route('payroll.periods.finance-approve', $payrollPeriod) }}"
-      onsubmit="return confirm('Approve {{ addslashes($payrollPeriod->name) }} for payment?')">
+      onsubmit="return confirm('Setujui {{ addslashes($payrollPeriod->name) }} untuk pembayaran?')">
       @csrf
       <button type="submit" class="w-full bg-warning text-white py-3.5 rounded-xl font-label-md text-label-md flex items-center justify-center gap-2 active:opacity-90">
         <span class="material-symbols-outlined">thumb_up</span>
-        Finance Approve
+        Setujui (Keuangan)
       </button>
     </form>
 
   @elseif($payrollPeriod->status === 'FINANCE_APPROVAL' && in_array($role, ['finance', 'super_admin']))
     <form method="POST" action="{{ route('payroll.periods.lock', $payrollPeriod) }}"
-      onsubmit="return confirm('Lock {{ addslashes($payrollPeriod->name) }}? This cannot be undone.')">
+      onsubmit="return confirm('Kunci {{ addslashes($payrollPeriod->name) }}? Tindakan ini tidak dapat dibatalkan.')">
       @csrf
       <button type="submit" class="w-full bg-purple-600 text-white py-3.5 rounded-xl font-label-md text-label-md flex items-center justify-center gap-2 active:opacity-90">
         <span class="material-symbols-outlined">lock</span>
-        Lock Payroll
+        Kunci Penggajian
       </button>
     </form>
 
   @elseif($payrollPeriod->status === 'LOCKED' && in_array($role, ['finance', 'super_admin']))
     <div class="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 font-body-md text-body-md text-amber-800 flex items-start gap-2">
       <span class="material-symbols-outlined text-[18px] mt-0.5 flex-shrink-0">info</span>
-      <span><strong>Note:</strong> "Mark as Paid" records payment status in this system only. It does <strong>not</strong> initiate a real bank transfer or disburse funds.</span>
+      <span><strong>Catatan:</strong> "Tandai Sudah Dibayar" hanya mencatat status pembayaran dalam sistem ini. <strong>Tidak</strong> melakukan transfer bank nyata atau pencairan dana.</span>
     </div>
     <form method="POST" action="{{ route('payroll.periods.mark-paid', $payrollPeriod) }}"
-      onsubmit="return confirm('Mark {{ addslashes($payrollPeriod->name) }} as paid? This records payment status only.')">
+      onsubmit="return confirm('Tandai {{ addslashes($payrollPeriod->name) }} sudah dibayar? Ini hanya mencatat status pembayaran.')">
       @csrf
       <div class="flex flex-col gap-unit-sm">
-        <label class="font-label-md text-label-md text-on-surface-variant">Payment Reference (optional)</label>
-        <input type="text" name="payment_reference" maxlength="100" placeholder="e.g. TRF-20260622-001"
+        <label class="font-label-md text-label-md text-on-surface-variant">Referensi Pembayaran (opsional)</label>
+        <input type="text" name="payment_reference" maxlength="100" placeholder="cth. TRF-20260622-001"
           class="w-full border border-border rounded-xl px-4 py-3 font-body-md text-body-md bg-white focus:outline-none focus:ring-2 focus:ring-primary">
         <button type="submit" class="w-full bg-success text-white py-3.5 rounded-xl font-label-md text-label-md flex items-center justify-center gap-2 active:opacity-90">
           <span class="material-symbols-outlined">payments</span>
-          Mark as Paid
+          Tandai Sudah Dibayar
         </button>
       </div>
     </form>
@@ -182,15 +182,15 @@
     <div class="bg-green-50 border border-green-200 rounded-xl p-4 flex flex-col gap-2">
       <div class="flex items-center gap-2">
         <span class="material-symbols-outlined text-success">check_circle</span>
-        <p class="font-label-md text-label-md text-green-800">Payment Recorded</p>
+        <p class="font-label-md text-label-md text-green-800">Pembayaran Tercatat</p>
       </div>
       @if($payrollPeriod->paid_at)
-        <p class="font-label-sm text-label-sm text-on-surface-variant">Recorded: {{ $payrollPeriod->paid_at->format('M d, Y H:i') }}</p>
+        <p class="font-label-sm text-label-sm text-on-surface-variant">Tercatat: {{ $payrollPeriod->paid_at->translatedFormat('d M Y, H:i') }}</p>
       @endif
       @if($payrollPeriod->payment_reference)
-        <p class="font-label-sm text-label-sm text-on-surface-variant">Reference: {{ $payrollPeriod->payment_reference }}</p>
+        <p class="font-label-sm text-label-sm text-on-surface-variant">Referensi: {{ $payrollPeriod->payment_reference }}</p>
       @endif
-      <p class="font-label-sm text-label-sm text-amber-700">This is a payment record only. No real bank transfer was initiated.</p>
+      <p class="font-label-sm text-label-sm text-amber-700">Ini hanya catatan pembayaran. Tidak ada transfer bank nyata yang dilakukan.</p>
     </div>
   @endif
 
@@ -199,14 +199,14 @@
     <a href="{{ route('payroll.periods.export', $payrollPeriod) }}"
        class="flex items-center justify-center gap-2 w-full bg-surface-container border border-border text-on-surface py-3 rounded-xl font-label-md text-label-md active:opacity-70 transition-opacity">
       <span class="material-symbols-outlined">download</span>
-      Export CSV
+      Ekspor CSV
     </a>
   @endif
 
   {{-- Employee Records --}}
   @if($payrollPeriod->payrollRecords->count() > 0)
   <section class="flex flex-col gap-unit-sm">
-    <h2 class="font-headline-md text-headline-md text-on-surface">Employee Records</h2>
+    <h2 class="font-headline-md text-headline-md text-on-surface">Data Pegawai</h2>
     @foreach($payrollPeriod->payrollRecords as $record)
       <div class="bg-white rounded-xl border border-border shadow-sm p-4 flex flex-col gap-2">
         <div class="flex justify-between items-start">
@@ -216,14 +216,14 @@
           </div>
           <div class="text-right">
             <p class="font-label-md text-label-md text-primary">Rp {{ number_format($record->net_salary, 0, ',', '.') }}</p>
-            <p class="font-label-sm text-label-sm text-on-surface-variant">net</p>
+            <p class="font-label-sm text-label-sm text-on-surface-variant">bersih</p>
           </div>
         </div>
         @if($record->attendance_days !== null)
         <div class="flex gap-unit-md text-label-sm font-label-sm text-on-surface-variant">
-          <span><span class="material-symbols-outlined text-[14px] align-middle">calendar_today</span> {{ $record->attendance_days }}d attended</span>
+          <span><span class="material-symbols-outlined text-[14px] align-middle">calendar_today</span> {{ $record->attendance_days }} hari hadir</span>
           @if($record->leave_days > 0)
-            <span><span class="material-symbols-outlined text-[14px] align-middle">beach_access</span> {{ $record->leave_days }}d leave</span>
+            <span><span class="material-symbols-outlined text-[14px] align-middle">beach_access</span> {{ $record->leave_days }} hari cuti</span>
           @endif
         </div>
         @endif
@@ -232,7 +232,7 @@
   </section>
   @else
     <div class="bg-white rounded-xl border border-border shadow-sm p-6 text-center text-on-surface-variant font-body-md text-body-md">
-      No payroll records yet. Run calculation to generate records.
+      Belum ada data penggajian. Jalankan perhitungan untuk membuat data.
     </div>
   @endif
 
@@ -242,15 +242,15 @@
   @php($role = auth()->user()->role)
   <a class="flex flex-col items-center justify-center text-on-surface-variant transition-transform active:scale-95 duration-150 py-2" href="{{ $role === 'finance' ? '/finance/dashboard' : '/admin/dashboard' }}">
     <span class="material-symbols-outlined">home</span>
-    <span class="font-label-sm text-label-sm">Home</span>
+    <span class="font-label-sm text-label-sm">{{ __('common.nav_home') }}</span>
   </a>
   <a class="flex flex-col items-center justify-center text-primary bg-secondary-fixed rounded-xl px-3 py-1 transition-transform active:scale-95 duration-150" href="/payroll/periods">
     <span class="material-symbols-outlined">receipt_long</span>
-    <span class="font-label-sm text-label-sm">Payroll</span>
+    <span class="font-label-sm text-label-sm">{{ __('common.nav_payroll') }}</span>
   </a>
   <a class="flex flex-col items-center justify-center text-on-surface-variant transition-transform active:scale-95 duration-150 py-2" href="/profile">
     <span class="material-symbols-outlined">person</span>
-    <span class="font-label-sm text-label-sm">Profile</span>
+    <span class="font-label-sm text-label-sm">{{ __('common.nav_profile') }}</span>
   </a>
 </nav>
 

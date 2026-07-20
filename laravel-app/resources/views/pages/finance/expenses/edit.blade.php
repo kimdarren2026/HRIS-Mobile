@@ -1,7 +1,7 @@
-<!DOCTYPE html><html class="light" lang="en"><head>
+<!DOCTYPE html><html class="light" lang="id"><head>
 <meta charset="utf-8">
 <meta content="width=device-width, initial-scale=1.0" name="viewport">
-<title>Edit Expense - HRIS Mobile App</title>
+<title>Ubah Pengeluaran - HRIS Mobile App</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
@@ -49,7 +49,7 @@
   <a href="{{ route('finance.expenses.show', $expense) }}" class="text-primary p-1">
     <span class="material-symbols-outlined">arrow_back</span>
   </a>
-  <h1 class="font-headline-md text-headline-md font-bold text-primary">Edit Expense</h1>
+  <h1 class="font-headline-md text-headline-md font-bold text-primary">Ubah Pengeluaran</h1>
 </header>
 
 <main class="pt-20 pb-28 px-container-margin flex flex-col gap-unit-lg">
@@ -61,42 +61,42 @@
     @method('PUT')
 
     <div class="flex flex-col gap-unit-xs">
-      <label class="font-label-md text-label-md text-on-surface-variant">Category *</label>
+      <label class="font-label-md text-label-md text-on-surface-variant">Kategori *</label>
       <select name="category" required class="border border-border rounded-xl px-4 py-3 font-body-md text-body-md bg-white focus:outline-none focus:ring-2 focus:ring-primary">
         @foreach(\App\Models\CompanyExpense::CATEGORIES as $cat)
-          <option value="{{ $cat }}" {{ old('category', $expense->category) === $cat ? 'selected' : '' }}>{{ str_replace('_', ' ', $cat) }}</option>
+          <option value="{{ $cat }}" {{ old('category', $expense->category) === $cat ? 'selected' : '' }}>{{ __('finance.category_labels')[$cat] ?? $cat }}</option>
         @endforeach
       </select>
     </div>
 
     <div class="flex flex-col gap-unit-xs">
-      <label class="font-label-md text-label-md text-on-surface-variant">Title *</label>
+      <label class="font-label-md text-label-md text-on-surface-variant">Judul *</label>
       <input type="text" name="title" value="{{ old('title', $expense->title) }}" maxlength="255" required
         class="border border-border rounded-xl px-4 py-3 font-body-md text-body-md bg-white focus:outline-none focus:ring-2 focus:ring-primary">
     </div>
 
     <div class="flex flex-col gap-unit-xs">
-      <label class="font-label-md text-label-md text-on-surface-variant">Amount (Rp) *</label>
+      <label class="font-label-md text-label-md text-on-surface-variant">Jumlah (Rp) *</label>
       <input type="number" name="amount" value="{{ old('amount', $expense->amount) }}" min="0.01" step="0.01" required
         class="border border-border rounded-xl px-4 py-3 font-body-md text-body-md bg-white focus:outline-none focus:ring-2 focus:ring-primary">
     </div>
 
     <div class="flex flex-col gap-unit-xs">
-      <label class="font-label-md text-label-md text-on-surface-variant">Expense Date *</label>
+      <label class="font-label-md text-label-md text-on-surface-variant">Tanggal Pengeluaran *</label>
       <input type="date" name="expense_date" value="{{ old('expense_date', $expense->expense_date->format('Y-m-d')) }}" required
         class="border border-border rounded-xl px-4 py-3 font-body-md text-body-md bg-white focus:outline-none focus:ring-2 focus:ring-primary">
     </div>
 
     <div class="flex flex-col gap-unit-xs">
-      <label class="font-label-md text-label-md text-on-surface-variant">Recipient / Vendor *</label>
+      <label class="font-label-md text-label-md text-on-surface-variant">Penerima / Vendor *</label>
       <input type="text" name="recipient_name" value="{{ old('recipient_name', $expense->recipient_name) }}" maxlength="255" required
         class="border border-border rounded-xl px-4 py-3 font-body-md text-body-md bg-white focus:outline-none focus:ring-2 focus:ring-primary">
     </div>
 
     <div class="flex flex-col gap-unit-xs">
-      <label class="font-label-md text-label-md text-on-surface-variant">Linked Employee (optional)</label>
+      <label class="font-label-md text-label-md text-on-surface-variant">Pegawai Terkait (opsional)</label>
       <select name="employee_id" class="border border-border rounded-xl px-4 py-3 font-body-md text-body-md bg-white focus:outline-none focus:ring-2 focus:ring-primary">
-        <option value="">None</option>
+        <option value="">Tidak ada</option>
         @foreach($employees as $emp)
           <option value="{{ $emp->id }}" {{ old('employee_id', $expense->employee_id) == $emp->id ? 'selected' : '' }}>
             {{ $emp->user?->name ?? $emp->nik }}
@@ -106,22 +106,22 @@
     </div>
 
     <div class="flex flex-col gap-unit-xs">
-      <label class="font-label-md text-label-md text-on-surface-variant">Cost Center / Department</label>
+      <label class="font-label-md text-label-md text-on-surface-variant">Cost Center / Departemen</label>
       <input type="text" name="cost_center" value="{{ old('cost_center', $expense->cost_center) }}" maxlength="100"
         class="border border-border rounded-xl px-4 py-3 font-body-md text-body-md bg-white focus:outline-none focus:ring-2 focus:ring-primary">
     </div>
 
     <div class="flex flex-col gap-unit-xs">
-      <label class="font-label-md text-label-md text-on-surface-variant">Description</label>
+      <label class="font-label-md text-label-md text-on-surface-variant">Deskripsi</label>
       <textarea name="description" rows="3" maxlength="2000"
         class="border border-border rounded-xl px-4 py-3 font-body-md text-body-md bg-white focus:outline-none focus:ring-2 focus:ring-primary resize-none">{{ old('description', $expense->description) }}</textarea>
     </div>
 
     <div class="flex flex-col gap-unit-xs">
       <label class="font-label-md text-label-md text-on-surface-variant">
-        Replace Receipt (JPG/PNG/PDF, max 5MB)
+        Ganti Bukti Kwitansi (JPG/PNG/PDF, maks 5MB)
         @if($expense->receipt_path)
-          <span class="text-success ml-1">— existing receipt on file</span>
+          <span class="text-success ml-1">— sudah ada kwitansi tersimpan</span>
         @endif
       </label>
       <input type="file" name="receipt" accept=".jpg,.jpeg,.png,.pdf"
@@ -130,7 +130,7 @@
 
     <button type="submit" class="w-full bg-primary text-white py-3.5 rounded-xl font-label-md text-label-md flex items-center justify-center gap-2 active:opacity-90 mt-unit-sm">
       <span class="material-symbols-outlined">save</span>
-      Save Changes
+      Simpan Perubahan
     </button>
   </form>
 
