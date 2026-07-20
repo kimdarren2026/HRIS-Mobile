@@ -1,7 +1,7 @@
-<!DOCTYPE html><html class="light" lang="en"><head>
+<!DOCTYPE html><html class="light" lang="id"><head>
 <meta charset="utf-8">
 <meta content="width=device-width, initial-scale=1.0" name="viewport">
-<title>Audit Log Detail - HRIS Mobile App</title>
+<title>Detail Log Audit - HRIS Mobile App</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
@@ -50,7 +50,7 @@
   <a href="{{ route('audit-logs.index') }}" class="text-primary p-1">
     <span class="material-symbols-outlined">arrow_back</span>
   </a>
-  <h1 class="font-headline-md text-headline-md font-bold text-primary flex-1 truncate">Audit Detail</h1>
+  <h1 class="font-headline-md text-headline-md font-bold text-primary flex-1 truncate">Detail Audit</h1>
 </header>
 
 <main class="pt-20 pb-28 px-container-margin flex flex-col gap-unit-lg">
@@ -63,7 +63,7 @@
         <p class="font-label-sm text-label-sm text-on-surface-variant mt-0.5">{{ ucfirst($auditLog->module) }} · #{{ $auditLog->id }}</p>
       </div>
       <p class="font-label-sm text-label-sm text-on-surface-variant text-right flex-shrink-0">
-        {{ $auditLog->created_at->format('M d, Y') }}<br>{{ $auditLog->created_at->format('H:i:s') }}
+        {{ $auditLog->created_at->translatedFormat('d M Y') }}<br>{{ $auditLog->created_at->format('H:i:s') }}
       </p>
     </div>
     <p class="font-body-md text-body-md text-on-surface border-t border-border pt-3">{{ $auditLog->description }}</p>
@@ -71,10 +71,10 @@
 
   {{-- Actor --}}
   <div class="bg-white rounded-xl border border-border shadow-sm p-4 flex flex-col gap-2">
-    <p class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wide">Actor</p>
-    <p class="font-body-md text-body-md text-on-surface">{{ $auditLog->user?->name ?? 'System / Unknown' }}</p>
+    <p class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wide">Pelaku</p>
+    <p class="font-body-md text-body-md text-on-surface">{{ $auditLog->user?->name ?? 'Sistem / Tidak Diketahui' }}</p>
     @if($auditLog->user)
-      <p class="font-label-sm text-label-sm text-on-surface-variant">{{ $auditLog->user->email }} · {{ $auditLog->user->role }}</p>
+      <p class="font-label-sm text-label-sm text-on-surface-variant">{{ $auditLog->user->email }} · {{ __('common.role_labels')[$auditLog->user->role] ?? $auditLog->user->role }}</p>
     @endif
   </div>
 
@@ -88,9 +88,9 @@
 
   {{-- Request Info --}}
   <div class="bg-white rounded-xl border border-border shadow-sm p-4 flex flex-col gap-2">
-    <p class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wide">Request</p>
+    <p class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wide">Permintaan</p>
     <div>
-      <p class="font-label-sm text-label-sm text-on-surface-variant">IP Address</p>
+      <p class="font-label-sm text-label-sm text-on-surface-variant">Alamat IP</p>
       <p class="font-body-md text-body-md text-on-surface">{{ $auditLog->ip_address ?? '—' }}</p>
     </div>
     @if($auditLog->user_agent)
@@ -104,18 +104,18 @@
   {{-- Before / After --}}
   @if($auditLog->old_values || $auditLog->new_values)
     <div class="bg-white rounded-xl border border-border shadow-sm p-4 flex flex-col gap-3">
-      <p class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wide">Changes</p>
+      <p class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wide">Perubahan</p>
 
       @if($auditLog->old_values)
         <div>
-          <p class="font-label-sm text-label-sm text-red-600 mb-1">Before</p>
+          <p class="font-label-sm text-label-sm text-red-600 mb-1">Sebelum</p>
           <pre class="bg-red-50 rounded-lg p-3 font-label-sm text-label-sm text-red-800 text-[11px]">{{ json_encode($auditLog->old_values, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) }}</pre>
         </div>
       @endif
 
       @if($auditLog->new_values)
         <div>
-          <p class="font-label-sm text-label-sm text-green-600 mb-1">After</p>
+          <p class="font-label-sm text-label-sm text-green-600 mb-1">Sesudah</p>
           <pre class="bg-green-50 rounded-lg p-3 font-label-sm text-label-sm text-green-800 text-[11px]">{{ json_encode($auditLog->new_values, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) }}</pre>
         </div>
       @endif
@@ -125,7 +125,7 @@
   {{-- Legacy changes blob --}}
   @if($auditLog->changes && !$auditLog->old_values && !$auditLog->new_values)
     <div class="bg-white rounded-xl border border-border shadow-sm p-4 flex flex-col gap-2">
-      <p class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wide">Changes</p>
+      <p class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wide">Perubahan</p>
       <pre class="bg-surface-container rounded-lg p-3 font-label-sm text-label-sm text-on-surface text-[11px]">{{ json_encode($auditLog->changes, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) }}</pre>
     </div>
   @endif

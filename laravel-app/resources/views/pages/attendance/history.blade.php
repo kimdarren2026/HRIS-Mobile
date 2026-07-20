@@ -195,8 +195,8 @@ $badgeLabel = match($record->status) {
 <div class="absolute left-0 top-0 bottom-0 w-1 {{ $statusColor }} rounded-l-xl"></div>
 <div class="flex justify-between items-start pl-2">
 <div>
-<h3 class="text-headline-md font-headline-md text-on-background">{{ $record->attendance_date->format('M d, Y') }}</h3>
-<p class="text-label-sm font-label-sm text-on-surface-variant mt-0.5">{{ $record->attendance_date->format('l') }}</p>
+<h3 class="text-headline-md font-headline-md text-on-background">{{ $record->attendance_date->translatedFormat('M d, Y') }}</h3>
+<p class="text-label-sm font-label-sm text-on-surface-variant mt-0.5">{{ $record->attendance_date->translatedFormat('l') }}</p>
 </div>
 <span class="px-2 py-1 rounded-full {{ $badgeCls }} text-status-badge font-status-badge uppercase tracking-wider flex items-center gap-1">
 <span class="material-symbols-outlined text-[14px]">{{ $badgeIcon }}</span> {{ $badgeLabel }}
@@ -205,11 +205,11 @@ $badgeLabel = match($record->status) {
 <div class="grid grid-cols-2 gap-4 mt-2 pl-2">
 <div>
 <p class="text-label-sm font-label-sm text-on-surface-variant mb-1 uppercase">Absen Masuk</p>
-<p class="text-body-md font-body-md text-on-background font-medium">{{ $record->check_in_time ? $record->check_in_time->format('h:i A') : '--:--' }}</p>
+<p class="text-body-md font-body-md text-on-background font-medium">{{ $record->check_in_time ? $record->check_in_time->format('H:i') : '--:--' }}</p>
 </div>
 <div>
 <p class="text-label-sm font-label-sm text-on-surface-variant mb-1 uppercase">Absen Pulang</p>
-<p class="text-body-md font-body-md text-on-background font-medium">{{ $record->check_out_time ? $record->check_out_time->format('h:i A') : '--:--' }}</p>
+<p class="text-body-md font-body-md text-on-background font-medium">{{ $record->check_out_time ? $record->check_out_time->format('H:i') : '--:--' }}</p>
 @if($record->check_out_lat && $record->check_out_lng)
 <p class="text-label-sm font-label-sm text-on-surface-variant mt-0.5 opacity-70">{{ number_format((float)$record->check_out_lat, 5) }}, {{ number_format((float)$record->check_out_lng, 5) }}</p>
 @endif
@@ -272,7 +272,8 @@ $badgeLabel = match($record->status) {
 <span class="font-label-sm text-label-sm mt-1">Cuti</span>
 </a>
 <!-- Inactive: Payslip -->
-<a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 active:scale-90 transition-all duration-200 cursor-pointer hover:bg-surface-container-high rounded-lg" href="/payslip/detail">
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 active:scale-90 transition-all duration-200 cursor-pointer hover:bg-surface-container-high rounded-lg relative" href="/payslip/detail">
+<span class="absolute top-0 right-2 w-2 h-2 rounded-full bg-warning" aria-hidden="true" title="Segera Hadir"></span>
 <span class="material-symbols-outlined text-[24px]">payments</span>
 <span class="font-label-sm text-label-sm mt-1">Slip Gaji</span>
 </a>

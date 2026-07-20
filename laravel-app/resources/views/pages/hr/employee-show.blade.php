@@ -1,4 +1,4 @@
-<!DOCTYPE html><html class="light" lang="en"><head>
+<!DOCTYPE html><html class="light" lang="id"><head>
 <meta charset="utf-8">
 <meta content="width=device-width, initial-scale=1.0" name="viewport">
 <title>{{ $employee->user?->name ?? $employee->nik }} - HRIS Mobile App</title>
@@ -46,7 +46,7 @@ tailwind.config = {
   <a href="{{ route('employees.index') }}" class="text-primary p-1">
     <span class="material-symbols-outlined">arrow_back</span>
   </a>
-  <h1 class="font-headline-md text-headline-md font-bold text-primary truncate">Employee Detail</h1>
+  <h1 class="font-headline-md text-headline-md font-bold text-primary truncate">Detail Pegawai</h1>
   <a href="{{ route('employees.edit', $employee) }}" class="text-primary hover:bg-surface-container-low p-2 rounded-full transition-colors active:scale-95">
     <span class="material-symbols-outlined">edit</span>
   </a>
@@ -78,23 +78,30 @@ tailwind.config = {
         'terminated' => 'bg-surface-container text-on-surface-variant',
         default      => 'bg-surface-container text-on-surface-variant',
       };
+      $statusLabel = match($employee->employment_status) {
+        'active'     => 'Aktif',
+        'probation'  => 'Masa Percobaan',
+        'resigned'   => 'Mengundurkan Diri',
+        'terminated' => 'Diberhentikan',
+        default      => $employee->employment_status,
+      };
     @endphp
-    <span class="inline-flex items-center px-3 py-1 rounded-full {{ $statusColor }} font-status-badge capitalize">
-      {{ $employee->employment_status }}
+    <span class="inline-flex items-center px-3 py-1 rounded-full {{ $statusColor }} font-status-badge">
+      {{ $statusLabel }}
     </span>
   </section>
 
   {{-- Employment Info --}}
   <section>
-    <h3 class="font-label-md text-label-md text-outline uppercase tracking-widest mb-unit-sm pl-1">Employment</h3>
+    <h3 class="font-label-md text-label-md text-outline uppercase tracking-widest mb-unit-sm pl-1">Kepegawaian</h3>
     <div class="bg-surface-container-lowest rounded-xl border border-border overflow-hidden divide-y divide-border shadow-sm">
       <div class="p-unit-md flex items-center gap-3">
         <div class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center text-primary">
           <span class="material-symbols-outlined text-[20px]">badge</span>
         </div>
         <div>
-          <p class="text-[10px] text-outline font-semibold uppercase">Join Date</p>
-          <p class="font-body-md text-on-surface">{{ $employee->join_date?->format('M d, Y') ?? '—' }}</p>
+          <p class="text-[10px] text-outline font-semibold uppercase">Tanggal Bergabung</p>
+          <p class="font-body-md text-on-surface">{{ $employee->join_date?->translatedFormat('d M Y') ?? '—' }}</p>
         </div>
       </div>
       <div class="p-unit-md flex items-center gap-3">
@@ -102,7 +109,7 @@ tailwind.config = {
           <span class="material-symbols-outlined text-[20px]">domain</span>
         </div>
         <div>
-          <p class="text-[10px] text-outline font-semibold uppercase">Department</p>
+          <p class="text-[10px] text-outline font-semibold uppercase">Departemen</p>
           <p class="font-body-md text-on-surface">{{ $employee->department?->name ?? '—' }}</p>
         </div>
       </div>
@@ -111,7 +118,7 @@ tailwind.config = {
           <span class="material-symbols-outlined text-[20px]">work</span>
         </div>
         <div>
-          <p class="text-[10px] text-outline font-semibold uppercase">Position</p>
+          <p class="text-[10px] text-outline font-semibold uppercase">Posisi</p>
           <p class="font-body-md text-on-surface">{{ $employee->position?->name ?? '—' }}</p>
         </div>
       </div>
@@ -120,7 +127,7 @@ tailwind.config = {
 
   {{-- Contact Info --}}
   <section>
-    <h3 class="font-label-md text-label-md text-outline uppercase tracking-widest mb-unit-sm pl-1">Contact</h3>
+    <h3 class="font-label-md text-label-md text-outline uppercase tracking-widest mb-unit-sm pl-1">Kontak</h3>
     <div class="bg-surface-container-lowest rounded-xl border border-border overflow-hidden divide-y divide-border shadow-sm">
       <div class="p-unit-md flex items-center gap-3">
         <div class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center text-primary">
@@ -136,7 +143,7 @@ tailwind.config = {
           <span class="material-symbols-outlined text-[20px]">call</span>
         </div>
         <div>
-          <p class="text-[10px] text-outline font-semibold uppercase">Phone</p>
+          <p class="text-[10px] text-outline font-semibold uppercase">Telepon</p>
           <p class="font-body-md text-on-surface">{{ $employee->phone_number }}</p>
         </div>
       </div>
@@ -146,7 +153,7 @@ tailwind.config = {
           <span class="material-symbols-outlined text-[20px]">home</span>
         </div>
         <div>
-          <p class="text-[10px] text-outline font-semibold uppercase">Address</p>
+          <p class="text-[10px] text-outline font-semibold uppercase">Alamat</p>
           <p class="font-body-md text-on-surface">{{ $employee->address }}</p>
         </div>
       </div>
@@ -176,7 +183,7 @@ tailwind.config = {
           <span class="material-symbols-outlined text-[20px]">account_balance_wallet</span>
         </div>
         <div>
-          <p class="text-[10px] text-outline font-semibold uppercase">Account</p>
+          <p class="text-[10px] text-outline font-semibold uppercase">Rekening</p>
           <p class="font-body-md text-on-surface">**** {{ substr($employee->bank_account_number, -4) }}</p>
         </div>
       </div>
@@ -189,7 +196,7 @@ tailwind.config = {
   <a href="{{ route('employees.edit', $employee) }}"
     class="w-full h-14 bg-primary text-on-primary font-semibold rounded-xl shadow-lg flex items-center justify-center gap-2 hover:opacity-90 active:scale-95 transition-all">
     <span class="material-symbols-outlined text-[20px]">edit</span>
-    Edit Employee
+    Ubah Pegawai
   </a>
 
 </main>

@@ -247,7 +247,8 @@ Kirim untuk Review HR
 <span class="font-label-sm text-label-sm mt-1">Cuti</span>
 </button>
 <!-- Inactive: Payslip -->
-<button class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 hover:bg-surface-container-high rounded-lg transition-all duration-200" onclick="window.location.href='/payslip/detail'">
+<button class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 hover:bg-surface-container-high rounded-lg transition-all duration-200 relative" onclick="window.location.href='/payslip/detail'">
+<span class="absolute top-0 right-2 w-2 h-2 rounded-full bg-warning" aria-hidden="true" title="Segera Hadir"></span>
 <span class="material-symbols-outlined" data-icon="payments">payments</span>
 <span class="font-label-sm text-label-sm mt-1">Slip Gaji</span>
 </button>

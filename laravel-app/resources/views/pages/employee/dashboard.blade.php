@@ -199,7 +199,7 @@
 <h2 class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider mb-1">Presensi Hari Ini</h2>
 <p class="font-headline-lg text-headline-lg text-on-background">
 @if ($todayRecord)
-    {{ $todayRecord->check_in_time?->format('h:i A') ?? '—' }}
+    {{ $todayRecord->check_in_time?->format('H:i') ?? '—' }}
 @else
     —
 @endif
@@ -293,7 +293,7 @@ $leaveStatusLabel = match($latestLeave->status) {
 </div>
 <div class="flex-1 min-w-0">
 <p class="font-body-md text-body-md font-semibold text-on-background truncate">{{ $latestLeave->leaveType?->name ?? 'Pengajuan Cuti' }}</p>
-<p class="font-label-sm text-label-sm text-on-surface-variant">{{ $latestLeave->start_date->format('M d') }} - {{ $latestLeave->end_date->format('M d, Y') }}</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant">{{ $latestLeave->start_date->translatedFormat('M d') }} - {{ $latestLeave->end_date->translatedFormat('M d, Y') }}</p>
 </div>
 <div class="{{ $leaveStatusClass }} px-2 py-1 rounded-full font-status-badge text-status-badge shrink-0">
 {{ $leaveStatusLabel }}
@@ -315,7 +315,7 @@ $leaveStatusLabel = match($latestLeave->status) {
 <div class="flex justify-between items-end relative z-10">
 <div>
 <p class="font-body-md text-body-md text-on-background font-semibold">Gaji Bersih</p>
-<p class="font-headline-md text-headline-md text-on-background">{{ number_format((float) $latestPayroll->net_salary, 2) }}</p>
+<p class="font-headline-md text-headline-md text-on-background">Rp {{ number_format((float) $latestPayroll->net_salary, 0, ',', '.') }}</p>
 </div>
 <a class="text-primary font-label-md text-label-md flex items-center gap-1 hover:underline active:opacity-70 transition-opacity" href="/my/payroll/{{ $latestPayroll->id }}">
 Lihat Detail

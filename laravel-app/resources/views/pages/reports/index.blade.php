@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 
-<html class="light" lang="en"><head>
+<html class="light" lang="id"><head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Reports &amp; Analytics - HRIS Mobile App</title>
+<title>Laporan &amp; Analitik - HRIS Mobile App</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
@@ -136,277 +136,69 @@
 <button class="active:scale-95 duration-150 p-2 rounded-full hover:bg-surface-container-low transition-colors" onclick="window.location.href='/settings'">
 <span class="material-symbols-outlined text-primary dark:text-primary-fixed-dim">menu</span>
 </button>
-<h1 class="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed-dim">Reports &amp; Analytics</h1>
+<h1 class="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed-dim">Laporan &amp; Analitik</h1>
 </div>
-<!-- TODO Phase 4: connect action -->
-<button class="active:scale-95 duration-150 p-2 rounded-full hover:bg-surface-container-low transition-colors relative">
-<span class="material-symbols-outlined text-primary dark:text-primary-fixed-dim">notifications</span>
-<span class="absolute top-2 right-2 w-2 h-2 bg-danger rounded-full border-2 border-surface"></span>
-</button>
+	@include('partials.notification-bell', [
+	    'class' => 'relative active:scale-95 duration-150 p-2 rounded-full hover:bg-surface-container-low transition-colors text-primary dark:text-primary-fixed-dim',
+	    'badgeClass' => 'absolute top-1 right-1 w-2 h-2 rounded-full bg-danger border-2 border-surface',
+	])
 </header>
 <main class="pt-20 px-container-margin flex flex-col gap-unit-lg">
-<!-- Filters & Actions -->
-<section class="flex flex-col gap-unit-md">
-<div class="flex items-center justify-between gap-unit-md">
-<div class="relative flex-1">
-<select class="w-full bg-surface-container-lowest border border-outline-variant rounded-xl px-4 py-2.5 font-body-md text-body-md text-on-surface focus:ring-2 focus:ring-primary focus:border-transparent outline-none appearance-none">
-<option>Last 30 Days</option>
-<option>Last 7 Days</option>
-<option>This Month</option>
-<option>Custom Range</option>
-</select>
-<span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-outline">expand_more</span>
-</div>
-<!-- TODO Phase 4: connect action -->
-<button class="flex items-center gap-unit-xs px-4 py-2.5 border border-primary text-primary rounded-xl font-label-md text-label-md hover:bg-primary/5 active:scale-95 transition-all">
-<span class="material-symbols-outlined text-[20px]">download</span>
-                    Export
-                </button>
-</div>
+<!-- Modul laporan belum terhubung ke data nyata (Phase 57). Sengaja tidak
+     menampilkan angka/grafik palsu — lihat CLAUDE Phase 57 roadmap untuk
+     rencana implementasi laporan attendance & export Excel nyata. -->
+<section class="bg-white p-unit-lg rounded-xl border border-border custom-shadow flex flex-col items-center text-center gap-3 mt-4">
+<span class="material-symbols-outlined text-primary text-[48px]">construction</span>
+<h2 class="font-headline-md text-headline-md text-on-surface">Modul laporan sedang dikembangkan</h2>
+<p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
+    Laporan kehadiran, cuti, dan penggajian berbasis data nyata — termasuk export ke Excel — belum tersedia di halaman ini.
+    Fitur ini sedang dalam pengembangan pada fase berikutnya.
+</p>
+<span class="mt-1 text-[10px] font-bold uppercase tracking-wide bg-amber-100 text-amber-700 px-3 py-1.5 rounded-full">Segera Hadir</span>
 </section>
-<!-- Summary Grid -->
-<section class="grid grid-cols-2 gap-card-gap">
-<!-- Total Employees -->
-<div class="bg-white p-unit-md rounded-xl border border-border custom-shadow flex flex-col gap-1">
-<span class="text-on-surface-variant font-label-sm text-label-sm">Total Employees</span>
-<div class="flex items-end justify-between">
-<span class="font-headline-md text-headline-md text-on-surface">125</span>
-<span class="text-success font-label-sm text-label-sm flex items-center">+2% <span class="material-symbols-outlined text-[14px]">trending_up</span></span>
-</div>
-</div>
-<!-- Attendance Rate -->
-<div class="bg-white p-unit-md rounded-xl border border-border custom-shadow flex flex-col gap-1">
-<span class="text-on-surface-variant font-label-sm text-label-sm">Attendance Rate</span>
-<div class="flex items-end justify-between">
-<span class="font-headline-md text-headline-md text-on-surface">94.2%</span>
-<span class="text-danger font-label-sm text-label-sm flex items-center">-0.5% <span class="material-symbols-outlined text-[14px]">trending_down</span></span>
-</div>
-</div>
-<!-- Pending Approvals -->
-<div class="bg-white p-unit-md rounded-xl border border-border custom-shadow flex flex-col gap-1">
-<span class="text-on-surface-variant font-label-sm text-label-sm">Pending Approvals</span>
-<div class="flex items-end justify-between">
-<span class="font-headline-md text-headline-md text-warning">8</span>
-<span class="material-symbols-outlined text-outline text-[20px]">pending</span>
-</div>
-</div>
-<!-- Monthly Payroll -->
-<div class="bg-white p-unit-md rounded-xl border border-border custom-shadow flex flex-col gap-1">
-<span class="text-on-surface-variant font-label-sm text-label-sm">Monthly Payroll</span>
-<div class="flex items-end justify-between">
-<span class="font-body-lg text-body-lg font-bold text-on-surface">$685.4K</span>
-<span class="material-symbols-outlined text-outline text-[20px]">payments</span>
-</div>
-</div>
-</section>
-<!-- Attendance Trend Chart -->
-<section class="bg-white p-unit-md rounded-xl border border-border custom-shadow">
-<div class="flex justify-between items-center mb-6">
-<h3 class="font-headline-md text-headline-md text-on-surface text-[16px]">Attendance Trend</h3>
-<span class="text-on-surface-variant font-label-sm text-label-sm">Last 7 Days</span>
-</div>
-<div class="flex items-end justify-between h-40 pt-4 px-2">
-<!-- Simple Bar Chart -->
-<div class="flex flex-col items-center gap-2 flex-1">
-<div class="w-6 bg-surface-container rounded-t-sm h-[85%] relative group">
-<div class="absolute -top-6 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-on-surface text-white text-[10px] px-1 rounded">92%</div>
-</div>
-<span class="text-[10px] text-outline">Mon</span>
-</div>
-<div class="flex flex-col items-center gap-2 flex-1">
-<div class="w-6 bg-primary rounded-t-sm h-[94%] relative group">
-<div class="absolute -top-6 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-on-surface text-white text-[10px] px-1 rounded">94%</div>
-</div>
-<span class="text-[10px] text-outline">Tue</span>
-</div>
-<div class="flex flex-col items-center gap-2 flex-1">
-<div class="w-6 bg-surface-container rounded-t-sm h-[88%] relative group"></div>
-<span class="text-[10px] text-outline">Wed</span>
-</div>
-<div class="flex flex-col items-center gap-2 flex-1">
-<div class="w-6 bg-surface-container rounded-t-sm h-[91%] relative group"></div>
-<span class="text-[10px] text-outline">Thu</span>
-</div>
-<div class="flex flex-col items-center gap-2 flex-1">
-<div class="w-6 bg-primary rounded-t-sm h-[96%] relative group"></div>
-<span class="text-[10px] text-outline">Fri</span>
-</div>
-<div class="flex flex-col items-center gap-2 flex-1">
-<div class="w-6 bg-surface-variant rounded-t-sm h-[40%] relative group"></div>
-<span class="text-[10px] text-outline">Sat</span>
-</div>
-<div class="flex flex-col items-center gap-2 flex-1">
-<div class="w-6 bg-surface-variant rounded-t-sm h-[35%] relative group"></div>
-<span class="text-[10px] text-outline">Sun</span>
-</div>
-</div>
-</section>
-<!-- Leave Summary -->
-<section class="bg-white p-unit-md rounded-xl border border-border custom-shadow">
-<h3 class="font-headline-md text-headline-md text-on-surface text-[16px] mb-4">Leave Summary</h3>
-<div class="flex items-center gap-unit-md">
-<div class="flex-1 flex flex-col items-center p-3 rounded-lg bg-success/5 border border-success/10">
-<span class="font-headline-md text-headline-md text-success">45</span>
-<span class="text-[11px] font-label-md text-success uppercase tracking-wider">Approved</span>
-</div>
-<div class="flex-1 flex flex-col items-center p-3 rounded-lg bg-warning/5 border border-warning/10">
-<span class="font-headline-md text-headline-md text-warning">12</span>
-<span class="text-[11px] font-label-md text-warning uppercase tracking-wider">Pending</span>
-</div>
-<div class="flex-1 flex flex-col items-center p-3 rounded-lg bg-danger/5 border border-danger/10">
-<span class="font-headline-md text-headline-md text-danger">3</span>
-<span class="text-[11px] font-label-md text-danger uppercase tracking-wider">Rejected</span>
-</div>
-</div>
-</section>
-<!-- Payroll Summary -->
-<section class="bg-white p-unit-md rounded-xl border border-border custom-shadow">
-<div class="flex justify-between items-start mb-4">
-<div>
-<h3 class="font-headline-md text-headline-md text-on-surface text-[16px]">Payroll Summary</h3>
-<p class="text-on-surface-variant font-body-md text-body-md">Period: June 2026</p>
-</div>
-<span class="bg-success text-on-primary font-status-badge text-status-badge px-3 py-1 rounded-full uppercase">Processing</span>
-</div>
-<div class="flex flex-col gap-3 py-4 border-y border-border">
-<div class="flex justify-between items-center">
-<span class="text-on-surface-variant font-body-md text-body-md">Total Net Salary</span>
-<span class="text-on-surface font-headline-md text-headline-md">$685,400.00</span>
-</div>
-<div class="w-full bg-surface-container h-2 rounded-full overflow-hidden">
-<div class="bg-success h-full" style="width: 96%"></div>
-</div>
-<div class="flex justify-between text-on-surface-variant font-label-sm text-label-sm">
-<span>Paid: 120 employees</span>
-<span>Unpaid: 5 employees</span>
-</div>
-</div>
-<button class="w-full mt-4 py-2.5 text-primary font-label-md text-label-md hover:bg-primary/5 rounded-lg transition-colors flex items-center justify-center gap-2" onclick="window.location.href='/payroll/periods'">
-                Review Payroll Details
-                <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
-</button>
-</section>
-<!-- Department Summary -->
-<section class="flex flex-col gap-unit-md">
-<h3 class="font-headline-md text-headline-md text-on-surface text-[16px]">Department Breakdown</h3>
-<!-- Dept Card 1 -->
-<div class="bg-white p-unit-md rounded-xl border border-border custom-shadow flex items-center justify-between">
-<div class="flex items-center gap-4">
-<div class="w-10 h-10 bg-primary-container/10 rounded-lg flex items-center justify-center">
-<span class="material-symbols-outlined text-primary">terminal</span>
-</div>
-<div>
-<h4 class="font-body-lg text-body-lg font-bold">IT Department</h4>
-<p class="text-on-surface-variant font-label-sm text-label-sm">42 Employees</p>
-</div>
-</div>
-<div class="text-right">
-<span class="block font-body-md text-body-md font-bold text-on-surface">98.5%</span>
-<span class="text-[10px] text-outline font-label-sm uppercase">Attendance</span>
-</div>
-</div>
-<!-- Dept Card 2 -->
-<div class="bg-white p-unit-md rounded-xl border border-border custom-shadow flex items-center justify-between">
-<div class="flex items-center gap-4">
-<div class="w-10 h-10 bg-primary-container/10 rounded-lg flex items-center justify-center">
-<span class="material-symbols-outlined text-primary">campaign</span>
-</div>
-<div>
-<h4 class="font-body-lg text-body-lg font-bold">Marketing</h4>
-<p class="text-on-surface-variant font-label-sm text-label-sm">28 Employees</p>
-</div>
-</div>
-<div class="text-right">
-<span class="block font-body-md text-body-md font-bold text-on-surface">91.2%</span>
-<span class="text-[10px] text-outline font-label-sm uppercase">Attendance</span>
-</div>
-</div>
-<!-- Dept Card 3 -->
-<div class="bg-white p-unit-md rounded-xl border border-border custom-shadow flex items-center justify-between">
-<div class="flex items-center gap-4">
-<div class="w-10 h-10 bg-primary-container/10 rounded-lg flex items-center justify-center">
-<span class="material-symbols-outlined text-primary">account_balance</span>
-</div>
-<div>
-<h4 class="font-body-lg text-body-lg font-bold">Finance</h4>
-<p class="text-on-surface-variant font-label-sm text-label-sm">15 Employees</p>
-</div>
-</div>
-<div class="text-right">
-<span class="block font-body-md text-body-md font-bold text-on-surface">96.0%</span>
-<span class="text-[10px] text-outline font-label-sm uppercase">Attendance</span>
-</div>
-</div>
+@php($role = auth()->user()->role)
+<section class="bg-surface-container-low p-unit-md rounded-xl border border-outline-variant/40 flex items-start gap-2">
+<span class="material-symbols-outlined text-outline text-[18px] mt-0.5">info</span>
+<p class="font-body-md text-body-md text-on-surface-variant">
+    @if($role !== 'finance')
+    Sementara ini, data kehadiran dapat dilihat melalui <a href="/hr/approval-queue" class="text-primary underline">Persetujuan</a>, dan
+    @endif
+    data penggajian dapat dilihat melalui <a href="/payroll/periods" class="text-primary underline">Penggajian</a>.
+</p>
 </section>
 </main>
 <!-- BottomNavBar -->
 <nav class="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[390px] z-50 bg-surface/80 dark:bg-surface-dim/80 backdrop-blur-md border-t border-outline-variant dark:border-outline flex justify-around items-center h-[72px] pb-safe px-unit-sm shadow-sm">
-@php($role = auth()->user()->role)
 @if($role === 'finance')
 <a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant px-3 py-1.5 hover:bg-surface-container dark:hover:bg-surface-container-high transition-all active:scale-90 duration-200" href="/finance/dashboard">
 <span class="material-symbols-outlined">home</span>
-<span class="font-label-md text-label-md">Home</span>
+<span class="font-label-md text-label-md">{{ __('common.nav_home') }}</span>
 </a>
 <a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant px-3 py-1.5 hover:bg-surface-container dark:hover:bg-surface-container-high transition-all active:scale-90 duration-200" href="/payroll/periods">
 <span class="material-symbols-outlined">payments</span>
-<span class="font-label-md text-label-md">Payroll</span>
+<span class="font-label-md text-label-md">{{ __('common.nav_payroll') }}</span>
 </a>
 @else
 <a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant px-3 py-1.5 hover:bg-surface-container dark:hover:bg-surface-container-high transition-all active:scale-90 duration-200" href="/admin/dashboard">
 <span class="material-symbols-outlined">home</span>
-<span class="font-label-md text-label-md">Home</span>
+<span class="font-label-md text-label-md">{{ __('common.nav_home') }}</span>
 </a>
 <a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant px-3 py-1.5 hover:bg-surface-container dark:hover:bg-surface-container-high transition-all active:scale-90 duration-200" href="/hr/employees">
 <span class="material-symbols-outlined">groups</span>
-<span class="font-label-md text-label-md">Employees</span>
+<span class="font-label-md text-label-md">{{ __('common.nav_employees') }}</span>
 </a>
 <a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant px-3 py-1.5 hover:bg-surface-container dark:hover:bg-surface-container-high transition-all active:scale-90 duration-200" href="/hr/approval-queue">
 <span class="material-symbols-outlined">rule</span>
-<span class="font-label-md text-label-md">Approvals</span>
+<span class="font-label-md text-label-md">{{ __('common.nav_approvals') }}</span>
 </a>
 @endif
 <a class="flex flex-col items-center justify-center bg-secondary-container dark:bg-secondary text-on-secondary-container dark:text-on-secondary rounded-xl px-3 py-1.5 active:scale-90 duration-200" href="/reports">
 <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">assessment</span>
-<span class="font-label-md text-label-md">Reports</span>
+<span class="font-label-md text-label-md">{{ __('common.nav_reports') }}</span>
 </a>
 <a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant px-3 py-1.5 hover:bg-surface-container dark:hover:bg-surface-container-high transition-all active:scale-90 duration-200" href="/profile">
 <span class="material-symbols-outlined">person</span>
-<span class="font-label-md text-label-md">Profile</span>
+<span class="font-label-md text-label-md">{{ __('common.nav_profile') }}</span>
 </a>
 </nav>
-<script>
-        // Micro-interactions for summary cards
-        document.querySelectorAll('.custom-shadow').forEach(card => {
-            card.addEventListener('touchstart', () => {
-                card.style.transform = 'scale(0.98)';
-                card.style.transition = 'transform 0.1s ease';
-            });
-            card.addEventListener('touchend', () => {
-                card.style.transform = 'scale(1)';
-            });
-        });
-
-        // Simple mock for "Export" loading state
-        const exportBtn = document.querySelector('button:has(span:contains("download"))');
-        if(exportBtn) {
-            exportBtn.addEventListener('click', function() {
-                const icon = this.querySelector('span');
-                const originalText = this.innerText;
-                icon.innerText = 'sync';
-                icon.classList.add('animate-spin');
-                this.disabled = true;
-                
-                setTimeout(() => {
-                    icon.innerText = 'check_circle';
-                    icon.classList.remove('animate-spin');
-                    this.innerHTML = `<span class="material-symbols-outlined text-[20px]">check_circle</span> Done`;
-                    setTimeout(() => {
-                        icon.innerText = 'download';
-                        this.innerHTML = `<span class="material-symbols-outlined text-[20px]">download</span> Export`;
-                        this.disabled = false;
-                    }, 2000);
-                }, 1500);
-            });
-        }
-    </script>
 </body></html>

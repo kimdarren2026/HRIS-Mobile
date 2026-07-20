@@ -260,7 +260,8 @@
         <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">event_note</span>
         <span class="text-label-sm font-bold">Cuti</span>
     </a>
-    <a class="flex flex-col items-center gap-unit-xs text-on-surface-variant hover:text-primary transition-colors" href="/payslip/detail">
+    <a class="flex flex-col items-center gap-unit-xs text-on-surface-variant hover:text-primary transition-colors relative" href="/payslip/detail">
+        <span class="absolute -top-0.5 right-1 w-2 h-2 rounded-full bg-warning" aria-hidden="true" title="Segera Hadir"></span>
         <span class="material-symbols-outlined">payments</span>
         <span class="text-label-sm">Slip Gaji</span>
     </a>

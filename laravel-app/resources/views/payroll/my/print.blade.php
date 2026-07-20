@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Payslip – {{ $payrollRecord->payrollPeriod->name }}</title>
+<title>Slip Gaji – {{ $payrollRecord->payrollPeriod->name }}</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: Arial, Helvetica, sans-serif; font-size: 14px; color: #111; background: #fff; max-width: 800px; margin: 0 auto; padding: 32px 24px; }
@@ -49,8 +49,8 @@
 <body>
 
 <div class="no-print">
-  <button class="btn-print" onclick="window.print()">&#x1F5A8; Print Payslip</button>
-  <a class="btn-back" href="{{ route('my.payroll.show', $payrollRecord) }}">← Back to Payslip</a>
+  <button class="btn-print" onclick="window.print()">&#x1F5A8; Cetak Slip Gaji</button>
+  <a class="btn-back" href="{{ route('my.payroll.show', $payrollRecord) }}">← Kembali ke Slip Gaji</a>
 </div>
 
 @php
@@ -64,67 +64,67 @@
 
 <div class="header">
   <div>
-    <h1>PAYSLIP</h1>
+    <h1>SLIP GAJI</h1>
     <p class="period-info">{{ $period->name }}</p>
-    <p class="period-info">{{ $period->start_date->format('d M Y') }} – {{ $period->end_date->format('d M Y') }}</p>
+    <p class="period-info">{{ $period->start_date->translatedFormat('d M Y') }} – {{ $period->end_date->translatedFormat('d M Y') }}</p>
   </div>
   <div class="right">
-    <span class="status-badge">{{ str_replace('_', ' ', $period->status) }}</span>
+    <span class="status-badge">{{ __('payroll.status_labels')[$period->status] ?? $period->status }}</span>
     @if($period->pay_date)
-      <p style="margin-top: 8px;">Pay Date: {{ $period->pay_date->format('d M Y') }}</p>
+      <p style="margin-top: 8px;">Tanggal Bayar: {{ $period->pay_date->translatedFormat('d M Y') }}</p>
     @endif
   </div>
 </div>
 
 {{-- Employee Info --}}
-<p class="section-title">Employee Information</p>
+<p class="section-title">Informasi Pegawai</p>
 <table>
   <tbody>
     <tr>
-      <th style="width:40%">Employee Name</th>
+      <th style="width:40%">Nama Pegawai</th>
       <td>{{ $employee->user->name ?? '—' }}</td>
     </tr>
     <tr>
-      <th>Employee Number (NIK)</th>
+      <th>Nomor Pegawai (NIK)</th>
       <td>{{ $employee->nik }}</td>
     </tr>
     @if($employee->position)
     <tr>
-      <th>Position</th>
+      <th>Posisi</th>
       <td>{{ $employee->position->name }}</td>
     </tr>
     @endif
     @if($employee->department)
     <tr>
-      <th>Department</th>
+      <th>Departemen</th>
       <td>{{ $employee->department->name }}</td>
     </tr>
     @endif
     <tr>
-      <th>Attendance Days</th>
-      <td>{{ $payrollRecord->attendance_days }} days</td>
+      <th>Hari Hadir</th>
+      <td>{{ $payrollRecord->attendance_days }} hari</td>
     </tr>
     <tr>
-      <th>Leave Days</th>
-      <td>{{ number_format((float) $payrollRecord->leave_days, 1) }} days</td>
+      <th>Hari Cuti</th>
+      <td>{{ number_format((float) $payrollRecord->leave_days, 1) }} hari</td>
     </tr>
   </tbody>
 </table>
 
 {{-- Earnings --}}
-<p class="section-title">Earnings</p>
+<p class="section-title">Pendapatan</p>
 <table>
   <thead>
-    <tr><th>Description</th><th class="text-right">Amount (IDR)</th></tr>
+    <tr><th>Keterangan</th><th class="text-right">Jumlah (Rp)</th></tr>
   </thead>
   <tbody>
     <tr>
-      <td>Basic Salary</td>
+      <td>Gaji Pokok</td>
       <td class="text-right">Rp {{ number_format((float) $payrollRecord->basic_salary, 0, ',', '.') }}</td>
     </tr>
     @if((float) $payrollRecord->allowance > 0)
     <tr>
-      <td>Allowance</td>
+      <td>Tunjangan</td>
       <td class="text-right">Rp {{ number_format((float) $payrollRecord->allowance, 0, ',', '.') }}</td>
     </tr>
     @endif
@@ -136,59 +136,59 @@
     @endif
     @if((float) $payrollRecord->overtime > 0)
     <tr>
-      <td>Overtime</td>
+      <td>Lembur</td>
       <td class="text-right">Rp {{ number_format((float) $payrollRecord->overtime, 0, ',', '.') }}</td>
     </tr>
     @endif
   </tbody>
   <tfoot>
     <tr>
-      <th>Total Earnings</th>
+      <th>Total Pendapatan</th>
       <th class="text-right">Rp {{ number_format($gross, 0, ',', '.') }}</th>
     </tr>
   </tfoot>
 </table>
 
 {{-- Deductions --}}
-<p class="section-title">Deductions</p>
+<p class="section-title">Potongan</p>
 <table>
   <thead>
-    <tr><th>Description</th><th class="text-right">Amount (IDR)</th></tr>
+    <tr><th>Keterangan</th><th class="text-right">Jumlah (Rp)</th></tr>
   </thead>
   <tbody>
     @if((float) $payrollRecord->deduction > 0)
     <tr>
-      <td>General Deduction</td>
+      <td>Potongan Umum</td>
       <td class="text-right">Rp {{ number_format((float) $payrollRecord->deduction, 0, ',', '.') }}</td>
     </tr>
     @endif
     @if((float) $payrollRecord->late_deduction > 0)
     <tr>
-      <td>Late Deduction</td>
+      <td>Potongan Terlambat</td>
       <td class="text-right">Rp {{ number_format((float) $payrollRecord->late_deduction, 0, ',', '.') }}</td>
     </tr>
     @endif
     @if((float) $payrollRecord->attendance_deduction > 0)
     <tr>
-      <td>Attendance Deduction</td>
+      <td>Potongan Kehadiran</td>
       <td class="text-right">Rp {{ number_format((float) $payrollRecord->attendance_deduction, 0, ',', '.') }}</td>
     </tr>
     @endif
     @if((float) $payrollRecord->tax_bpjs > 0)
     <tr>
-      <td>Tax &amp; BPJS</td>
+      <td>Pajak &amp; BPJS</td>
       <td class="text-right">Rp {{ number_format((float) $payrollRecord->tax_bpjs, 0, ',', '.') }}</td>
     </tr>
     @endif
     @if($totalDeductions === 0.0)
     <tr>
-      <td colspan="2" style="text-align:center; color:#888;">No deductions</td>
+      <td colspan="2" style="text-align:center; color:#888;">Tidak ada potongan</td>
     </tr>
     @endif
   </tbody>
   <tfoot>
     <tr>
-      <th>Total Deductions</th>
+      <th>Total Potongan</th>
       <th class="text-right">Rp {{ number_format($totalDeductions, 0, ',', '.') }}</th>
     </tr>
   </tfoot>
@@ -196,11 +196,11 @@
 
 {{-- Net Salary --}}
 <div class="net-salary-box">
-  <span class="label">NET SALARY</span>
+  <span class="label">GAJI BERSIH</span>
   <span class="amount">Rp {{ number_format((float) $payrollRecord->net_salary, 0, ',', '.') }}</span>
 </div>
 
-<p class="footer">Generated: {{ now()->format('d M Y, H:i:s') }} &nbsp;|&nbsp; This is a computer-generated payslip.</p>
+<p class="footer">Dibuat: {{ now()->translatedFormat('d M Y, H:i:s') }} &nbsp;|&nbsp; Ini adalah slip gaji yang dibuat otomatis oleh sistem.</p>
 
 </body>
 </html>

@@ -1,7 +1,7 @@
-<!DOCTYPE html><html class="light" lang="en"><head>
+<!DOCTYPE html><html class="light" lang="id"><head>
 <meta charset="utf-8">
 <meta content="width=device-width, initial-scale=1.0" name="viewport">
-<title>Audit Logs - HRIS Mobile App</title>
+<title>Log Audit - HRIS Mobile App</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
@@ -49,7 +49,7 @@
   <a href="/admin/dashboard" class="text-primary p-1">
     <span class="material-symbols-outlined">arrow_back</span>
   </a>
-  <h1 class="font-headline-md text-headline-md font-bold text-primary flex-1 truncate">Audit Logs</h1>
+  <h1 class="font-headline-md text-headline-md font-bold text-primary flex-1 truncate">Log Audit</h1>
   <span class="font-label-sm text-label-sm text-on-surface-variant">Super Admin</span>
 </header>
 
@@ -57,24 +57,24 @@
 
   {{-- Filters --}}
   <form method="GET" action="{{ route('audit-logs.index') }}" class="bg-white rounded-xl border border-border shadow-sm p-4 flex flex-col gap-unit-sm">
-    <p class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wide">Filters</p>
+    <p class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wide">Filter</p>
 
     <select name="module" class="border border-border rounded-lg px-3 py-2 font-body-md text-body-md bg-white focus:outline-none focus:ring-2 focus:ring-primary text-sm">
-      <option value="">All Modules</option>
+      <option value="">Semua Modul</option>
       @foreach($modules as $m)
         <option value="{{ $m }}" @selected(request('module') === $m)>{{ ucfirst($m) }}</option>
       @endforeach
     </select>
 
     <select name="action" class="border border-border rounded-lg px-3 py-2 font-body-md text-body-md bg-white focus:outline-none focus:ring-2 focus:ring-primary text-sm">
-      <option value="">All Actions</option>
+      <option value="">Semua Aksi</option>
       @foreach($actions as $a)
         <option value="{{ $a }}" @selected(request('action') === $a)>{{ str_replace('_', ' ', $a) }}</option>
       @endforeach
     </select>
 
     <select name="user_id" class="border border-border rounded-lg px-3 py-2 font-body-md text-body-md bg-white focus:outline-none focus:ring-2 focus:ring-primary text-sm">
-      <option value="">All Actors</option>
+      <option value="">Semua Pelaku</option>
       @foreach($users as $u)
         <option value="{{ $u->id }}" @selected(request('user_id') == $u->id)>{{ $u->name }}</option>
       @endforeach
@@ -88,14 +88,14 @@
     </div>
 
     <div class="flex gap-unit-sm">
-      <button type="submit" class="flex-1 bg-primary text-white py-2.5 rounded-lg font-label-md text-label-md">Apply</button>
-      <a href="{{ route('audit-logs.index') }}" class="flex-1 text-center bg-surface-container-high text-on-surface py-2.5 rounded-lg font-label-md text-label-md">Reset</a>
+      <button type="submit" class="flex-1 bg-primary text-white py-2.5 rounded-lg font-label-md text-label-md">Terapkan</button>
+      <a href="{{ route('audit-logs.index') }}" class="flex-1 text-center bg-surface-container-high text-on-surface py-2.5 rounded-lg font-label-md text-label-md">Atur Ulang</a>
     </div>
   </form>
 
   {{-- Count --}}
   <p class="font-label-sm text-label-sm text-on-surface-variant">
-    {{ number_format($auditLogs->total()) }} record(s) — page {{ $auditLogs->currentPage() }} of {{ $auditLogs->lastPage() }}
+    {{ number_format($auditLogs->total()) }} data — halaman {{ $auditLogs->currentPage() }} dari {{ $auditLogs->lastPage() }}
   </p>
 
   {{-- Log List --}}
@@ -107,11 +107,11 @@
           <p class="font-label-md text-label-md text-primary truncate">{{ str_replace('_', ' ', $log->action) }}</p>
           <p class="font-body-md text-body-md text-on-surface truncate mt-0.5">{{ $log->description }}</p>
           <p class="font-label-sm text-label-sm text-on-surface-variant mt-1">
-            {{ $log->user?->name ?? 'System' }} · {{ ucfirst($log->module) }}
+            {{ $log->user?->name ?? 'Sistem' }} · {{ ucfirst($log->module) }}
           </p>
         </div>
         <div class="text-right flex-shrink-0">
-          <p class="font-label-sm text-label-sm text-on-surface-variant">{{ $log->created_at->format('M d') }}</p>
+          <p class="font-label-sm text-label-sm text-on-surface-variant">{{ $log->created_at->translatedFormat('M d') }}</p>
           <p class="font-label-sm text-label-sm text-on-surface-variant">{{ $log->created_at->format('H:i') }}</p>
           @if($log->auditable_type)
             <span class="inline-block mt-1 bg-secondary-fixed text-primary px-2 py-0.5 rounded-full text-[10px] font-semibold">
@@ -124,7 +124,7 @@
   @empty
     <div class="bg-white rounded-xl border border-border p-8 text-center">
       <span class="material-symbols-outlined text-[40px] text-on-surface-variant">manage_search</span>
-      <p class="font-body-md text-body-md text-on-surface-variant mt-2">No audit logs found.</p>
+      <p class="font-body-md text-body-md text-on-surface-variant mt-2">Tidak ada log audit ditemukan.</p>
     </div>
   @endforelse
 
@@ -132,15 +132,15 @@
   @if($auditLogs->hasPages())
     <div class="flex justify-between items-center gap-unit-sm">
       @if($auditLogs->onFirstPage())
-        <span class="flex-1 text-center py-2.5 rounded-lg bg-surface-container-high text-on-surface-variant font-label-md text-label-md opacity-50">Previous</span>
+        <span class="flex-1 text-center py-2.5 rounded-lg bg-surface-container-high text-on-surface-variant font-label-md text-label-md opacity-50">Sebelumnya</span>
       @else
-        <a href="{{ $auditLogs->previousPageUrl() }}" class="flex-1 text-center py-2.5 rounded-lg bg-surface-container-high text-on-surface font-label-md text-label-md">Previous</a>
+        <a href="{{ $auditLogs->previousPageUrl() }}" class="flex-1 text-center py-2.5 rounded-lg bg-surface-container-high text-on-surface font-label-md text-label-md">Sebelumnya</a>
       @endif
 
       @if($auditLogs->hasMorePages())
-        <a href="{{ $auditLogs->nextPageUrl() }}" class="flex-1 text-center py-2.5 rounded-lg bg-primary text-white font-label-md text-label-md">Next</a>
+        <a href="{{ $auditLogs->nextPageUrl() }}" class="flex-1 text-center py-2.5 rounded-lg bg-primary text-white font-label-md text-label-md">Berikutnya</a>
       @else
-        <span class="flex-1 text-center py-2.5 rounded-lg bg-primary/40 text-white font-label-md text-label-md opacity-50">Next</span>
+        <span class="flex-1 text-center py-2.5 rounded-lg bg-primary/40 text-white font-label-md text-label-md opacity-50">Berikutnya</span>
       @endif
     </div>
   @endif

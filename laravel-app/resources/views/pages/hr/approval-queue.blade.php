@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 
-<html class="light" lang="en"><head>
+<html class="light" lang="id"><head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
-<title>HR Approval Queue - HRIS Mobile App</title>
+<title>Antrean Persetujuan HR - HRIS Mobile App</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
@@ -122,7 +122,7 @@
 <button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container-low transition-colors active:scale-95 duration-150" onclick="window.location.href='/settings'">
 <span class="material-symbols-outlined text-on-surface-variant">menu</span>
 </button>
-<h1 class="font-headline-md text-headline-md font-bold text-primary">HR Approval Queue</h1>
+<h1 class="font-headline-md text-headline-md font-bold text-primary">Antrean Persetujuan HR</h1>
 </div>
 	@include('partials.notification-bell', [
 	    'class' => 'relative w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container-low transition-colors active:scale-95 duration-150 text-on-surface-variant',
@@ -136,7 +136,7 @@
 <button id="tab-btn-attendance" onclick="switchTab('attendance')"
     class="relative flex-1 flex items-center justify-center py-4 text-primary font-bold transition-colors">
 <div class="flex items-center gap-2">
-<span class="font-label-md text-label-md">Attendance</span>
+<span class="font-label-md text-label-md">Kehadiran</span>
 <span class="bg-primary-container text-on-primary-container px-2 py-0.5 rounded-full text-[10px] font-bold">{{ $pending->total() }}</span>
 </div>
 <div class="active-tab-indicator w-full"></div>
@@ -144,7 +144,7 @@
 <button id="tab-btn-leave" onclick="switchTab('leave')"
     class="relative flex-1 flex items-center justify-center py-4 text-on-surface-variant hover:bg-surface-container-low transition-colors">
 <div class="flex items-center gap-2">
-<span class="font-label-md text-label-md">Leave</span>
+<span class="font-label-md text-label-md">Cuti</span>
 <span class="bg-surface-container-highest text-on-surface-variant px-2 py-0.5 rounded-full text-[10px] font-bold">{{ $leavePending->total() }}</span>
 </div>
 </button>
@@ -172,14 +172,14 @@
 </div>
 </div>
 <div class="bg-warning/10 text-warning px-3 py-1 rounded-full font-status-badge text-status-badge shrink-0">
-Pending Review
+Menunggu Peninjauan
 </div>
 </div>
 <div class="bg-surface-container-low p-3 rounded-lg border border-outline-variant/30">
 <div class="flex items-center gap-2 mb-1">
 <span class="material-symbols-outlined text-primary text-[18px]">location_on</span>
 <span class="font-label-md text-label-md text-on-surface-variant">
-Check-in {{ $record->check_in_time?->format('d M Y, h:i A') }}
+Absen masuk {{ $record->check_in_time?->translatedFormat('d M Y, H:i') }}
 </span>
 </div>
 @if($record->out_of_radius_reason)
@@ -188,39 +188,39 @@ Check-in {{ $record->check_in_time?->format('d M Y, h:i A') }}
 @if($record->check_in_photo_path)
 <a href="/attendance/photo/{{ $record->id }}" target="_blank"
    class="inline-flex items-center gap-1 mt-2 text-primary font-label-sm text-label-sm hover:underline">
-<span class="material-symbols-outlined text-[14px]">photo_camera</span> View selfie
+<span class="material-symbols-outlined text-[14px]">photo_camera</span> Lihat selfie
 </a>
 @endif
 </div>
 <form method="POST" action="/hr/attendance/{{ $record->id }}/approve" class="flex gap-3 pt-2 flex-col">
 @csrf
-<input type="text" name="approval_note" placeholder="Optional note for employee..." maxlength="1000"
+<input type="text" name="approval_note" placeholder="Catatan opsional untuk pegawai..." maxlength="1000"
     class="w-full border border-outline-variant rounded-lg px-3 py-2 font-body-md text-body-md text-on-surface bg-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none placeholder:text-outline">
 <div class="flex gap-3">
 <button type="submit"
     class="flex-1 bg-success text-on-primary py-3 rounded-lg font-label-md flex items-center justify-center gap-2 active:scale-95 transition-transform">
-<span class="material-symbols-outlined text-[18px]">check_circle</span> Approve
+<span class="material-symbols-outlined text-[18px]">check_circle</span> Setujui
 </button>
 <button type="button" onclick="toggleReject('att-{{ $record->id }}')"
     class="flex-1 border-2 border-danger text-danger py-3 rounded-lg font-label-md flex items-center justify-center gap-2 active:scale-95 transition-transform">
-<span class="material-symbols-outlined text-[18px]">block</span> Reject
+<span class="material-symbols-outlined text-[18px]">block</span> Tolak
 </button>
 </div>
 </form>
 <form id="reject-form-att-{{ $record->id }}" method="POST" action="/hr/attendance/{{ $record->id }}/reject" class="hidden flex-col gap-2">
 @csrf
-<textarea name="approval_note" rows="3" maxlength="1000" required minlength="10" placeholder="Rejection reason (required, min 10 characters)..."
+<textarea name="approval_note" rows="3" maxlength="1000" required minlength="10" placeholder="Alasan penolakan (wajib, minimal 10 karakter)..."
     class="w-full border border-danger rounded-lg px-3 py-2 font-body-md text-body-md text-on-surface bg-surface focus:border-error focus:ring-1 focus:ring-error outline-none resize-none placeholder:text-outline"></textarea>
 <button type="submit"
     class="w-full bg-danger text-on-error py-3 rounded-lg font-label-md flex items-center justify-center gap-2 active:scale-95 transition-transform">
-<span class="material-symbols-outlined text-[18px]">cancel</span> Confirm Rejection
+<span class="material-symbols-outlined text-[18px]">cancel</span> Konfirmasi Penolakan
 </button>
 </form>
 </div>
 @empty
 <div class="flex flex-col items-center justify-center py-unit-xl opacity-40 select-none">
 <span class="material-symbols-outlined text-[64px]">rule</span>
-<p class="font-label-md mt-2 text-on-surface-variant">No attendance pending review.</p>
+<p class="font-label-md mt-2 text-on-surface-variant">Tidak ada kehadiran yang menunggu peninjauan.</p>
 </div>
 @endforelse
 
@@ -237,8 +237,8 @@ Check-in {{ $record->check_in_time?->format('d M Y, h:i A') }}
 @php
     $days = (int) $leave->total_days;
     $dateRange = $leave->start_date->isSameDay($leave->end_date)
-        ? $leave->start_date->format('d M Y')
-        : $leave->start_date->format('d M') . ' – ' . $leave->end_date->format('d M Y');
+        ? $leave->start_date->translatedFormat('d M Y')
+        : $leave->start_date->translatedFormat('d M') . ' – ' . $leave->end_date->translatedFormat('d M Y');
 @endphp
 <div class="bg-surface border border-outline-variant rounded-xl shadow-sm overflow-hidden flex flex-col gap-unit-md p-unit-md">
 <div class="flex items-start justify-between">
@@ -254,14 +254,14 @@ Check-in {{ $record->check_in_time?->format('d M Y, h:i A') }}
 </div>
 </div>
 <div class="bg-warning/10 text-warning px-3 py-1 rounded-full font-status-badge text-status-badge shrink-0">
-Pending HR
+Menunggu HR
 </div>
 </div>
 <div class="bg-surface-container-low p-3 rounded-lg border border-outline-variant/30 flex flex-col gap-1">
 <div class="flex items-center gap-2">
 <span class="material-symbols-outlined text-primary text-[18px]">event_note</span>
 <span class="font-label-md text-label-md text-on-surface-variant">
-{{ $leave->leaveType->name }} &bull; {{ $dateRange }} &bull; {{ $days }} {{ $days === 1 ? 'day' : 'days' }}
+{{ $leave->leaveType->name }} &bull; {{ $dateRange }} &bull; {{ $days }} hari
 </span>
 </div>
 <p class="font-body-md text-on-surface-variant italic leading-relaxed">"{{ $leave->reason }}"</p>
@@ -274,33 +274,33 @@ Pending HR
 </div>
 <form method="POST" action="/hr/leave/{{ $leave->id }}/approve" class="flex gap-3 pt-2 flex-col">
 @csrf
-<input type="text" name="approval_note" placeholder="Optional note for employee..." maxlength="1000"
+<input type="text" name="approval_note" placeholder="Catatan opsional untuk pegawai..." maxlength="1000"
     class="w-full border border-outline-variant rounded-lg px-3 py-2 font-body-md text-body-md text-on-surface bg-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none placeholder:text-outline">
 <div class="flex gap-3">
 <button type="submit"
     class="flex-1 bg-success text-on-primary py-3 rounded-lg font-label-md flex items-center justify-center gap-2 active:scale-95 transition-transform">
-<span class="material-symbols-outlined text-[18px]">check_circle</span> Approve
+<span class="material-symbols-outlined text-[18px]">check_circle</span> Setujui
 </button>
 <button type="button" onclick="toggleReject('leave-{{ $leave->id }}')"
     class="flex-1 border-2 border-danger text-danger py-3 rounded-lg font-label-md flex items-center justify-center gap-2 active:scale-95 transition-transform">
-<span class="material-symbols-outlined text-[18px]">block</span> Reject
+<span class="material-symbols-outlined text-[18px]">block</span> Tolak
 </button>
 </div>
 </form>
 <form id="reject-form-leave-{{ $leave->id }}" method="POST" action="/hr/leave/{{ $leave->id }}/reject" class="hidden flex-col gap-2">
 @csrf
-<textarea name="approval_note" rows="3" maxlength="1000" required minlength="10" placeholder="Rejection reason (required, min 10 characters)..."
+<textarea name="approval_note" rows="3" maxlength="1000" required minlength="10" placeholder="Alasan penolakan (wajib, minimal 10 karakter)..."
     class="w-full border border-danger rounded-lg px-3 py-2 font-body-md text-body-md text-on-surface bg-surface focus:border-error focus:ring-1 focus:ring-error outline-none resize-none placeholder:text-outline"></textarea>
 <button type="submit"
     class="w-full bg-danger text-on-error py-3 rounded-lg font-label-md flex items-center justify-center gap-2 active:scale-95 transition-transform">
-<span class="material-symbols-outlined text-[18px]">cancel</span> Confirm Rejection
+<span class="material-symbols-outlined text-[18px]">cancel</span> Konfirmasi Penolakan
 </button>
 </form>
 </div>
 @empty
 <div class="flex flex-col items-center justify-center py-unit-xl opacity-40 select-none">
 <span class="material-symbols-outlined text-[64px]">event_busy</span>
-<p class="font-label-md mt-2 text-on-surface-variant">No leave requests pending.</p>
+<p class="font-label-md mt-2 text-on-surface-variant">Tidak ada pengajuan cuti yang menunggu.</p>
 </div>
 @endforelse
 
@@ -359,27 +359,27 @@ function switchTab(tab) {
 <!-- Home -->
 <button class="flex flex-col items-center justify-center text-on-surface-variant px-3 py-1.5 hover:bg-surface-container transition-all active:scale-90 duration-200" onclick="window.location.href='/admin/dashboard'">
 <span class="material-symbols-outlined">home</span>
-<span class="font-label-md text-[10px] mt-1">Home</span>
+<span class="font-label-md text-[10px] mt-1">{{ __('common.nav_home') }}</span>
 </button>
 <!-- Employees -->
 <button class="flex flex-col items-center justify-center text-on-surface-variant px-3 py-1.5 hover:bg-surface-container transition-all active:scale-90 duration-200" onclick="window.location.href='/hr/employees'">
 <span class="material-symbols-outlined">groups</span>
-<span class="font-label-md text-[10px] mt-1">Employees</span>
+<span class="font-label-md text-[10px] mt-1">{{ __('common.nav_employees') }}</span>
 </button>
 <!-- Approvals (Active) -->
 <button class="flex flex-col items-center justify-center bg-secondary-container text-on-secondary-container rounded-xl px-4 py-1.5 active:scale-90 duration-200" onclick="window.location.href='/hr/approval-queue'">
 <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">rule</span>
-<span class="font-label-md text-[10px] mt-1">Approvals</span>
+<span class="font-label-md text-[10px] mt-1">{{ __('common.nav_approvals') }}</span>
 </button>
 <!-- Reports -->
 <button class="flex flex-col items-center justify-center text-on-surface-variant px-3 py-1.5 hover:bg-surface-container transition-all active:scale-90 duration-200" onclick="window.location.href='/reports'">
 <span class="material-symbols-outlined">assessment</span>
-<span class="font-label-md text-[10px] mt-1">Reports</span>
+<span class="font-label-md text-[10px] mt-1">{{ __('common.nav_reports') }}</span>
 </button>
 <!-- Profile -->
 <button class="flex flex-col items-center justify-center text-on-surface-variant px-3 py-1.5 hover:bg-surface-container transition-all active:scale-90 duration-200" onclick="window.location.href='/profile'">
 <span class="material-symbols-outlined">person</span>
-<span class="font-label-md text-[10px] mt-1">Profile</span>
+<span class="font-label-md text-[10px] mt-1">{{ __('common.nav_profile') }}</span>
 </button>
 </nav>
 <script>

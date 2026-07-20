@@ -68,7 +68,10 @@ class Phase38AuditLowPriorityTest extends TestCase
         );
     }
 
-    // ── Fix 2: Payslip detail — empty state, no fake data ─────────────────────
+    // ── Fix 2: Payslip detail — maintenance placeholder, no fake data ─────────
+    // Phase 57: this route now shows a planned "under construction" placeholder
+    // instead of the old empty-state view — see Phase57LocalizationPayslipTest
+    // for full maintenance-page coverage.
 
     public function test_payslip_detail_is_accessible_to_employee(): void
     {
@@ -77,13 +80,13 @@ class Phase38AuditLowPriorityTest extends TestCase
             ->assertOk();
     }
 
-    public function test_payslip_detail_shows_empty_state_message(): void
+    public function test_payslip_detail_shows_maintenance_message(): void
     {
         $this->actingAs($this->employeeUser)
             ->get('/payslip/detail')
             ->assertOk()
-            ->assertSee('No Payslip Data Available')
-            ->assertSee('external payroll integration');
+            ->assertSee('Fitur Slip Gaji Sedang Disiapkan')
+            ->assertSee('Data penggajian Anda tetap aman');
     }
 
     public function test_payslip_detail_shows_no_fake_salary_data(): void

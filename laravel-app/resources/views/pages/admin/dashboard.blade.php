@@ -1,7 +1,7 @@
-<!DOCTYPE html><html class="light" lang="en"><head>
+<!DOCTYPE html><html class="light" lang="id"><head>
 <meta charset="utf-8">
 <meta content="width=device-width, initial-scale=1.0" name="viewport">
-<title>HRIS Mobile App - Admin Dashboard</title>
+<title>HRIS Mobile App - Dasbor Admin</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
@@ -136,58 +136,58 @@
 <main class="mt-20 px-container-margin space-y-6">
 <!-- Hero Section -->
 <section class="space-y-1">
-<h1 class="font-headline-md text-headline-md text-on-surface">Hi, {{ auth()->user()->name }}</h1>
-<p class="font-body-md text-body-md text-outline">{{ now()->format('l, F d, Y') }}</p>
+<h1 class="font-headline-md text-headline-md text-on-surface">Hai, {{ auth()->user()->name }}</h1>
+<p class="font-body-md text-body-md text-outline">{{ now()->translatedFormat('l, F d, Y') }}</p>
 </section>
 <!-- Summary Grid (2x2) -->
 <section class="grid grid-cols-2 gap-card-gap">
 <div class="bg-surface-container-lowest p-unit-md rounded-xl border border-border shadow-sm flex flex-col gap-1">
 <span class="material-symbols-outlined text-primary mb-2" data-icon="group">group</span>
-<span class="font-label-md text-label-md text-outline uppercase tracking-wider">Total Employees</span>
+<span class="font-label-md text-label-md text-outline uppercase tracking-wider">Total Pegawai</span>
 <span class="font-headline-lg text-headline-lg text-on-surface">{{ $totalEmployees }}</span>
 </div>
 <div class="bg-surface-container-lowest p-unit-md rounded-xl border border-border shadow-sm flex flex-col gap-1">
 <span class="material-symbols-outlined text-warning mb-2" data-icon="how_to_reg">how_to_reg</span>
-<span class="font-label-md text-label-md text-outline uppercase tracking-wider">Pending Attendance</span>
+<span class="font-label-md text-label-md text-outline uppercase tracking-wider">Menunggu Peninjauan</span>
 <span class="font-headline-lg text-headline-lg text-on-surface">{{ $pendingAttendance }}</span>
 </div>
 <div class="bg-surface-container-lowest p-unit-md rounded-xl border border-border shadow-sm flex flex-col gap-1">
 <span class="material-symbols-outlined text-tertiary mb-2" data-icon="event_busy">event_busy</span>
-<span class="font-label-md text-label-md text-outline uppercase tracking-wider">Leave Requests</span>
+<span class="font-label-md text-label-md text-outline uppercase tracking-wider">Pengajuan Cuti</span>
 <span class="font-headline-lg text-headline-lg text-on-surface">{{ $pendingLeave }}</span>
 </div>
 <div class="bg-surface-container-lowest p-unit-md rounded-xl border border-border shadow-sm flex flex-col gap-1">
 <span class="material-symbols-outlined text-success mb-2" data-icon="payments">payments</span>
-<span class="font-label-md text-label-md text-outline uppercase tracking-wider">Payroll Period</span>
+<span class="font-label-md text-label-md text-outline uppercase tracking-wider">Periode Penggajian</span>
 <span class="font-body-md text-body-md font-bold text-on-surface truncate">{{ $latestPeriod?->name ?? 'N/A' }}</span>
 </div>
 </section>
 <!-- Quick Actions -->
 <section class="space-y-unit-sm">
-<h2 class="font-label-md text-label-md text-outline px-1">QUICK ACTIONS</h2>
+<h2 class="font-label-md text-label-md text-outline px-1">AKSI CEPAT</h2>
 <div class="grid grid-cols-2 gap-card-gap">
 <button class="flex items-center gap-3 bg-primary text-white p-unit-md rounded-xl active:scale-95 transition-transform text-left" onclick="window.location.href='/hr/approval-queue'">
 <span class="material-symbols-outlined" data-icon="fact_check">fact_check</span>
-<span class="font-label-md text-label-md">Review Attendance</span>
+<span class="font-label-md text-label-md">Tinjau Kehadiran</span>
 </button>
 <button class="flex items-center gap-3 bg-secondary text-white p-unit-md rounded-xl active:scale-95 transition-transform text-left" onclick="window.location.href='/hr/approval-queue'">
 <span class="material-symbols-outlined" data-icon="edit_calendar">edit_calendar</span>
-<span class="font-label-md text-label-md">Review Leave</span>
+<span class="font-label-md text-label-md">Tinjau Cuti</span>
 </button>
 <button class="flex items-center gap-3 bg-surface-container-high text-on-surface p-unit-md rounded-xl active:scale-95 transition-transform text-left border border-outline-variant" onclick="window.location.href='/hr/employees'">
 <span class="material-symbols-outlined text-primary" data-icon="manage_accounts">manage_accounts</span>
-<span class="font-label-md text-label-md">Manage Employees</span>
+<span class="font-label-md text-label-md">Kelola Pegawai</span>
 </button>
 <button class="flex items-center gap-3 bg-surface-container-high text-on-surface p-unit-md rounded-xl active:scale-95 transition-transform text-left border border-outline-variant" onclick="window.location.href='/reports'">
 <span class="material-symbols-outlined text-primary" data-icon="analytics">analytics</span>
-<span class="font-label-md text-label-md">View Reports</span>
+<span class="font-label-md text-label-md">Lihat Laporan</span>
 </button>
 </div>
 </section>
 <!-- Attendance Overview (Chart) -->
 <section class="bg-surface-container-lowest p-unit-md rounded-xl border border-border shadow-sm space-y-4">
 <div class="flex justify-between items-center">
-<h2 class="font-headline-md text-headline-md text-on-surface">Attendance Overview</h2>
+<h2 class="font-headline-md text-headline-md text-on-surface">Ringkasan Kehadiran</h2>
 <span class="material-symbols-outlined text-outline" data-icon="more_vert">more_vert</span>
 </div>
 <!-- Simple Visual Bar Chart -->
@@ -215,15 +215,15 @@
 </div>
 <div class="grid grid-cols-3 gap-2 pt-2 border-t border-outline-variant">
 <div class="text-center">
-<p class="text-[10px] text-outline font-bold uppercase">Approved</p>
+<p class="text-[10px] text-outline font-bold uppercase">Disetujui</p>
 <p class="font-headline-md text-success">{{ $approvedAttendance }}</p>
 </div>
 <div class="text-center border-x border-outline-variant">
-<p class="text-[10px] text-outline font-bold uppercase">Pending</p>
+<p class="text-[10px] text-outline font-bold uppercase">Menunggu</p>
 <p class="font-headline-md text-warning">{{ $pendingAttendance }}</p>
 </div>
 <div class="text-center">
-<p class="text-[10px] text-outline font-bold uppercase">Rejected</p>
+<p class="text-[10px] text-outline font-bold uppercase">Ditolak</p>
 <p class="font-headline-md text-danger">{{ $rejectedAttendance }}</p>
 </div>
 </div>
@@ -231,28 +231,28 @@
 <!-- Leave Overview -->
 <section class="bg-surface-container-lowest p-unit-md rounded-xl border border-border shadow-sm space-y-4">
 <div class="flex justify-between items-center">
-<h2 class="font-headline-md text-headline-md text-on-surface">Leave Requests</h2>
-<span class="text-primary font-label-md">Weekly</span>
+<h2 class="font-headline-md text-headline-md text-on-surface">Pengajuan Cuti</h2>
+<span class="text-primary font-label-md">Mingguan</span>
 </div>
 <div class="flex flex-col gap-3">
 <div class="flex items-center justify-between p-3 bg-surface rounded-lg">
 <div class="flex items-center gap-3">
 <div class="w-2 h-8 bg-warning rounded-full"></div>
-<span class="font-body-md font-medium">Pending HR Approval</span>
+<span class="font-body-md font-medium">Menunggu Persetujuan HR</span>
 </div>
 <span class="font-headline-md text-on-surface">{{ $pendingLeave }}</span>
 </div>
 <div class="flex items-center justify-between p-3 bg-surface rounded-lg">
 <div class="flex items-center gap-3">
 <div class="w-2 h-8 bg-success rounded-full"></div>
-<span class="font-body-md font-medium">Approved</span>
+<span class="font-body-md font-medium">Disetujui</span>
 </div>
 <span class="font-headline-md text-on-surface">{{ $approvedLeave }}</span>
 </div>
 <div class="flex items-center justify-between p-3 bg-surface rounded-lg">
 <div class="flex items-center gap-3">
 <div class="w-2 h-8 bg-danger rounded-full"></div>
-<span class="font-body-md font-medium">Rejected</span>
+<span class="font-body-md font-medium">Ditolak</span>
 </div>
 <span class="font-headline-md text-on-surface">{{ $rejectedLeave }}</span>
 </div>
@@ -261,49 +261,18 @@
 <!-- Recent Activity -->
 <section class="bg-surface-container-lowest p-unit-md rounded-xl border border-border shadow-sm space-y-4 mb-8">
 <div class="flex justify-between items-center">
-<h2 class="font-headline-md text-headline-md text-on-surface">Recent Activity</h2>
-<button class="text-primary font-label-md hover:underline" onclick="window.location.href='/hr/approval-queue'">View All</button>
+<h2 class="font-headline-md text-headline-md text-on-surface">Aktivitas Terbaru</h2>
+<button class="text-primary font-label-md hover:underline" onclick="window.location.href='/hr/approval-queue'">Lihat Semua</button>
 </div>
 <div class="space-y-4">
-<!-- Activity Item -->
-<div class="flex gap-4">
-<div class="w-10 h-10 rounded-full bg-primary-container/20 flex items-center justify-center shrink-0">
-<span class="material-symbols-outlined text-primary text-sm" data-icon="check_circle">check_circle</span>
-</div>
-<div class="flex flex-col">
-<span class="font-body-md text-on-surface">Attendance approved for <b>Alex Rivers</b></span>
-<span class="text-[11px] text-outline">2 mins ago</span>
-</div>
-</div>
-<!-- Activity Item -->
-<div class="flex gap-4">
-<div class="w-10 h-10 rounded-full bg-secondary-container/20 flex items-center justify-center shrink-0">
-<span class="material-symbols-outlined text-secondary text-sm" data-icon="description">description</span>
-</div>
-<div class="flex flex-col">
-<span class="font-body-md text-on-surface">Leave request submitted by <b>Sarah Chen</b></span>
-<span class="text-[11px] text-outline">1 hour ago</span>
-</div>
-</div>
-<!-- Activity Item -->
-<div class="flex gap-4">
-<div class="w-10 h-10 rounded-full bg-surface-container-highest flex items-center justify-center shrink-0">
-<span class="material-symbols-outlined text-outline text-sm" data-icon="person_add">person_add</span>
-</div>
-<div class="flex flex-col">
-<span class="font-body-md text-on-surface">Employee data updated for <b>John Doe</b></span>
-<span class="text-[11px] text-outline">3 hours ago</span>
-</div>
-</div>
-<!-- Activity Item -->
-<div class="flex gap-4">
-<div class="w-10 h-10 rounded-full bg-success/10 flex items-center justify-center shrink-0">
-<span class="material-symbols-outlined text-success text-sm" data-icon="payments">payments</span>
-</div>
-<div class="flex flex-col">
-<span class="font-body-md text-on-surface">Payroll period reviewed for <b>June 2026</b></span>
-<span class="text-[11px] text-outline">Yesterday</span>
-</div>
+{{--
+    Belum ada sumber data aktivitas nyata yang terhubung ke dashboard ini.
+    Fase 57 sengaja tidak menambah query/analytics baru — lihat roadmap
+    Phase 62 untuk rencana dashboard berbasis data nyata (mis. dari audit_logs).
+--}}
+<div class="flex flex-col items-center justify-center py-unit-lg text-center gap-2 opacity-70">
+<span class="material-symbols-outlined text-[40px] text-outline">history</span>
+<p class="font-body-md text-on-surface-variant">Belum ada aktivitas terbaru.</p>
 </div>
 </div>
 </section>
@@ -313,24 +282,24 @@
 <section class="mx-container-margin bg-white border border-border rounded-xl shadow-[0px_1px_2px_0px_rgba(0,0,0,0.05)] p-4 flex flex-col gap-3 mb-2">
 <div class="flex items-center gap-2">
 <span class="material-symbols-outlined text-primary text-[20px]">person</span>
-<h2 class="font-semibold text-on-surface" style="font-size:16px;line-height:24px;">My Self-Service</h2>
+<h2 class="font-semibold text-on-surface" style="font-size:16px;line-height:24px;">Layanan Mandiri Saya</h2>
 </div>
 <div class="grid grid-cols-2 gap-3">
 <a href="/attendance/checkin" class="flex flex-col items-center gap-2 p-3 rounded-xl border border-outline-variant hover:bg-surface-container-low transition-colors active:scale-95">
 <span class="material-symbols-outlined text-primary">schedule</span>
-<span style="font-size:12px;font-weight:600;color:#464555;">My Attendance</span>
+<span style="font-size:12px;font-weight:600;color:#464555;">Kehadiran Saya</span>
 </a>
 <a href="/leave/request" class="flex flex-col items-center gap-2 p-3 rounded-xl border border-outline-variant hover:bg-surface-container-low transition-colors active:scale-95">
 <span class="material-symbols-outlined text-primary">event_note</span>
-<span style="font-size:12px;font-weight:600;color:#464555;">My Leave</span>
+<span style="font-size:12px;font-weight:600;color:#464555;">Cuti Saya</span>
 </a>
 <a href="/my/payroll" class="flex flex-col items-center gap-2 p-3 rounded-xl border border-outline-variant hover:bg-surface-container-low transition-colors active:scale-95">
 <span class="material-symbols-outlined text-primary">receipt_long</span>
-<span style="font-size:12px;font-weight:600;color:#464555;">My Payslip</span>
+<span style="font-size:12px;font-weight:600;color:#464555;">Slip Gaji Saya</span>
 </a>
 <a href="/my/profile" class="flex flex-col items-center gap-2 p-3 rounded-xl border border-outline-variant hover:bg-surface-container-low transition-colors active:scale-95">
 <span class="material-symbols-outlined text-primary">account_circle</span>
-<span style="font-size:12px;font-weight:600;color:#464555;">My Profile</span>
+<span style="font-size:12px;font-weight:600;color:#464555;">Profil Saya</span>
 </a>
 </div>
 </section>
@@ -341,27 +310,27 @@
 <!-- Home (Active) -->
 <button class="flex flex-col items-center justify-center text-primary font-bold hover:bg-surface-container-low transition-all active:scale-95 duration-200" onclick="window.location.href='/admin/dashboard'">
 <span class="material-symbols-outlined" data-icon="home" style="font-variation-settings: 'FILL' 1;">home</span>
-<span class="font-label-sm text-label-sm">Home</span>
+<span class="font-label-sm text-label-sm">{{ __('common.nav_home') }}</span>
 </button>
 <!-- Employees -->
 <button class="flex flex-col items-center justify-center text-outline hover:bg-surface-container-low transition-all active:scale-95 duration-200" onclick="window.location.href='/hr/employees'">
 <span class="material-symbols-outlined" data-icon="badge">badge</span>
-<span class="font-label-sm text-label-sm">Employees</span>
+<span class="font-label-sm text-label-sm">{{ __('common.nav_employees') }}</span>
 </button>
 <!-- Approvals -->
 <button class="flex flex-col items-center justify-center text-outline hover:bg-surface-container-low transition-all active:scale-95 duration-200" onclick="window.location.href='/hr/approval-queue'">
 <span class="material-symbols-outlined" data-icon="fact_check">fact_check</span>
-<span class="font-label-sm text-label-sm">Approvals</span>
+<span class="font-label-sm text-label-sm">{{ __('common.nav_approvals') }}</span>
 </button>
 <!-- Reports -->
 <button class="flex flex-col items-center justify-center text-outline hover:bg-surface-container-low transition-all active:scale-95 duration-200" onclick="window.location.href='/reports'">
 <span class="material-symbols-outlined" data-icon="analytics">analytics</span>
-<span class="font-label-sm text-label-sm">Reports</span>
+<span class="font-label-sm text-label-sm">{{ __('common.nav_reports') }}</span>
 </button>
 <!-- Profile -->
 <button class="flex flex-col items-center justify-center text-outline hover:bg-surface-container-low transition-all active:scale-95 duration-200" onclick="window.location.href='/profile'">
 <span class="material-symbols-outlined" data-icon="person">person</span>
-<span class="font-label-sm text-label-sm">Profile</span>
+<span class="font-label-sm text-label-sm">{{ __('common.nav_profile') }}</span>
 </button>
 </nav>
 <script>

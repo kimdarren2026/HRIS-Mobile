@@ -145,8 +145,8 @@
             };
             $days = (int) $req->total_days;
             $dateRange = $req->start_date->isSameDay($req->end_date)
-                ? $req->start_date->format('M d, Y')
-                : $req->start_date->format('M d') . ' – ' . $req->end_date->format('M d, Y');
+                ? $req->start_date->translatedFormat('M d, Y')
+                : $req->start_date->translatedFormat('M d') . ' – ' . $req->end_date->translatedFormat('M d, Y');
         @endphp
         <div class="bg-white border border-border rounded-xl p-unit-md shadow-sm relative overflow-hidden">
             <div class="absolute left-0 top-0 bottom-0 w-1 {{ $statusColor }}"></div>
@@ -221,7 +221,8 @@
         <span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 1;">event_note</span>
         <span class="font-label-sm text-label-sm">Cuti</span>
     </a>
-    <a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 hover:bg-surface-container-high active:scale-90 transition-all duration-200" href="/payslip/detail">
+    <a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 hover:bg-surface-container-high active:scale-90 transition-all duration-200 relative" href="/payslip/detail">
+        <span class="absolute top-0 right-2 w-2 h-2 rounded-full bg-warning" aria-hidden="true" title="Segera Hadir"></span>
         <span class="material-symbols-outlined mb-1">payments</span>
         <span class="font-label-sm text-label-sm">Slip Gaji</span>
     </a>
