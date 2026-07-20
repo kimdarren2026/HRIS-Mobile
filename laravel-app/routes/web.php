@@ -124,6 +124,8 @@ Route::middleware(['auth', 'role:admin_hr,super_admin'])->group(function (): voi
 
     // System settings (Phase 19)
     Route::get('/settings', [SettingsController::class, 'index'])->name('settings.index');
+    Route::get('/settings/locations/create',                [OfficeLocationController::class, 'create'])->name('settings.locations.create');
+    Route::post('/settings/locations',                      [OfficeLocationController::class, 'store'])->name('settings.locations.store');
     Route::get('/settings/locations/{officeLocation}/edit', [OfficeLocationController::class, 'edit'])->name('settings.locations.edit');
     Route::put('/settings/locations/{officeLocation}',      [OfficeLocationController::class, 'update'])->name('settings.locations.update');
     Route::get('/settings/leave-types',                    [LeaveTypeSettingsController::class, 'index'])->name('settings.leave-types.index');

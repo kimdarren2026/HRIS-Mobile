@@ -320,9 +320,9 @@ Absen pulang akan dicatat. Status Menunggu Review HR tetap menunggu keputusan HR
 <main class="flex-1 mt-16 px-container-margin py-unit-md flex flex-col gap-unit-lg">
 
 @if(!$officeLocation)
-<div class="bg-warning/10 border border-warning/30 rounded-lg px-4 py-3 flex items-start gap-2">
-<span class="material-symbols-outlined text-warning text-[18px] shrink-0 mt-0.5">warning</span>
-<p class="font-body-md text-body-md text-on-surface-variant">Lokasi kantor belum dikonfigurasi. Absen masuk tetap bisa dilakukan namun akan masuk status <strong>Menunggu Review HR</strong>. Hubungi HR untuk mengatur lokasi kantor.</p>
+<div class="bg-error-container border border-error/30 rounded-lg px-4 py-3 flex items-start gap-2">
+<span class="material-symbols-outlined text-error text-[18px] shrink-0 mt-0.5">block</span>
+<p class="font-body-md text-body-md text-on-error-container">Lokasi kantor belum dikonfigurasi. Absen masuk <strong>belum bisa dilakukan</strong>. Hubungi HR/Admin untuk mengatur lokasi kantor terlebih dahulu.</p>
 </div>
 @endif
 
@@ -478,10 +478,13 @@ Alasan absen di luar radius <span class="text-danger">*</span>
     }
 
     // ── Submit guard ───────────────────────────────────────────────────────
+    // Check-in is blocked server-side too when no office location is active —
+    // this only avoids sending an employee through the GPS/camera flow for a
+    // submission that would be rejected anyway.
     function updateSubmit() {
         const btn = document.getElementById('submit-btn');
         if (!btn) return;
-        btn.disabled = !(gpsReady && photoReady);
+        btn.disabled = OFFICE_LAT === null || !(gpsReady && photoReady);
     }
 
     // ── GPS ────────────────────────────────────────────────────────────────

@@ -55,13 +55,20 @@ class AttendanceController extends Controller
             return back()->withErrors(['general' => 'Anda sudah melakukan check-in hari ini.']);
         }
 
-        $lat    = (float) $request->lat;
-        $lng    = (float) $request->lng;
         $office = $this->attendanceService->getActiveOffice();
 
+        if (! $office) {
+            return back()->withErrors([
+                'general' => 'Lokasi kantor belum dikonfigurasi. Check-in belum bisa dilakukan. Hubungi HR/Admin untuk mengatur lokasi kantor terlebih dahulu.',
+            ]);
+        }
+
+        $lat = (float) $request->lat;
+        $lng = (float) $request->lng;
+
         // Server-side radius decision — never trust client-supplied status
-        $distance     = $office ? round($this->attendanceService->calculateDistance($lat, $lng, $office), 2) : null;
-        $withinRadius = $office && ($distance !== null) && ($distance <= $office->radius_meters);
+        $distance     = round($this->attendanceService->calculateDistance($lat, $lng, $office), 2);
+        $withinRadius = $distance <= $office->radius_meters;
 
         if (! $withinRadius) {
             $request->validate([

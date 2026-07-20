@@ -143,8 +143,13 @@
 <h2 class="font-headline-md text-headline-md-mobile">Office Location &amp; Radius</h2>
 </div>
 @if($office)
-<div class="flex flex-col">
+<div class="flex flex-col gap-1">
+<div class="flex items-center justify-between">
 <span class="font-label-md text-label-md text-on-surface-variant">{{ $office->name }}</span>
+<span class="font-status-badge text-status-badge text-success bg-success/10 px-2 py-1 rounded-full flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]" style="font-variation-settings:'FILL' 1;">check_circle</span> Active
+</span>
+</div>
 <p class="font-body-md text-body-md text-on-surface">Lat: {{ $office->latitude }}, Lng: {{ $office->longitude }}</p>
 <div class="mt-2 py-2 px-3 bg-surface-container-low rounded-lg flex justify-between items-center">
 <span class="font-body-md text-body-md">Check-in radius</span>
@@ -152,10 +157,13 @@
 </div>
 </div>
 <a href="{{ route('settings.locations.edit', $office) }}" class="mt-2 block text-center border border-primary text-primary font-label-md text-label-md py-2.5 rounded-lg active:scale-95 transition-transform hover:bg-primary/5">
-    Manage Location
+    Edit Office Location
 </a>
 @else
-<p class="font-body-md text-body-md text-on-surface-variant">No active office location configured.</p>
+<p class="font-body-md text-body-md text-on-surface-variant">No active office location configured. Employee check-in will be blocked until a location is set.</p>
+<a href="{{ route('settings.locations.create') }}" class="mt-2 block text-center bg-primary text-on-primary font-label-md text-label-md py-2.5 rounded-lg active:scale-95 transition-transform hover:bg-primary/90">
+    Set Office Location
+</a>
 @endif
 </section>
 
