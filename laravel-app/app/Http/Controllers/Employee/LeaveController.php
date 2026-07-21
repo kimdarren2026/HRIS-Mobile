@@ -38,10 +38,17 @@ class LeaveController extends Controller
 
         $annualLeaveEligible = $this->leaveService->isEligibleForAnnualLeave($employee);
 
-        $balanceRows = $balances->map(fn (LeaveBalance $balance) => [
-            'label'     => $balance->leaveType->display_name,
-            'remaining' => (int) $balance->remaining,
-        ])->values();
+        $balanceRows = $balances->map(function (LeaveBalance $balance) use ($employee, $year) {
+            // Half-day policy point 5: pending half-day requests hold 1 day
+            // each from the displayed remaining balance (no column persisted —
+            // see LeaveService::heldHalfDayDays()).
+            $held = $this->leaveService->heldHalfDayDays($employee, $balance->leaveType, $year);
+
+            return [
+                'label'     => $balance->leaveType->display_name,
+                'remaining' => max(0, (int) $balance->remaining - $held),
+            ];
+        })->values();
 
         // No approved leave yet this year means no LeaveBalance row exists (it is
         // created lazily on first approval). Show the entitlement as a preview
@@ -54,9 +61,11 @@ class LeaveController extends Controller
             $annualType = $leaveTypes->first(fn (LeaveType $type) => $type->isAnnualEntitlementType());
 
             if ($annualType) {
+                $held = $this->leaveService->heldHalfDayDays($employee, $annualType, $year);
+
                 $balanceRows->push([
                     'label'     => $annualType->display_name,
-                    'remaining' => LeaveBalance::DEFAULT_ANNUAL_QUOTA,
+                    'remaining' => max(0, LeaveBalance::DEFAULT_ANNUAL_QUOTA - $held),
                 ]);
             }
         }

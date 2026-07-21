@@ -162,6 +162,9 @@
                 </div>
                 <div class="text-right">
                     <div class="font-label-md text-label-md text-on-surface">{{ $days }} Hari</div>
+                    @if($req->isHalfDay())
+                    <div class="font-label-sm text-label-sm text-warning">Setengah Hari</div>
+                    @endif
                 </div>
             </div>
             <div class="pl-2">

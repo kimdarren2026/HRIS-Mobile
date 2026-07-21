@@ -24,7 +24,10 @@ use Tests\TestCase;
  * - 2-working-day monthly cap for annual/personal leave (policy point 1).
  * - Working-day calculation excludes weekends and national holidays (points 2 & 3).
  * - Balance deduction happens on approval only, using chargeable (working) days.
- * - No half-day leave: schema has no fraction field, computed days are always whole (point 6).
+ * - Half-day leave (Phase 58 policy correction): supported via a duration_type
+ *   column, not a fractional total_days/chargeable_days value. A half-day
+ *   request against a balance-deducting leave type always charges exactly
+ *   1 whole day (never 0.5) — see LeaveService::submit()/heldHalfDayDays().
  * - Annual reset: unused balance never carries over into the next calendar year,
  *   which new-year entitlement always starts at the full 18-day quota (point 8).
  *   Implemented via the existing year-scoped LeaveBalance architecture
@@ -81,6 +84,29 @@ class LeavePolicyTest extends TestCase
             'start_date'    => $start,
             'end_date'      => $end,
             'reason'        => 'Test leave reason for policy tests.',
+        ]);
+    }
+
+    private function submitHalfDay(Employee $employee, string $date, ?LeaveType $type = null): LeaveRequest
+    {
+        return $this->service->submit($employee, [
+            'leave_type_id'  => ($type ?? $this->annualLeaveType)->id,
+            'start_date'     => $date,
+            'end_date'       => $date,
+            'duration_type'  => 'HALF_DAY',
+            'reason'         => 'Test half-day leave reason for policy tests.',
+        ]);
+    }
+
+    private function givenAnnualBalance(Employee $employee): void
+    {
+        LeaveBalance::create([
+            'employee_id'   => $employee->id,
+            'leave_type_id' => $this->annualLeaveType->id,
+            'year'          => 2026,
+            'total_quota'   => 18,
+            'used'          => 0,
+            'remaining'     => 18,
         ]);
     }
 
@@ -242,18 +268,158 @@ class LeavePolicyTest extends TestCase
         $this->submitAnnual($employee, $wednesday->toDateString(), $wednesday->toDateString(), $this->personalLeaveType);
     }
 
-    // ── No half-day leave (policy point 6) ───────────────────────────────────
+    // ── Half-day leave (Phase 58 policy correction) ──────────────────────────
 
-    public function test_leave_requests_table_has_no_half_day_or_duration_fraction_column(): void
+    public function test_half_day_leave_deducts_one_full_day_of_balance(): void
     {
-        // start_date/end_date are date-only columns and total_days/chargeable_days
-        // are server-computed from them — there is no user-facing half-day input
-        // to disable. This test locks that schema invariant.
-        $columns = \Illuminate\Support\Facades\Schema::getColumnListing('leave_requests');
+        $employee = $this->makeEmployee(now()->subYears(2)->toDateString());
+        $this->givenAnnualBalance($employee);
 
-        foreach (['is_half_day', 'half_day', 'duration_fraction', 'session', 'am_pm'] as $forbidden) {
-            $this->assertNotContains($forbidden, $columns);
+        $monday  = Carbon::parse('2026-08-03');
+        $request = $this->submitHalfDay($employee, $monday->toDateString());
+
+        $this->assertSame('HALF_DAY', $request->duration_type);
+        $this->assertSame('1.00', (string) $request->chargeable_days);
+
+        $this->service->approve($request, $this->hrUser, 'Approved.');
+
+        $balance = LeaveBalance::where('employee_id', $employee->id)->first()->fresh();
+        $this->assertSame('1.00', $balance->used);
+        $this->assertSame('17.00', $balance->remaining);
+    }
+
+    public function test_pending_half_day_leave_holds_one_day_of_balance(): void
+    {
+        $employee = $this->makeEmployee(now()->subYears(2)->toDateString());
+
+        $monday = Carbon::parse('2026-08-03');
+        $this->submitHalfDay($employee, $monday->toDateString());
+
+        $held = $this->service->heldHalfDayDays($employee, $this->annualLeaveType, 2026);
+        $this->assertSame(1, $held);
+
+        // Held balance is a display-time computation, not a persisted column —
+        // no leave_balances row is created until approval.
+        $this->assertDatabaseMissing('leave_balances', ['employee_id' => $employee->id]);
+    }
+
+    public function test_two_half_day_leaves_in_same_month_count_as_two_days(): void
+    {
+        $employee = $this->makeEmployee(now()->subYears(2)->toDateString());
+
+        $this->submitHalfDay($employee, Carbon::parse('2026-08-03')->toDateString());
+        $this->submitHalfDay($employee, Carbon::parse('2026-08-04')->toDateString());
+
+        $held = $this->service->heldHalfDayDays($employee, $this->annualLeaveType, 2026);
+        $this->assertSame(2, $held);
+    }
+
+    public function test_third_half_day_leave_in_same_month_requires_special_approval(): void
+    {
+        $employee = $this->makeEmployee(now()->subYears(2)->toDateString());
+
+        $this->submitHalfDay($employee, Carbon::parse('2026-08-03')->toDateString());
+        $this->submitHalfDay($employee, Carbon::parse('2026-08-04')->toDateString());
+
+        $this->expectException(ValidationException::class);
+        $this->submitHalfDay($employee, Carbon::parse('2026-08-05')->toDateString());
+    }
+
+    public function test_reject_releases_held_half_day_balance(): void
+    {
+        $employee = $this->makeEmployee(now()->subYears(2)->toDateString());
+
+        $monday  = Carbon::parse('2026-08-03');
+        $request = $this->submitHalfDay($employee, $monday->toDateString());
+
+        $this->assertSame(1, $this->service->heldHalfDayDays($employee, $this->annualLeaveType, 2026));
+
+        $this->service->reject($request, $this->hrUser, 'Rejected for test reasons.');
+
+        $this->assertSame(0, $this->service->heldHalfDayDays($employee, $this->annualLeaveType, 2026));
+        $this->assertDatabaseMissing('leave_balances', ['employee_id' => $employee->id]);
+    }
+
+    public function test_double_approval_does_not_deduct_more_than_one_day(): void
+    {
+        $employee = $this->makeEmployee(now()->subYears(2)->toDateString());
+        $this->givenAnnualBalance($employee);
+
+        $monday  = Carbon::parse('2026-08-03');
+        $request = $this->submitHalfDay($employee, $monday->toDateString());
+
+        $this->service->approve($request, $this->hrUser, 'Approved.');
+        $this->service->approve($request->fresh(), $this->hrUser, 'Approved again.');
+
+        $balance = LeaveBalance::where('employee_id', $employee->id)->first()->fresh();
+        $this->assertSame('1.00', $balance->used);
+        $this->assertSame('17.00', $balance->remaining);
+    }
+
+    public function test_half_day_leave_cannot_be_submitted_on_weekend_or_holiday(): void
+    {
+        $employee = $this->makeEmployee(now()->subYears(2)->toDateString());
+
+        try {
+            $this->submitHalfDay($employee, Carbon::parse('2026-08-08')->toDateString()); // Saturday
+            $this->fail('Expected ValidationException for weekend half-day request.');
+        } catch (ValidationException $e) {
+            $this->assertArrayHasKey('start_date', $e->errors());
         }
+
+        Holiday::create(['date' => '2026-08-05', 'name' => 'Test Holiday']); // Wednesday
+
+        try {
+            $this->submitHalfDay($employee, Carbon::parse('2026-08-05')->toDateString());
+            $this->fail('Expected ValidationException for holiday half-day request.');
+        } catch (ValidationException $e) {
+            $this->assertArrayHasKey('start_date', $e->errors());
+        }
+    }
+
+    public function test_ui_shows_half_day_leave_still_counts_as_one_day(): void
+    {
+        $employee = $this->makeEmployee(now()->subYears(2)->toDateString());
+
+        $response = $this->actingAs($employee->user)->get('/leave/request');
+
+        $response->assertOk();
+        $response->assertSee('Cuti setengah hari tetap diperhitungkan sebagai 1 hari dari saldo cuti.');
+    }
+
+    public function test_non_chargeable_half_day_does_not_hold_or_deduct_annual_balance(): void
+    {
+        $employee = $this->makeEmployee(now()->subYears(2)->toDateString());
+        $this->givenAnnualBalance($employee); // known starting point: total 18, used 0, remaining 18
+
+        $nonChargeableType = LeaveType::create(['name' => 'Sick Leave', 'deducts_balance' => false]);
+
+        $monday  = Carbon::parse('2026-08-03'); // valid single work day
+        $request = $this->submitHalfDay($employee, $monday->toDateString(), $nonChargeableType);
+
+        // ── While pending ────────────────────────────────────────────────
+        $annualBalance = LeaveBalance::where('employee_id', $employee->id)
+            ->where('leave_type_id', $this->annualLeaveType->id)
+            ->first();
+
+        $this->assertSame('0.00', $annualBalance->fresh()->used);
+        $this->assertSame('18.00', $annualBalance->fresh()->remaining);
+        $this->assertSame(0, $this->service->heldHalfDayDays($employee, $this->annualLeaveType, 2026));
+        $this->assertDatabaseMissing('leave_balances', ['leave_type_id' => $nonChargeableType->id]);
+
+        // ── After approval ───────────────────────────────────────────────
+        $this->service->approve($request, $this->hrUser, 'Approved.');
+
+        $this->assertSame('0.00', $annualBalance->fresh()->used);
+        $this->assertSame('18.00', $annualBalance->fresh()->remaining);
+        $this->assertSame('HALF_DAY', $request->fresh()->duration_type);
+        $this->assertSame('APPROVED', $request->fresh()->status);
+
+        // No new leave_balances row was created for the non-chargeable type,
+        // and the only row that exists is the one seeded above for the
+        // annual (chargeable) leave type.
+        $this->assertDatabaseMissing('leave_balances', ['leave_type_id' => $nonChargeableType->id]);
+        $this->assertSame(1, LeaveBalance::where('employee_id', $employee->id)->count());
     }
 
     public function test_submitted_leave_always_has_whole_number_day_counts(): void

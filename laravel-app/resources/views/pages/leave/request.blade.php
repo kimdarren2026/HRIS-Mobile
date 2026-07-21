@@ -176,6 +176,21 @@
             </div>
         </div>
 
+        {{-- Duration type --}}
+        <div class="flex flex-col gap-unit-xs">
+            <label class="text-label-md font-label-md text-on-surface-variant">Durasi</label>
+            <div class="flex gap-unit-md">
+                <label class="flex-1 flex items-center gap-2 px-unit-md h-12 bg-surface border border-outline-variant rounded-lg cursor-pointer has-[:checked]:border-primary-container has-[:checked]:bg-primary-container/10">
+                    <input type="radio" name="duration_type" value="FULL_DAY" id="duration_full" {{ old('duration_type', 'FULL_DAY') === 'FULL_DAY' ? 'checked' : '' }}>
+                    <span class="text-body-md font-body-md text-on-surface">Sehari Penuh</span>
+                </label>
+                <label class="flex-1 flex items-center gap-2 px-unit-md h-12 bg-surface border border-outline-variant rounded-lg cursor-pointer has-[:checked]:border-primary-container has-[:checked]:bg-primary-container/10">
+                    <input type="radio" name="duration_type" value="HALF_DAY" id="duration_half" {{ old('duration_type') === 'HALF_DAY' ? 'checked' : '' }}>
+                    <span class="text-body-md font-body-md text-on-surface">Setengah Hari</span>
+                </label>
+            </div>
+        </div>
+
         {{-- Dates --}}
         <div class="flex gap-unit-md">
             <div class="flex flex-col gap-unit-xs w-1/2">
@@ -196,6 +211,9 @@
 
         {{-- Duration preview --}}
         <p id="duration-preview" class="text-label-sm font-label-sm text-primary hidden text-center -mt-2"></p>
+        <p id="half-day-note" class="text-label-sm font-label-sm text-warning hidden text-center -mt-2">
+            Cuti setengah hari tetap diperhitungkan sebagai 1 hari dari saldo cuti. Hanya dapat diajukan untuk satu tanggal kerja (bukan Sabtu, Minggu, atau hari libur).
+        </p>
 
         {{-- Reason --}}
         <div class="flex flex-col gap-unit-xs">
@@ -232,7 +250,7 @@
             Hari Sabtu, Minggu, dan Libur Nasional tidak dihitung sebagai pengurang saldo cuti tahunan.
         </p>
         <p class="text-label-sm font-label-sm text-on-surface-variant">
-            Tidak tersedia cuti setengah hari.
+            Cuti setengah hari tetap diperhitungkan sebagai 1 hari dari saldo cuti.
         </p>
         <p class="text-label-sm font-label-sm text-on-surface-variant">
             Sisa cuti tahunan yang tidak digunakan akan gugur pada akhir tahun kalender.
@@ -272,11 +290,25 @@
 </nav>
 
 <script>
-const startInput = document.getElementById('start_date');
-const endInput   = document.getElementById('end_date');
-const preview    = document.getElementById('duration-preview');
+const startInput   = document.getElementById('start_date');
+const endInput     = document.getElementById('end_date');
+const preview      = document.getElementById('duration-preview');
+const halfDayNote  = document.getElementById('half-day-note');
+const durationFull = document.getElementById('duration_full');
+const durationHalf = document.getElementById('duration_half');
+
+function isHalfDay() {
+    return durationHalf.checked;
+}
 
 function updateDuration() {
+    if (isHalfDay()) {
+        preview.classList.add('hidden');
+        halfDayNote.classList.remove('hidden');
+        return;
+    }
+    halfDayNote.classList.add('hidden');
+
     const s = new Date(startInput.value);
     const e = new Date(endInput.value);
     if (!startInput.value || !endInput.value || e < s) {
@@ -288,11 +320,30 @@ function updateDuration() {
     preview.classList.remove('hidden');
 }
 
+function syncHalfDayEndDate() {
+    if (isHalfDay()) {
+        endInput.value = startInput.value;
+        endInput.readOnly = true;
+        endInput.classList.add('opacity-60', 'bg-surface-container-low');
+    } else {
+        endInput.readOnly = false;
+        endInput.classList.remove('opacity-60', 'bg-surface-container-low');
+    }
+    updateDuration();
+}
+
 startInput.addEventListener('change', function() {
-    if (endInput.value && endInput.value < this.value) endInput.value = this.value;
+    if (isHalfDay()) {
+        endInput.value = this.value;
+    } else if (endInput.value && endInput.value < this.value) {
+        endInput.value = this.value;
+    }
     updateDuration();
 });
 endInput.addEventListener('change', updateDuration);
+durationFull.addEventListener('change', syncHalfDayEndDate);
+durationHalf.addEventListener('change', syncHalfDayEndDate);
+syncHalfDayEndDate();
 
 // Show filename when file selected
 document.getElementById('attachment-input').addEventListener('change', function() {
