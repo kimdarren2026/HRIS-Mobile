@@ -12,6 +12,7 @@ class LeaveRequest extends Model
         'leave_type_id',
         'start_date',
         'end_date',
+        'duration_type',
         'total_days',
         'chargeable_days',
         'reason',
@@ -46,5 +47,10 @@ class LeaveRequest extends Model
     public function approver(): BelongsTo
     {
         return $this->belongsTo(User::class, 'approved_by');
+    }
+
+    public function isHalfDay(): bool
+    {
+        return $this->duration_type === 'HALF_DAY';
     }
 }

@@ -261,7 +261,7 @@ Menunggu HR
 <div class="flex items-center gap-2">
 <span class="material-symbols-outlined text-primary text-[18px]">event_note</span>
 <span class="font-label-md text-label-md text-on-surface-variant">
-{{ $leave->leaveType->name }} &bull; {{ $dateRange }} &bull; {{ $days }} hari
+{{ $leave->leaveType->name }} &bull; {{ $dateRange }} &bull; {{ $days }} hari{{ $leave->isHalfDay() ? ' (Setengah Hari)' : '' }}
 </span>
 </div>
 <p class="font-body-md text-on-surface-variant italic leading-relaxed">"{{ $leave->reason }}"</p>

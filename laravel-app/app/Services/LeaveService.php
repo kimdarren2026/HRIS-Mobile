@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Employee;
+use App\Models\Holiday;
 use App\Models\LeaveBalance;
 use App\Models\LeaveRequest;
 use App\Models\LeaveType;
@@ -26,17 +27,33 @@ class LeaveService
 
     public function submit(Employee $employee, array $data, ?UploadedFile $attachment = null): LeaveRequest
     {
-        $startDate = Carbon::parse($data['start_date']);
-        $endDate   = Carbon::parse($data['end_date']);
-        $totalDays = $startDate->diffInDays($endDate) + 1;
+        $startDate    = Carbon::parse($data['start_date']);
+        $endDate      = Carbon::parse($data['end_date']);
+        $totalDays    = $startDate->diffInDays($endDate) + 1;
+        $durationType = $data['duration_type'] ?? 'FULL_DAY';
+        $isHalfDay    = $durationType === 'HALF_DAY';
 
-        // Policy point 6: half-day leave is not supported. start_date/end_date
-        // are date-only columns and diffInDays always yields a whole number, so
-        // this can never actually trip today — it documents/guards the invariant
-        // in case a time-of-day or duration-fraction input is ever added later.
+        // Defensive invariant guard: start_date/end_date are date-only columns
+        // and diffInDays always yields a whole number, so this can never
+        // actually trip today. Kept in case a time-of-day input is ever added
+        // later. Half-day leave itself is handled below via duration_type —
+        // it is a supported, whole-day-equivalent request, not a fractional
+        // total_days/chargeable_days value (half-day policy correction).
         if ($totalDays != floor($totalDays)) {
             throw ValidationException::withMessages([
-                'start_date' => 'Tidak tersedia cuti setengah hari.',
+                'start_date' => 'Tanggal cuti tidak valid.',
+            ]);
+        }
+
+        if ($isHalfDay && ! $startDate->isSameDay($endDate)) {
+            throw ValidationException::withMessages([
+                'start_date' => 'Cuti setengah hari hanya boleh diajukan untuk satu tanggal kerja.',
+            ]);
+        }
+
+        if ($isHalfDay && $this->isBlockedForHalfDay($startDate)) {
+            throw ValidationException::withMessages([
+                'start_date' => 'Cuti setengah hari tidak dapat diajukan pada akhir pekan atau hari libur.',
             ]);
         }
 
@@ -54,11 +71,20 @@ class LeaveService
 
         $leaveType = LeaveType::findOrFail($data['leave_type_id']);
 
-        $chargeableDays = $this->calculator->countChargeableDays(
-            $startDate,
-            $endDate,
-            ! $leaveType->counts_calendar_days,
-        );
+        // Half-day policy correction: for leave types that deduct annual
+        // balance, a half-day request always charges exactly 1 whole day —
+        // never a fraction. For non-deducting leave types the normal
+        // calculator result is kept (chargeable_days is inert there anyway,
+        // since approve() only touches balance when deducts_balance is true).
+        if ($isHalfDay && $leaveType->deducts_balance) {
+            $chargeableDays = 1;
+        } else {
+            $chargeableDays = $this->calculator->countChargeableDays(
+                $startDate,
+                $endDate,
+                ! $leaveType->counts_calendar_days,
+            );
+        }
 
         if ($this->isAnnualEntitlementType($leaveType)) {
             $this->assertEligibleForAnnualLeave($employee, $startDate);
@@ -72,12 +98,43 @@ class LeaveService
             'leave_type_id'  => $data['leave_type_id'],
             'start_date'     => $startDate->toDateString(),
             'end_date'       => $endDate->toDateString(),
+            'duration_type'  => $durationType,
             'total_days'     => $totalDays,
             'chargeable_days'=> $chargeableDays,
             'reason'         => $data['reason'],
             'attachment_path'=> $attachmentPath,
             'status'         => 'PENDING_HR',
         ]);
+    }
+
+    // Half-day policy point 7: cannot be submitted on Saturday, Sunday, or any
+    // date already recorded in the holidays calendar. The holidays table has
+    // no "type" column distinguishing national holidays / cuti bersama /
+    // internal campus holidays (none of that is regulated in this system yet
+    // — see WorkingDayCalculator/Holiday model), so every row in it is treated
+    // uniformly as a blocking date, matching how the same table already
+    // excludes dates from working-day/chargeable-day counting elsewhere.
+    private function isBlockedForHalfDay(Carbon $date): bool
+    {
+        if ($date->isWeekend()) {
+            return true;
+        }
+
+        return Holiday::whereDate('date', $date->toDateString())->exists();
+    }
+
+    // Half-day policy point 5: pending half-day requests hold 1 day of balance
+    // without persisting a new "held" column (leave_balances is unaffected).
+    // The hold is purely a display-time computation — see also item 10 of the
+    // correction: existing decimal columns are already sufficient.
+    public function heldHalfDayDays(Employee $employee, LeaveType $leaveType, int $year): int
+    {
+        return (int) LeaveRequest::where('employee_id', $employee->id)
+            ->where('leave_type_id', $leaveType->id)
+            ->where('duration_type', 'HALF_DAY')
+            ->where('status', 'PENDING_HR')
+            ->whereYear('start_date', $year)
+            ->sum('chargeable_days');
     }
 
     private function isAnnualEntitlementType(LeaveType $leaveType): bool

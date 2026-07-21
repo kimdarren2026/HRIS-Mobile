@@ -17,6 +17,7 @@ class StoreLeaveRequest extends FormRequest
             'leave_type_id' => ['required', 'exists:leave_types,id'],
             'start_date'    => ['required', 'date', 'after_or_equal:today'],
             'end_date'      => ['required', 'date', 'after_or_equal:start_date'],
+            'duration_type' => ['nullable', 'in:FULL_DAY,HALF_DAY'],
             'reason'        => ['required', 'string', 'min:10', 'max:1000'],
             'attachment'    => ['nullable', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:5120'],
         ];
