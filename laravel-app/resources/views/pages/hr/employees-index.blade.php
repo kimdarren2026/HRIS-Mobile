@@ -139,7 +139,7 @@ tailwind.config = {
             <p class="font-body-md text-on-surface-variant text-[13px] truncate">{{ $emp->position?->name ?? '—' }}</p>
             <div class="flex gap-4 mt-1">
               <span class="font-label-sm text-on-surface-variant">{{ $emp->department?->name ?? '—' }}</span>
-              <span class="font-label-sm text-on-surface-variant">{{ $emp->nik }}</span>
+              <span class="font-label-sm text-on-surface-variant">{{ $emp->nik ?? '—' }}</span>
             </div>
           </a>
           <details class="relative shrink-0">

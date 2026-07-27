@@ -387,6 +387,20 @@ class FunctionalNotificationsTest extends TestCase
     public function test_attendance_approval_notifies_employee(): void
     {
         $employee = $this->makeEmployee($this->employeeUser);
+
+        // admin_hr needs its own active employee profile to approve (Phase 58D approver guard).
+        $hrDept = Department::create(['name' => 'Test HR Approver', 'description' => '']);
+        $hrPosition = Position::create(['name' => 'HR Approver', 'department_id' => $hrDept->id]);
+        Employee::create([
+            'user_id' => $this->hrUser->id,
+            'nik' => 'NIK-FN-HR-APPROVER',
+            'department_id' => $hrDept->id,
+            'position_id' => $hrPosition->id,
+            'join_date' => '2026-01-01',
+            'employment_status' => 'active',
+            'phone_number' => '+62811000099',
+        ]);
+
         $record   = AttendanceRecord::create([
             'employee_id'    => $employee->id,
             'attendance_date'=> today(),

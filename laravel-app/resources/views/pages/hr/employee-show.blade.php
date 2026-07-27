@@ -67,7 +67,7 @@ tailwind.config = {
       {{ strtoupper(substr($employee->user?->name ?? '?', 0, 2)) }}
     </div>
     <h2 class="font-headline-lg text-headline-lg text-on-surface">{{ $employee->user?->name ?? '—' }}</h2>
-    <p class="font-label-md text-label-md text-outline tracking-wider">NIK: {{ $employee->nik }}</p>
+    <p class="font-label-md text-label-md text-outline tracking-wider">NIK: {{ $employee->nik ?? '—' }}</p>
     <p class="font-body-lg text-primary-container font-semibold">{{ $employee->position?->name ?? '—' }}</p>
     <p class="font-body-md text-on-surface-variant">{{ $employee->department?->name ?? '—' }}</p>
     @php
@@ -144,7 +144,7 @@ tailwind.config = {
         </div>
         <div>
           <p class="text-[10px] text-outline font-semibold uppercase">Telepon</p>
-          <p class="font-body-md text-on-surface">{{ $employee->phone_number }}</p>
+          <p class="font-body-md text-on-surface">{{ $employee->phone_number ?? '—' }}</p>
         </div>
       </div>
       @if($employee->address)
