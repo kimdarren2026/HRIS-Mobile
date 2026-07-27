@@ -192,6 +192,12 @@ Absen masuk {{ $record->check_in_time?->translatedFormat('d M Y, H:i') }}
 </a>
 @endif
 </div>
+@if(auth()->user()->employee?->id === $record->employee_id)
+<div class="bg-surface-container-low border border-outline-variant/30 rounded-lg px-3 py-2.5 flex items-center gap-2">
+<span class="material-symbols-outlined text-on-surface-variant text-[18px]">info</span>
+<p class="font-label-md text-label-md text-on-surface-variant">Tidak dapat menyetujui pengajuan sendiri</p>
+</div>
+@else
 <form method="POST" action="/hr/attendance/{{ $record->id }}/approve" class="flex gap-3 pt-2 flex-col">
 @csrf
 <input type="text" name="approval_note" placeholder="Catatan opsional untuk pegawai..." maxlength="1000"
@@ -216,6 +222,7 @@ Absen masuk {{ $record->check_in_time?->translatedFormat('d M Y, H:i') }}
 <span class="material-symbols-outlined text-[18px]">cancel</span> Konfirmasi Penolakan
 </button>
 </form>
+@endif
 </div>
 @empty
 <div class="flex flex-col items-center justify-center py-unit-xl opacity-40 select-none">

@@ -285,6 +285,27 @@ class AttendanceCheckInTest extends TestCase
 
     // ── Approve / Reject ────────────────────────────────────────────────────
 
+    /**
+     * admin_hr must have its own active employee profile to approve/reject
+     * attendance (Phase 58D: self-approval + approver-profile guard on
+     * AttendanceRecordPolicy) — this seeds one for these HR-actor tests.
+     */
+    private function makeHrWithEmployee(): User
+    {
+        $hr = User::factory()->create(['role' => 'admin_hr', 'is_active' => true]);
+        $dept = Department::create(['name' => 'HR Dept '.uniqid(), 'description' => '']);
+        $position = Position::create(['name' => 'HR Role '.uniqid(), 'department_id' => $dept->id]);
+
+        Employee::factory()->create([
+            'user_id' => $hr->id,
+            'department_id' => $dept->id,
+            'position_id' => $position->id,
+            'employment_status' => 'active',
+        ]);
+
+        return $hr;
+    }
+
     private function createPendingRecord(): AttendanceRecord
     {
         return AttendanceRecord::create([
@@ -302,7 +323,7 @@ class AttendanceCheckInTest extends TestCase
     public function test_hr_can_approve_pending_attendance(): void
     {
         $record = $this->createPendingRecord();
-        $hr     = User::factory()->create(['role' => 'admin_hr', 'is_active' => true]);
+        $hr     = $this->makeHrWithEmployee();
 
         $this->actingAs($hr)
             ->post("/hr/attendance/{$record->id}/approve", ['approval_note' => 'Client visit confirmed.'])
@@ -314,7 +335,7 @@ class AttendanceCheckInTest extends TestCase
     public function test_hr_can_reject_pending_attendance_with_note(): void
     {
         $record = $this->createPendingRecord();
-        $hr     = User::factory()->create(['role' => 'admin_hr', 'is_active' => true]);
+        $hr     = $this->makeHrWithEmployee();
 
         $this->actingAs($hr)
             ->post("/hr/attendance/{$record->id}/reject", [
@@ -328,7 +349,7 @@ class AttendanceCheckInTest extends TestCase
     public function test_reject_without_note_fails(): void
     {
         $record = $this->createPendingRecord();
-        $hr     = User::factory()->create(['role' => 'admin_hr', 'is_active' => true]);
+        $hr     = $this->makeHrWithEmployee();
 
         $this->actingAs($hr)
             ->post("/hr/attendance/{$record->id}/reject", ['approval_note' => ''])
@@ -338,7 +359,7 @@ class AttendanceCheckInTest extends TestCase
     public function test_reject_with_short_note_fails(): void
     {
         $record = $this->createPendingRecord();
-        $hr     = User::factory()->create(['role' => 'admin_hr', 'is_active' => true]);
+        $hr     = $this->makeHrWithEmployee();
 
         $this->actingAs($hr)
             ->post("/hr/attendance/{$record->id}/reject", ['approval_note' => 'Too short'])

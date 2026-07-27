@@ -9,6 +9,7 @@ use App\Services\AuditLogService;
 use App\Services\NotificationService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\View\View;
 
 class AttendanceApprovalController extends Controller
@@ -32,6 +33,8 @@ class AttendanceApprovalController extends Controller
 
     public function approve(Request $request, AttendanceRecord $attendanceRecord): RedirectResponse
     {
+        Gate::authorize('approve', $attendanceRecord);
+
         abort_unless($attendanceRecord->status === 'PENDING_REVIEW', 422);
 
         $attendanceRecord->update([
@@ -65,6 +68,8 @@ class AttendanceApprovalController extends Controller
 
     public function reject(Request $request, AttendanceRecord $attendanceRecord): RedirectResponse
     {
+        Gate::authorize('reject', $attendanceRecord);
+
         abort_unless($attendanceRecord->status === 'PENDING_REVIEW', 422);
 
         $request->validate([
