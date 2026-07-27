@@ -7,6 +7,7 @@ use App\Http\Requests\StoreLeaveRequest;
 use App\Models\LeaveBalance;
 use App\Models\LeaveRequest;
 use App\Models\LeaveType;
+use App\Services\AnnualLeaveEntitlementService;
 use App\Services\AuditLogService;
 use App\Services\LeaveService;
 use App\Services\NotificationService;
@@ -21,6 +22,7 @@ class LeaveController extends Controller
     public function __construct(
         private readonly LeaveService $leaveService,
         private readonly NotificationService $notifications,
+        private readonly AnnualLeaveEntitlementService $entitlementService,
     ) {}
 
     public function showRequest(): View
@@ -51,27 +53,54 @@ class LeaveController extends Controller
         })->values();
 
         // No approved leave yet this year means no LeaveBalance row exists (it is
-        // created lazily on first approval). Show the entitlement as a preview
-        // instead of persisting a row just because the employee opened this page.
+        // created lazily on first approval, or by leave:initialize-year). Show
+        // the entitlement as a preview instead of persisting a row just because
+        // the employee opened this page.
         $hasAnnualBalanceRow = $balances->contains(
             fn (LeaveBalance $balance) => $balance->leaveType->isAnnualEntitlementType()
         );
 
-        if ($annualLeaveEligible && ! $hasAnnualBalanceRow) {
-            $annualType = $leaveTypes->first(fn (LeaveType $type) => $type->isAnnualEntitlementType());
+        // Phase 58C: Annual Leave and Personal Leave share one 18-day pool —
+        // always resolve the same canonical type LeaveService::approve() and
+        // leave:initialize-year key their balance row by.
+        $annualType    = LeaveType::canonicalAnnualEntitlementType();
+        $annualSummary = null;
 
-            if ($annualType) {
-                $held = $this->leaveService->heldHalfDayDays($employee, $annualType, $year);
+        if ($annualType) {
+            $entitlement     = $this->entitlementService->calculate($employee, $year);
+            $existingBalance = $balances->get($annualType->id);
+            $entitlementDays = $existingBalance ? (int) $existingBalance->total_quota : $entitlement['final_entitlement'];
+            $used            = $existingBalance ? (int) $existingBalance->used : 0;
+            $remainingRaw    = $existingBalance ? (int) $existingBalance->remaining : $entitlementDays;
+            $held            = $this->leaveService->heldHalfDayDays($employee, $annualType, $year);
 
+            $statusLabel = match (true) {
+                ! $entitlement['eligible']            => 'Belum Memenuhi Masa Kerja 12 Bulan',
+                $entitlement['months_remaining'] < 12 => 'Hak Prorata',
+                default                                => 'Hak Penuh',
+            };
+
+            $annualSummary = [
+                'entitlement'      => $entitlementDays,
+                'used'             => $used,
+                'held'             => $held,
+                'available'        => max(0, $remainingRaw - $held),
+                'year'             => $year,
+                'eligibility_date' => $entitlement['eligibility_date'],
+                'status_label'     => $statusLabel,
+                'is_prorata'       => $entitlement['eligible'] && $entitlement['months_remaining'] < 12,
+            ];
+
+            if ($annualLeaveEligible && ! $hasAnnualBalanceRow) {
                 $balanceRows->push([
                     'label'     => $annualType->display_name,
-                    'remaining' => max(0, LeaveBalance::DEFAULT_ANNUAL_QUOTA - $held),
+                    'remaining' => max(0, $entitlementDays - $held),
                 ]);
             }
         }
 
         return view('pages.leave.request', compact(
-            'leaveTypes', 'balanceRows', 'annualLeaveEligible', 'year'
+            'leaveTypes', 'balanceRows', 'annualLeaveEligible', 'year', 'annualSummary'
         ));
     }
 
