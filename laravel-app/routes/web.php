@@ -13,6 +13,7 @@ use App\Http\Controllers\Finance\PayrollPeriodController;
 use App\Http\Controllers\HR\AttendanceApprovalController;
 use App\Http\Controllers\HR\EmployeeController as HREmployeeController;
 use App\Http\Controllers\HR\LeaveApprovalController;
+use App\Http\Controllers\HR\LeaveBalanceController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\Settings\LeaveTypeSettingsController;
 use App\Http\Controllers\Settings\OfficeLocationController;
@@ -121,6 +122,11 @@ Route::middleware(['auth', 'role:admin_hr,super_admin'])->group(function (): voi
     Route::get('/hr/employees/{employee}',      [HREmployeeController::class, 'show'])->name('employees.show');
     Route::get('/hr/employees/{employee}/edit', [HREmployeeController::class, 'edit'])->name('employees.edit');
     Route::put('/hr/employees/{employee}',      [HREmployeeController::class, 'update'])->name('employees.update');
+
+    // Annual leave opening balance / transition adjustment (Phase 58C)
+    Route::get('/hr/leave-balances',                  [LeaveBalanceController::class, 'index'])->name('hr.leave-balances.index');
+    Route::get('/hr/leave-balances/{employee}/edit',  [LeaveBalanceController::class, 'edit'])->name('hr.leave-balances.edit');
+    Route::put('/hr/leave-balances/{employee}',       [LeaveBalanceController::class, 'update'])->name('hr.leave-balances.update');
 
     // System settings (Phase 19)
     Route::get('/settings', [SettingsController::class, 'index'])->name('settings.index');

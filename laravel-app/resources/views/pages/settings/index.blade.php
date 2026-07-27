@@ -188,6 +188,9 @@
 <a href="{{ route('settings.leave-types.index') }}" class="mt-2 block text-center border border-primary text-primary font-label-md text-label-md py-2.5 rounded-lg active:scale-95 transition-transform hover:bg-primary/5">
     Kelola Jenis Cuti
 </a>
+<a href="{{ route('hr.leave-balances.index') }}" class="block text-center border border-primary text-primary font-label-md text-label-md py-2.5 rounded-lg active:scale-95 transition-transform hover:bg-primary/5">
+    Saldo Awal Cuti Tahunan
+</a>
 </section>
 
 <!-- Section 3: Payroll Settings -->

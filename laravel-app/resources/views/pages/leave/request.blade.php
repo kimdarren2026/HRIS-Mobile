@@ -154,6 +154,53 @@
         @endif
     </section>
 
+    {{-- Annual Leave Entitlement Detail (Phase 58C) --}}
+    @if($annualSummary)
+    <section class="bg-surface-container-lowest border border-border rounded-xl shadow-sm p-unit-md flex flex-col gap-2">
+        <div class="flex items-center justify-between">
+            <h2 class="text-label-md font-label-md text-on-surface-variant uppercase tracking-wider">Rincian Cuti Tahunan {{ $annualSummary['year'] }}</h2>
+            <span class="text-label-sm font-label-sm px-2 py-0.5 rounded-full
+                @if($annualSummary['status_label'] === 'Hak Penuh') bg-success/10 text-success
+                @elseif($annualSummary['status_label'] === 'Hak Prorata') bg-warning/10 text-warning
+                @else bg-outline-variant/40 text-on-surface-variant
+                @endif">
+                {{ $annualSummary['status_label'] }}
+            </span>
+        </div>
+        <div class="grid grid-cols-2 gap-2 text-body-md font-body-md">
+            <div class="flex flex-col">
+                <span class="text-label-sm text-on-surface-variant">Hak Cuti Tahun Ini</span>
+                <span class="font-semibold">{{ $annualSummary['entitlement'] }} hari</span>
+            </div>
+            <div class="flex flex-col">
+                <span class="text-label-sm text-on-surface-variant">Saldo Terpakai</span>
+                <span class="font-semibold">{{ $annualSummary['used'] }} hari</span>
+            </div>
+            <div class="flex flex-col">
+                <span class="text-label-sm text-on-surface-variant">Saldo Tertahan</span>
+                <span class="font-semibold">{{ $annualSummary['held'] }} hari</span>
+            </div>
+            <div class="flex flex-col">
+                <span class="text-label-sm text-on-surface-variant">Saldo Tersedia</span>
+                <span class="font-semibold">{{ $annualSummary['available'] }} hari</span>
+            </div>
+            <div class="flex flex-col">
+                <span class="text-label-sm text-on-surface-variant">Tahun Saldo</span>
+                <span class="font-semibold">{{ $annualSummary['year'] }}</span>
+            </div>
+            <div class="flex flex-col">
+                <span class="text-label-sm text-on-surface-variant">Tanggal Mulai Hak</span>
+                <span class="font-semibold">{{ $annualSummary['eligibility_date']?->format('d M Y') ?? 'Perlu koreksi data HR' }}</span>
+            </div>
+        </div>
+        @if($annualSummary['is_prorata'])
+        <p class="text-label-sm font-label-sm text-on-surface-variant border-t border-border pt-2 mt-1">
+            Hak cuti tahun ini dihitung secara prorata berdasarkan bulan mulai hak sampai Desember dan dibulatkan ke bawah ke hari penuh.
+        </p>
+        @endif
+    </section>
+    @endif
+
     {{-- Form --}}
     <form class="flex flex-col gap-unit-md bg-surface-container-lowest p-unit-md rounded-xl shadow-sm border border-border"
           method="POST" action="/leave/request" enctype="multipart/form-data">

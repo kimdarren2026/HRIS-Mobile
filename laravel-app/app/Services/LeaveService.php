@@ -23,6 +23,7 @@ class LeaveService
 
     public function __construct(
         private readonly WorkingDayCalculator $calculator = new WorkingDayCalculator(),
+        private readonly AnnualLeaveEntitlementService $entitlementService = new AnnualLeaveEntitlementService(),
     ) {}
 
     public function submit(Employee $employee, array $data, ?UploadedFile $attachment = null): LeaveRequest
@@ -129,8 +130,16 @@ class LeaveService
     // correction: existing decimal columns are already sufficient.
     public function heldHalfDayDays(Employee $employee, LeaveType $leaveType, int $year): int
     {
+        // Phase 58C correction: Annual Leave and Personal Leave draw from one
+        // shared pool, so a pending half-day request under either type holds
+        // balance from the same pool — must sum across all annual-entitlement
+        // type ids, not just the one $leaveType happens to be.
+        $typeIds = $this->isAnnualEntitlementType($leaveType)
+            ? LeaveType::annualEntitlementTypeIds()
+            : [$leaveType->id];
+
         return (int) LeaveRequest::where('employee_id', $employee->id)
-            ->where('leave_type_id', $leaveType->id)
+            ->whereIn('leave_type_id', $typeIds)
             ->where('duration_type', 'HALF_DAY')
             ->where('status', 'PENDING_HR')
             ->whereYear('start_date', $year)
@@ -219,7 +228,7 @@ class LeaveService
         }
 
         DB::transaction(function () use ($leaveRequest, $approver, $note): void {
-            $leaveRequest->loadMissing('leaveType');
+            $leaveRequest->loadMissing(['leaveType', 'employee']);
             if ($leaveRequest->leaveType->deducts_balance) {
                 // Deduct chargeable_days (working days, minus national holidays)
                 // rather than the raw calendar span (policy points 2 & 3).
@@ -227,17 +236,39 @@ class LeaveService
                 // total_days so historical data keeps behaving as before.
                 $deduction = $leaveRequest->chargeable_days ?? $leaveRequest->total_days;
 
+                // Phase 58C correction: Annual Leave and Personal Leave share
+                // one 18-day pool, so the balance row is always keyed by the
+                // canonical annual-entitlement type id, never by the specific
+                // request's own leave_type_id (which would otherwise create a
+                // second, additive 18-day pool per type). If no canonical type
+                // can be resolved, fail loudly rather than silently falling
+                // back to the request's own type id (which would fabricate a
+                // balance on the wrong pool).
+                if ($this->isAnnualEntitlementType($leaveRequest->leaveType)) {
+                    $canonicalType = LeaveType::canonicalAnnualEntitlementType();
+
+                    if ($canonicalType === null) {
+                        throw ValidationException::withMessages([
+                            'leave_type' => 'Jenis cuti tahunan kanonik (Annual Leave/Cuti Tahunan) tidak ditemukan. Persetujuan dibatalkan untuk mencegah pembuatan saldo pada pool yang salah.',
+                        ]);
+                    }
+
+                    $balanceLeaveTypeId = $canonicalType->id;
+                } else {
+                    $balanceLeaveTypeId = $leaveRequest->leave_type_id;
+                }
+
+                // Fallback path: normally leave:initialize-year (Phase 58C)
+                // has already created the year's balance row with the correct
+                // full/prorated entitlement. This only fires if approval
+                // happens before that row exists yet.
                 $balance = LeaveBalance::firstOrCreate(
                     [
                         'employee_id'   => $leaveRequest->employee_id,
-                        'leave_type_id' => $leaveRequest->leave_type_id,
+                        'leave_type_id' => $balanceLeaveTypeId,
                         'year'          => $leaveRequest->start_date->year,
                     ],
-                    [
-                        'total_quota' => LeaveBalance::DEFAULT_ANNUAL_QUOTA,
-                        'used'        => 0,
-                        'remaining'   => LeaveBalance::DEFAULT_ANNUAL_QUOTA,
-                    ]
+                    $this->defaultBalanceAttributes($leaveRequest)
                 );
 
                 if ($balance->remaining < $deduction) {
@@ -257,6 +288,28 @@ class LeaveService
                 'approval_note' => $note,
             ]);
         });
+    }
+
+    // Policy point: entitlement for annual/personal leave is full-or-prorated
+    // per AnnualLeaveEntitlementService (Phase 58C), never the flat default.
+    // Other balance-deducting leave types keep the pre-existing flat default.
+    private function defaultBalanceAttributes(LeaveRequest $leaveRequest): array
+    {
+        if ($this->isAnnualEntitlementType($leaveRequest->leaveType)) {
+            $entitlement = $this->entitlementService->calculate(
+                $leaveRequest->employee,
+                $leaveRequest->start_date->year,
+            );
+            $quota = $entitlement['final_entitlement'];
+        } else {
+            $quota = LeaveBalance::DEFAULT_ANNUAL_QUOTA;
+        }
+
+        return [
+            'total_quota' => $quota,
+            'used'        => 0,
+            'remaining'   => $quota,
+        ];
     }
 
     public function reject(LeaveRequest $leaveRequest, User $approver, string $note): void

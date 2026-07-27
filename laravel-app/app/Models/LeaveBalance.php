@@ -21,6 +21,12 @@ class LeaveBalance extends Model
         'total_quota',
         'used',
         'remaining',
+        'pre_system_used_days',
+        'opening_adjustment',
+        'effective_date',
+        'reason',
+        'created_by',
+        'approved_by',
     ];
 
     protected function casts(): array
@@ -30,7 +36,20 @@ class LeaveBalance extends Model
             'total_quota' => 'decimal:2',
             'used' => 'decimal:2',
             'remaining' => 'decimal:2',
+            'pre_system_used_days' => 'decimal:2',
+            'opening_adjustment' => 'decimal:2',
+            'effective_date' => 'date',
         ];
+    }
+
+    public function creator(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
+
+    public function approver(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'approved_by');
     }
 
     public function employee(): BelongsTo

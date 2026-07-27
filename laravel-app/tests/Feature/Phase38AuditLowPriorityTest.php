@@ -166,6 +166,11 @@ class Phase38AuditLowPriorityTest extends TestCase
 
     public function test_approve_creates_balance_with_default_annual_quota(): void
     {
+        // Phase 58C: entitlement is now computed from join_date/12-month
+        // eligibility rather than a blind flat default, so this employee
+        // needs genuine long tenure for the full 18-day quota to apply.
+        $this->employee->update(['join_date' => '2020-01-01']);
+
         $leaveRequest = LeaveRequest::create([
             'employee_id'   => $this->employee->id,
             'leave_type_id' => $this->balanceLeaveType->id,
@@ -192,6 +197,9 @@ class Phase38AuditLowPriorityTest extends TestCase
 
     public function test_leave_approve_works_when_leave_type_not_pre_loaded(): void
     {
+        // Phase 58C: needs genuine 12-month+ tenure to hold an annual-leave balance.
+        $this->employee->update(['join_date' => '2020-01-01']);
+
         $leaveRequest = LeaveRequest::create([
             'employee_id'   => $this->employee->id,
             'leave_type_id' => $this->balanceLeaveType->id,

@@ -100,6 +100,9 @@ class LeaveServiceTest extends TestCase
     public function test_approve_creates_balance_record_if_none_exists(): void
     {
         // No pre-seeded balance. Default quota is 18 per STIKES policy point 1.
+        // Phase 58C: entitlement is computed from join_date/12-month eligibility,
+        // so this employee needs genuine long tenure for the full 18-day quota.
+        $this->employee->update(['join_date' => '2020-01-01']);
         $request = $this->makeRequest($this->balanceType, days: 2);
 
         $this->service->approve($request, $this->hrUser, null);
