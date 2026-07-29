@@ -255,7 +255,7 @@ class Phase37AuditMediumFixesTest extends TestCase
     public function test_checkout_requires_prior_checkin(): void
     {
         $this->actingAs($this->employeeUser)
-            ->post('/attendance/check-out', ['lat' => -6.2, 'lng' => 106.8])
+            ->post('/attendance/check-out', ['lat' => -6.2, 'lng' => 106.8, 'accuracy' => 5])
             ->assertSessionHasErrors(['general']);
     }
 
@@ -271,7 +271,7 @@ class Phase37AuditMediumFixesTest extends TestCase
         ]);
 
         $this->actingAs($this->employeeUser)
-            ->post('/attendance/check-out', ['lat' => -6.2001, 'lng' => 106.8001])
+            ->post('/attendance/check-out', ['lat' => -6.2001, 'lng' => 106.8001, 'accuracy' => 5])
             ->assertRedirect('/attendance/history');
 
         $record->refresh();
@@ -295,7 +295,7 @@ class Phase37AuditMediumFixesTest extends TestCase
         ]);
 
         $this->actingAs($this->employeeUser)
-            ->post('/attendance/check-out', ['lat' => -6.2, 'lng' => 106.8])
+            ->post('/attendance/check-out', ['lat' => -6.2, 'lng' => 106.8, 'accuracy' => 5])
             ->assertSessionHasErrors(['general']);
     }
 

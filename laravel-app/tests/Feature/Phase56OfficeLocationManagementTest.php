@@ -244,9 +244,10 @@ class Phase56OfficeLocationManagementTest extends TestCase
 
         $this->actingAs($this->employeeUser)
             ->post('/attendance/check-in', [
-                'lat'   => -6.2000000,
-                'lng'   => 106.8166660,
-                'photo' => $photo,
+                'lat'      => -6.2000000,
+                'lng'      => 106.8166660,
+                'accuracy' => 5,
+                'photo'    => $photo,
             ])
             ->assertRedirect()
             ->assertSessionHasErrors('general');
@@ -276,9 +277,10 @@ class Phase56OfficeLocationManagementTest extends TestCase
 
         $this->actingAs($this->employeeUser)
             ->post('/attendance/check-in', [
-                'lat'   => -6.2001000,
-                'lng'   => 106.8166660,
-                'photo' => $photo,
+                'lat'      => -6.2001000,
+                'lng'      => 106.8166660,
+                'accuracy' => 5,
+                'photo'    => $photo,
             ])
             ->assertRedirect('/attendance/history');
 

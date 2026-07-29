@@ -133,9 +133,10 @@ class Phase30AttendanceHardeningTest extends TestCase
 
         $this->actingAs($this->employeeUser)
             ->post('/attendance/check-in', [
-                'lat'   => -6.2100000,
-                'lng'   => 106.8166660,
-                'photo' => $photo,
+                'lat'      => -6.2100000,
+                'lng'      => 106.8166660,
+                'accuracy' => 5,
+                'photo'    => $photo,
             ])
             ->assertSessionHasErrors('reason');
 
@@ -158,10 +159,11 @@ class Phase30AttendanceHardeningTest extends TestCase
 
         $this->actingAs($this->employeeUser)
             ->post('/attendance/check-in', [
-                'lat'    => -6.2100000,
-                'lng'    => 106.8166660,
-                'photo'  => $photo,
-                'reason' => 'Bekerja dari kantor klien, telah mendapat persetujuan manajer.',
+                'lat'      => -6.2100000,
+                'lng'      => 106.8166660,
+                'accuracy' => 5,
+                'photo'    => $photo,
+                'reason'   => 'Bekerja dari kantor klien, telah mendapat persetujuan manajer.',
             ])
             ->assertRedirect('/attendance/history');
 
