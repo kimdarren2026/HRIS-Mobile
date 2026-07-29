@@ -18,8 +18,6 @@ class AttendanceCheckInRequest extends FormRequest
             'lng'      => ['required', 'numeric', 'between:-180,180'],
             'accuracy' => ['required', 'numeric', 'min:0', 'max:100000'],
             'photo'    => ['required', 'image', 'mimes:jpeg,png', 'max:5120'],
-            // reason conditional validation is handled in the controller after radius check
-            'reason'   => ['nullable', 'string', 'max:500'],
         ];
     }
 

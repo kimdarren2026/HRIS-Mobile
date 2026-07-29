@@ -123,42 +123,32 @@ class AttendanceCheckInTest extends TestCase
         Storage::disk('local')->assertExists($record->check_in_photo_path);
     }
 
-    public function test_checkin_outside_radius_with_valid_reason_is_pending_review(): void
+    public function test_checkin_outside_radius_is_rejected(): void
     {
         $coords = $this->coordsOutside();
 
         $this->actingAs($this->employeeUser)
-            ->post('/attendance/check-in', array_merge($coords, [
-                'photo'  => $this->validPhoto(),
-                'reason' => 'Working from client site, approved by manager beforehand.',
-            ]))
-            ->assertRedirect('/attendance/history');
-
-        $this->assertDatabaseHas('attendance_records', [
-            'employee_id' => $this->employee->id,
-            'status'      => 'PENDING_REVIEW',
-        ]);
-    }
-
-    // ── Check-in POST failure cases ─────────────────────────────────────────
-
-    public function test_checkin_outside_radius_without_reason_fails(): void
-    {
-        $this->actingAs($this->employeeUser)
-            ->post('/attendance/check-in', array_merge($this->coordsOutside(), ['photo' => $this->validPhoto()]))
-            ->assertSessionHasErrors('reason');
+            ->post('/attendance/check-in', array_merge($coords, ['photo' => $this->validPhoto()]))
+            ->assertSessionHasErrors('general');
 
         $this->assertDatabaseMissing('attendance_records', ['employee_id' => $this->employee->id]);
     }
 
-    public function test_checkin_outside_radius_with_reason_too_short_fails(): void
+    // ── Check-in POST failure cases ─────────────────────────────────────────
+
+    public function test_checkin_outside_radius_fails_even_with_a_reason_supplied(): void
     {
+        // Phase 58F removed the out-of-radius submission path entirely — a
+        // 'reason' field is no longer read by the backend, so supplying one
+        // must not change the outcome: still rejected, still no record.
         $this->actingAs($this->employeeUser)
             ->post('/attendance/check-in', array_merge($this->coordsOutside(), [
                 'photo'  => $this->validPhoto(),
-                'reason' => 'Too short',
+                'reason' => 'Working from client site, approved by manager beforehand.',
             ]))
-            ->assertSessionHasErrors('reason');
+            ->assertSessionHasErrors('general');
+
+        $this->assertDatabaseMissing('attendance_records', ['employee_id' => $this->employee->id]);
     }
 
     public function test_duplicate_checkin_same_day_is_rejected(): void
@@ -240,22 +230,15 @@ class AttendanceCheckInTest extends TestCase
         $this->assertLessThanOrEqual($this->office->radius_meters, $record->distance_from_office);
     }
 
-    public function test_distance_from_office_is_stored_on_checkin_outside_radius(): void
+    public function test_checkin_outside_radius_does_not_store_distance_because_no_record_is_created(): void
     {
         $coords = $this->coordsOutside();
 
         $this->actingAs($this->employeeUser)
-            ->post('/attendance/check-in', array_merge($coords, [
-                'photo'  => $this->validPhoto(),
-                'reason' => 'Working from home, approved by manager.',
-            ]))
-            ->assertRedirect('/attendance/history');
+            ->post('/attendance/check-in', array_merge($coords, ['photo' => $this->validPhoto()]))
+            ->assertSessionHasErrors('general');
 
-        $record = AttendanceRecord::where('employee_id', $this->employee->id)->first();
-        $this->assertNotNull($record);
-        $this->assertNotNull($record->distance_from_office);
-        $this->assertGreaterThan($this->office->radius_meters, $record->distance_from_office);
-        $this->assertSame('PENDING_REVIEW', $record->status);
+        $this->assertDatabaseMissing('attendance_records', ['employee_id' => $this->employee->id]);
     }
 
     // ── HR Approval Queue access ────────────────────────────────────────────

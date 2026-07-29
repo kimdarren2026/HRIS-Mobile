@@ -350,8 +350,10 @@ class FunctionalNotificationsTest extends TestCase
 
     // ── Notification events ────────────────────────────────────────────────────
 
-    public function test_outside_radius_check_in_notifies_hr_and_super_admin(): void
+    public function test_outside_radius_check_in_is_rejected_and_notifies_nobody(): void
     {
+        // Phase 58F: out-of-radius check-in no longer creates a PENDING_REVIEW
+        // record or an HR/super_admin review notification — it is rejected outright.
         $this->makeEmployee($this->employeeUser);
         $this->makeOffice();
 
@@ -359,16 +361,11 @@ class FunctionalNotificationsTest extends TestCase
             'lat'      => -6.2100000, // ~1.1 km outside radius
             'lng'      => 106.8166660,
             'accuracy' => 5,
-            'reason'   => 'Remote work — client site',
             'photo'    => UploadedFile::fake()->image('selfie.jpg', 200, 200)->size(80),
         ]);
 
-        $response->assertRedirect();                                       // 1
-
-        // Expects exactly one notification per target role user (1 HR + 1 SA = 2)
-        $this->assertSame(2, Notification::count());                       // 2
-        $this->assertSame(1, Notification::where('user_id', $this->hrUser->id)->count()); // 3
-        $this->assertSame('attendance', Notification::first()->type);      // 4
+        $response->assertSessionHasErrors('general');                     // 1
+        $this->assertSame(0, Notification::count());                     // 2
     }
 
     public function test_within_radius_check_in_does_not_notify(): void

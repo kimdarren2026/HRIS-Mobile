@@ -126,21 +126,18 @@ class Phase20AttendanceAuditTest extends TestCase
         $this->assertSame(0, $pending->total());
     }
 
-    // ── Part A: Finance outside radius → PENDING_REVIEW → appears in HR queue ─
+    // ── Part A: Finance outside radius → rejected outright (Phase 58F) ──────
 
-    public function test_finance_checkin_outside_radius_creates_pending_review(): void
+    public function test_finance_checkin_outside_radius_is_rejected(): void
     {
         $coords = $this->coordsOutside();
 
         $this->actingAs($this->financeUser)->post('/attendance/check-in', [
             ...$coords,
-            'photo'  => $this->photo(),
-            'reason' => 'Working from client site today',
-        ])->assertRedirect('/attendance/history');
+            'photo' => $this->photo(),
+        ])->assertSessionHasErrors('general');
 
-        $record = AttendanceRecord::where('employee_id', $this->financeEmployee->id)->first();
-        $this->assertNotNull($record);
-        $this->assertSame('PENDING_REVIEW', $record->status);
+        $this->assertDatabaseMissing('attendance_records', ['employee_id' => $this->financeEmployee->id]);
     }
 
     public function test_finance_pending_attendance_appears_in_hr_queue(): void
@@ -256,18 +253,16 @@ class Phase20AttendanceAuditTest extends TestCase
         $this->assertSame('APPROVED', $record->status);
     }
 
-    public function test_employee_checkin_outside_radius_creates_pending_review(): void
+    public function test_employee_checkin_outside_radius_is_rejected(): void
     {
         $coords = $this->coordsOutside();
 
         $this->actingAs($this->employeeUser)->post('/attendance/check-in', [
             ...$coords,
-            'photo'  => $this->photo(),
-            'reason' => 'Working from home today due to transport',
-        ])->assertRedirect('/attendance/history');
+            'photo' => $this->photo(),
+        ])->assertSessionHasErrors('general');
 
-        $record = AttendanceRecord::where('employee_id', $this->regularEmployee->id)->first();
-        $this->assertSame('PENDING_REVIEW', $record->status);
+        $this->assertDatabaseMissing('attendance_records', ['employee_id' => $this->regularEmployee->id]);
     }
 
     public function test_hr_queue_query_is_status_based_not_role_based(): void
