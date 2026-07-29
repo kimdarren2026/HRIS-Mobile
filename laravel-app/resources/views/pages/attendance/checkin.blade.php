@@ -270,18 +270,6 @@ Absen pulang akan dicatat. Status Menunggu Review HR tetap menunggu keputusan HR
 <p class="font-label-sm text-label-sm text-error" id="co-gps-error-text">Izin lokasi ditolak. Aktifkan GPS di pengaturan browser.</p>
 <button type="button" onclick="retryCoGps()" class="mt-1 text-primary font-label-sm text-label-sm underline">Coba lagi</button>
 </div>
-<div id="co-gps-uncertain-msg" class="hidden flex-col items-center gap-2 text-center px-4">
-<span class="material-symbols-outlined text-warning text-[32px]">gps_not_fixed</span>
-<p class="font-label-sm text-label-sm text-warning">Lokasi belum cukup akurat. Aktifkan Lokasi Akurat dan coba kembali.</p>
-<p class="font-label-sm text-label-sm text-on-surface-variant" id="co-gps-uncertain-acc">Akurasi: --</p>
-<button type="button" onclick="retryCoGps()" class="mt-1 text-primary font-label-sm text-label-sm underline">Coba Lagi</button>
-</div>
-<div id="co-gps-outside-msg" class="hidden flex-col items-center gap-2 text-center px-4">
-<span class="material-symbols-outlined text-error text-[32px]">location_off</span>
-<p class="font-label-sm text-label-sm text-error">Anda berada di luar radius kantor. Absensi tidak dapat dilakukan.</p>
-<p class="font-label-sm text-label-sm text-on-surface-variant" id="co-gps-outside-detail">--</p>
-<button type="button" onclick="retryCoGps()" class="mt-1 text-primary font-label-sm text-label-sm underline">Coba Lagi</button>
-</div>
 <div id="co-gps-ok" class="hidden items-center justify-center w-full h-full">
 <div class="relative flex items-center justify-center">
 <div class="absolute w-12 h-12 rounded-full bg-primary/20 animate-pin-pulse"></div>
@@ -371,18 +359,6 @@ Absen pulang akan dicatat. Status Menunggu Review HR tetap menunggu keputusan HR
 <p class="font-label-sm text-label-sm text-error" id="gps-error-text">Izin lokasi ditolak. Aktifkan GPS di pengaturan browser.</p>
 <button type="button" onclick="retryGps()" class="mt-1 text-primary font-label-sm text-label-sm underline">Coba lagi</button>
 </div>
-<div id="gps-uncertain-msg" class="hidden flex-col items-center gap-2 text-center px-4">
-<span class="material-symbols-outlined text-warning text-[32px]">gps_not_fixed</span>
-<p class="font-label-sm text-label-sm text-warning">Lokasi belum cukup akurat. Aktifkan Lokasi Akurat dan coba kembali.</p>
-<p class="font-label-sm text-label-sm text-on-surface-variant" id="gps-uncertain-acc">Akurasi: --</p>
-<button type="button" onclick="retryGps()" class="mt-1 text-primary font-label-sm text-label-sm underline">Coba Lagi</button>
-</div>
-<div id="gps-outside-msg" class="hidden flex-col items-center gap-2 text-center px-4">
-<span class="material-symbols-outlined text-error text-[32px]">location_off</span>
-<p class="font-label-sm text-label-sm text-error">Anda berada di luar radius kantor. Absensi tidak dapat dilakukan.</p>
-<p class="font-label-sm text-label-sm text-on-surface-variant" id="gps-outside-detail">--</p>
-<button type="button" onclick="retryGps()" class="mt-1 text-primary font-label-sm text-label-sm underline">Coba Lagi</button>
-</div>
 <div id="gps-ok" class="hidden items-center justify-center w-full h-full">
 <div class="relative flex items-center justify-center">
 <div class="absolute w-12 h-12 rounded-full bg-primary/20 animate-pin-pulse"></div>
@@ -427,6 +403,24 @@ Ambil Selfie
 <button type="button" id="photo-retake" class="hidden absolute bottom-2 right-2 z-20 bg-surface/80 rounded-full px-3 py-1 font-label-sm text-label-sm text-primary backdrop-blur-sm">Ambil Ulang</button>
 </div>
 <canvas id="selfie-canvas" class="hidden"></canvas>
+</section>
+
+<!-- Reason (hidden until distance > office radius) -->
+<section id="reason-section" class="flex flex-col gap-unit-xs hidden">
+<label class="font-label-md text-label-md text-on-surface px-1 flex justify-between" for="reason">
+Alasan check-in di luar radius <span class="text-danger">*</span>
+</label>
+@error('reason')
+<p class="text-error font-label-sm text-label-sm px-1">{{ $message }}</p>
+@enderror
+<textarea id="reason" name="reason" rows="3"
+    class="w-full rounded-lg border border-outline-variant bg-surface px-4 py-3 font-body-md text-body-md text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-shadow resize-none placeholder:text-outline"
+    placeholder="Contoh: Kunjungan klien, tugas luar kantor... (min. 10 karakter)"
+    minlength="10" maxlength="500">{{ old('reason') }}</textarea>
+<p id="reason-error" class="font-label-sm text-label-sm text-error hidden"></p>
+<p class="font-label-sm text-label-sm text-warning flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">pending</span> Status: Menunggu Review HR
+</p>
 </section>
 
 </main>
@@ -486,25 +480,21 @@ Ambil Selfie
     }
 
     // ── Radius classification ────────────────────────────────────────────────
-    // Mirrors AttendanceService::classifyLocation() exactly — the backend
-    // recomputes and enforces this independently, this copy only drives the UI.
-    function classifyLocation(distance, accuracy, radius) {
-        if (distance + accuracy <= radius) return 'INSIDE_RADIUS';
-        if (distance - accuracy > radius) return 'OUTSIDE_RADIUS';
-        return 'LOCATION_UNCERTAIN';
+    // Mirrors AttendanceService::classifyLocation() exactly — distance-only,
+    // never trusted client-side since the backend recomputes and enforces it
+    // independently. GPS accuracy is displayed but never affects this decision.
+    function classifyLocation(distance, radius) {
+        return distance <= radius ? 'INSIDE_RADIUS' : 'OUTSIDE_RADIUS';
     }
 
     // ── Submit guard ───────────────────────────────────────────────────────
-    // Check-in is blocked server-side too when no office location is active —
-    // this only avoids sending an employee through the GPS/camera flow for a
-    // submission that would be rejected anyway. locationBlocked covers both
-    // LOCATION_UNCERTAIN and OUTSIDE_RADIUS — neither may ever create a record,
-    // and there is no out-of-radius submission path anymore (Phase 58F).
-    let locationBlocked = false;
+    // Check-in outside radius is allowed (with a reason) — only a missing
+    // office location, missing GPS fix, or missing photo blocks submission.
+    let isOutsideRadius = false;
     function updateSubmit() {
         const btn = document.getElementById('submit-btn');
         if (!btn) return;
-        btn.disabled = OFFICE_LAT === null || locationBlocked || !(gpsReady && photoReady);
+        btn.disabled = OFFICE_LAT === null || !(gpsReady && photoReady);
     }
 
     // ── GPS ────────────────────────────────────────────────────────────────
@@ -513,17 +503,12 @@ Ambil Selfie
             showGpsError('Perangkat/browser ini tidak mendukung GPS. Gunakan browser yang mendukung geolocation.');
             return;
         }
-        const loadEl      = document.getElementById('gps-loading');
-        const okEl        = document.getElementById('gps-ok');
-        const errDiv      = document.getElementById('gps-error-msg');
-        const uncertainEl = document.getElementById('gps-uncertain-msg');
-        const outsideEl   = document.getElementById('gps-outside-msg');
-        if (errDiv)      { errDiv.classList.add('hidden'); errDiv.classList.remove('flex'); }
-        if (uncertainEl) { uncertainEl.classList.add('hidden'); uncertainEl.classList.remove('flex'); }
-        if (outsideEl)   { outsideEl.classList.add('hidden'); outsideEl.classList.remove('flex'); }
-        if (okEl)        { okEl.classList.add('hidden'); okEl.classList.remove('flex'); }
+        const loadEl = document.getElementById('gps-loading');
+        const okEl   = document.getElementById('gps-ok');
+        const errDiv = document.getElementById('gps-error-msg');
+        if (errDiv) { errDiv.classList.add('hidden'); errDiv.classList.remove('flex'); }
+        if (okEl)   { okEl.classList.add('hidden'); okEl.classList.remove('flex'); }
         if (loadEl) loadEl.classList.remove('hidden');
-        locationBlocked = false;
         gpsReady = false;
         updateSubmit();
 
@@ -539,61 +524,35 @@ Ambil Selfie
                 document.getElementById('accuracy').value = acc;
 
                 if (loadEl) loadEl.classList.add('hidden');
+                if (okEl)   { okEl.classList.remove('hidden'); okEl.classList.add('flex'); }
 
-                const badge  = document.getElementById('radius-badge');
-                const detail = document.getElementById('gps-detail');
+                const badge          = document.getElementById('radius-badge');
+                const detail         = document.getElementById('gps-detail');
+                const reasonSection  = document.getElementById('reason-section');
+                const submitLabel    = document.getElementById('submit-label');
+
+                gpsReady = true;
 
                 if (OFFICE_LAT !== null) {
                     const dist           = haversine(lat, lng, OFFICE_LAT, OFFICE_LNG);
-                    const classification = classifyLocation(dist, acc, OFFICE_RADIUS);
+                    const classification = classifyLocation(dist, OFFICE_RADIUS);
                     const distM          = Math.round(dist);
+                    isOutsideRadius      = classification === 'OUTSIDE_RADIUS';
 
-                    if (classification === 'LOCATION_UNCERTAIN') {
-                        locationBlocked = true;
-                        gpsReady = false;
-                        if (okEl) { okEl.classList.add('hidden'); okEl.classList.remove('flex'); }
-                        if (uncertainEl) {
-                            uncertainEl.classList.remove('hidden');
-                            uncertainEl.classList.add('flex');
-                            const accEl = document.getElementById('gps-uncertain-acc');
-                            if (accEl) accEl.innerText = 'Akurasi: ' + accRounded + 'm';
-                        }
+                    if (isOutsideRadius) {
                         badge.className = 'flex items-center gap-1.5 px-2 py-1 rounded-full bg-warning/10 border border-warning/20';
-                        badge.innerHTML = '<span class="material-symbols-outlined text-warning text-[14px]">gps_not_fixed</span><span class="font-status-badge text-status-badge text-warning">Lokasi belum akurat</span>';
-                        if (detail) detail.innerText = 'Akurasi: ' + accRounded + 'm';
-                        updateSubmit();
-                        return;
+                        badge.innerHTML = '<div class="w-1.5 h-1.5 rounded-full bg-warning animate-pulse"></div><span class="font-status-badge text-status-badge text-warning">Di luar radius kantor</span>';
+                        if (reasonSection) reasonSection.classList.remove('hidden');
+                        if (submitLabel)   submitLabel.innerText = 'Kirim untuk Review HR';
+                    } else {
+                        badge.className = 'flex items-center gap-1.5 px-2 py-1 rounded-full bg-success/10 border border-success/20';
+                        badge.innerHTML = '<div class="w-1.5 h-1.5 rounded-full bg-success animate-pulse"></div><span class="font-status-badge text-status-badge text-success">Dalam radius kantor</span>';
+                        if (reasonSection) reasonSection.classList.add('hidden');
+                        if (submitLabel)   submitLabel.innerText = 'Konfirmasi Absen Masuk';
                     }
 
-                    if (classification === 'OUTSIDE_RADIUS') {
-                        locationBlocked = true;
-                        gpsReady = false;
-                        if (okEl) { okEl.classList.add('hidden'); okEl.classList.remove('flex'); }
-                        if (outsideEl) {
-                            outsideEl.classList.remove('hidden');
-                            outsideEl.classList.add('flex');
-                            const outDetail = document.getElementById('gps-outside-detail');
-                            if (outDetail) outDetail.innerText = 'Akurasi: ' + accRounded + 'm • ' + distM + 'm dari kantor';
-                        }
-                        badge.className   = 'flex items-center gap-1.5 px-2 py-1 rounded-full bg-error-container border border-error/20';
-                        badge.innerHTML   = '<div class="w-1.5 h-1.5 rounded-full bg-error animate-pulse"></div><span class="font-status-badge text-status-badge text-error">Di luar radius kantor</span>';
-                        if (detail) detail.innerText = 'Akurasi: ' + accRounded + 'm • ' + distM + 'm dari kantor';
-                        updateSubmit();
-                        return;
-                    }
-
-                    locationBlocked = false;
-                    gpsReady = true;
-                    if (uncertainEl) { uncertainEl.classList.add('hidden'); uncertainEl.classList.remove('flex'); }
-                    if (outsideEl)   { outsideEl.classList.add('hidden'); outsideEl.classList.remove('flex'); }
-                    if (okEl)        { okEl.classList.remove('hidden'); okEl.classList.add('flex'); }
-
-                    badge.className   = 'flex items-center gap-1.5 px-2 py-1 rounded-full bg-success/10 border border-success/20';
-                    badge.innerHTML   = '<div class="w-1.5 h-1.5 rounded-full bg-success animate-pulse"></div><span class="font-status-badge text-status-badge text-success">Dalam radius kantor</span>';
-                    detail.innerText = 'Akurasi: ' + accRounded + 'm • ' + distM + 'm dari kantor';
+                    if (detail) detail.innerText = 'Akurasi: ' + accRounded + 'm • ' + distM + 'm dari kantor';
                 } else {
-                    gpsReady = true;
-                    if (okEl) { okEl.classList.remove('hidden'); okEl.classList.add('flex'); }
                     if (detail) detail.innerText = 'Akurasi: ' + accRounded + 'm — lokasi kantor belum diatur';
                 }
 
@@ -614,12 +573,7 @@ Ambil Selfie
     window.retryGps = function() { startGps(); };
 
     function showGpsError(msg) {
-        const loadEl      = document.getElementById('gps-loading');
-        const uncertainEl = document.getElementById('gps-uncertain-msg');
-        const outsideEl   = document.getElementById('gps-outside-msg');
-        if (uncertainEl) { uncertainEl.classList.add('hidden'); uncertainEl.classList.remove('flex'); }
-        if (outsideEl)   { outsideEl.classList.add('hidden'); outsideEl.classList.remove('flex'); }
-        locationBlocked = false;
+        const loadEl = document.getElementById('gps-loading');
         gpsReady = false;
         updateSubmit();
         const errDiv = document.getElementById('gps-error-msg');
@@ -734,8 +688,24 @@ Ambil Selfie
             e.preventDefault();
             if (!capturedBlob) return;
 
-            const btn = document.getElementById('submit-btn');
-            const lbl = document.getElementById('submit-label');
+            const btn         = document.getElementById('submit-btn');
+            const lbl         = document.getElementById('submit-label');
+            const idleLabel   = isOutsideRadius ? 'Kirim untuk Review HR' : 'Konfirmasi Absen Masuk';
+            const reasonInput = document.getElementById('reason');
+            const reasonError = document.getElementById('reason-error');
+
+            if (isOutsideRadius) {
+                const reasonVal = (reasonInput?.value || '').trim();
+                if (reasonVal.length < 10) {
+                    if (reasonError) {
+                        reasonError.innerText = 'Alasan minimal 10 karakter.';
+                        reasonError.classList.remove('hidden');
+                    }
+                    return;
+                }
+            }
+            if (reasonError) reasonError.classList.add('hidden');
+
             if (btn) btn.disabled = true;
             if (lbl) lbl.innerText = 'Mengirim...';
 
@@ -762,7 +732,7 @@ Ambil Selfie
             })
             .catch(function() {
                 if (btn) btn.disabled = false;
-                if (lbl) lbl.innerText = 'Konfirmasi Absen Masuk';
+                if (lbl) lbl.innerText = idleLabel;
             });
         });
     }
@@ -774,14 +744,15 @@ Ambil Selfie
     }
 
     // ── Check-out GPS ──────────────────────────────────────────────────────
+    // Check-out is never blocked by radius or accuracy — only a missing GPS
+    // fix blocks submission. The badge/detail below are informational only.
     if (document.getElementById('checkout-form')) {
         let coGpsReady = false;
-        let coLocationBlocked = false;
 
         function updateCoSubmit() {
             const btn = document.getElementById('co-submit-btn');
             if (!btn) return;
-            btn.disabled = coLocationBlocked || !coGpsReady;
+            btn.disabled = !coGpsReady;
         }
 
         function startCoGps() {
@@ -789,17 +760,12 @@ Ambil Selfie
                 showCoGpsError('Perangkat/browser ini tidak mendukung GPS.');
                 return;
             }
-            const loadEl      = document.getElementById('co-gps-loading');
-            const okEl        = document.getElementById('co-gps-ok');
-            const errDiv      = document.getElementById('co-gps-error-msg');
-            const uncertainEl = document.getElementById('co-gps-uncertain-msg');
-            const outsideEl   = document.getElementById('co-gps-outside-msg');
-            if (errDiv)      { errDiv.classList.add('hidden'); errDiv.classList.remove('flex'); }
-            if (uncertainEl) { uncertainEl.classList.add('hidden'); uncertainEl.classList.remove('flex'); }
-            if (outsideEl)   { outsideEl.classList.add('hidden'); outsideEl.classList.remove('flex'); }
-            if (okEl)        { okEl.classList.add('hidden'); okEl.classList.remove('flex'); }
+            const loadEl = document.getElementById('co-gps-loading');
+            const okEl   = document.getElementById('co-gps-ok');
+            const errDiv = document.getElementById('co-gps-error-msg');
+            if (errDiv) { errDiv.classList.add('hidden'); errDiv.classList.remove('flex'); }
+            if (okEl)   { okEl.classList.add('hidden'); okEl.classList.remove('flex'); }
             if (loadEl) loadEl.classList.remove('hidden');
-            coLocationBlocked = false;
             coGpsReady = false;
             updateCoSubmit();
 
@@ -815,61 +781,28 @@ Ambil Selfie
                     document.getElementById('co-accuracy').value = acc;
 
                     if (loadEl) loadEl.classList.add('hidden');
+                    if (okEl)   { okEl.classList.remove('hidden'); okEl.classList.add('flex'); }
 
                     const badge  = document.getElementById('co-radius-badge');
                     const detail = document.getElementById('co-gps-detail');
 
+                    coGpsReady = true;
+
                     if (OFFICE_LAT !== null) {
-                        const dist           = haversine(lat, lng, OFFICE_LAT, OFFICE_LNG);
-                        const classification = classifyLocation(dist, acc, OFFICE_RADIUS);
-                        const distM          = Math.round(dist);
+                        const dist      = haversine(lat, lng, OFFICE_LAT, OFFICE_LNG);
+                        const classification = classifyLocation(dist, OFFICE_RADIUS);
+                        const distM     = Math.round(dist);
+                        const isOutside = classification === 'OUTSIDE_RADIUS';
 
-                        if (classification === 'LOCATION_UNCERTAIN') {
-                            coLocationBlocked = true;
-                            coGpsReady = false;
-                            if (okEl) { okEl.classList.add('hidden'); okEl.classList.remove('flex'); }
-                            if (uncertainEl) {
-                                uncertainEl.classList.remove('hidden');
-                                uncertainEl.classList.add('flex');
-                                const accEl = document.getElementById('co-gps-uncertain-acc');
-                                if (accEl) accEl.innerText = 'Akurasi: ' + accRounded + 'm';
-                            }
+                        if (isOutside) {
                             badge.className = 'flex items-center gap-1.5 px-2 py-1 rounded-full bg-warning/10 border border-warning/20';
-                            badge.innerHTML = '<span class="material-symbols-outlined text-warning text-[14px]">gps_not_fixed</span><span class="font-status-badge text-status-badge text-warning">Lokasi belum akurat</span>';
-                            if (detail) detail.innerText = 'Akurasi: ' + accRounded + 'm';
-                            updateCoSubmit();
-                            return;
+                            badge.innerHTML = '<div class="w-1.5 h-1.5 rounded-full bg-warning animate-pulse"></div><span class="font-status-badge text-status-badge text-warning">Di luar radius kantor</span>';
+                        } else {
+                            badge.className = 'flex items-center gap-1.5 px-2 py-1 rounded-full bg-success/10 border border-success/20';
+                            badge.innerHTML = '<div class="w-1.5 h-1.5 rounded-full bg-success animate-pulse"></div><span class="font-status-badge text-status-badge text-success">Dalam radius kantor</span>';
                         }
-
-                        if (classification === 'OUTSIDE_RADIUS') {
-                            coLocationBlocked = true;
-                            coGpsReady = false;
-                            if (okEl) { okEl.classList.add('hidden'); okEl.classList.remove('flex'); }
-                            if (outsideEl) {
-                                outsideEl.classList.remove('hidden');
-                                outsideEl.classList.add('flex');
-                                const outDetail = document.getElementById('co-gps-outside-detail');
-                                if (outDetail) outDetail.innerText = 'Akurasi: ' + accRounded + 'm • ' + distM + 'm dari kantor';
-                            }
-                            badge.className = 'flex items-center gap-1.5 px-2 py-1 rounded-full bg-error-container border border-error/20';
-                            badge.innerHTML = '<div class="w-1.5 h-1.5 rounded-full bg-error animate-pulse"></div><span class="font-status-badge text-status-badge text-error">Di luar radius kantor</span>';
-                            if (detail) detail.innerText = 'Akurasi: ' + accRounded + 'm • ' + distM + 'm dari kantor';
-                            updateCoSubmit();
-                            return;
-                        }
-
-                        coLocationBlocked = false;
-                        coGpsReady = true;
-                        if (uncertainEl) { uncertainEl.classList.add('hidden'); uncertainEl.classList.remove('flex'); }
-                        if (outsideEl)   { outsideEl.classList.add('hidden'); outsideEl.classList.remove('flex'); }
-                        if (okEl)        { okEl.classList.remove('hidden'); okEl.classList.add('flex'); }
-
-                        badge.className = 'flex items-center gap-1.5 px-2 py-1 rounded-full bg-success/10 border border-success/20';
-                        badge.innerHTML = '<div class="w-1.5 h-1.5 rounded-full bg-success animate-pulse"></div><span class="font-status-badge text-status-badge text-success">Dalam radius kantor</span>';
                         if (detail) detail.innerText = 'Akurasi: ' + accRounded + 'm • ' + distM + 'm dari kantor';
                     } else {
-                        coGpsReady = true;
-                        if (okEl) { okEl.classList.remove('hidden'); okEl.classList.add('flex'); }
                         if (detail) detail.innerText = 'Akurasi: ' + accRounded + 'm';
                     }
 
@@ -890,12 +823,7 @@ Ambil Selfie
         window.retryCoGps = function() { startCoGps(); };
 
         function showCoGpsError(msg) {
-            const loadEl      = document.getElementById('co-gps-loading');
-            const uncertainEl = document.getElementById('co-gps-uncertain-msg');
-            const outsideEl   = document.getElementById('co-gps-outside-msg');
-            if (uncertainEl) { uncertainEl.classList.add('hidden'); uncertainEl.classList.remove('flex'); }
-            if (outsideEl)   { outsideEl.classList.add('hidden'); outsideEl.classList.remove('flex'); }
-            coLocationBlocked = false;
+            const loadEl = document.getElementById('co-gps-loading');
             coGpsReady = false;
             updateCoSubmit();
             const errDiv = document.getElementById('co-gps-error-msg');

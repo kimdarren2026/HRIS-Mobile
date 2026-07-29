@@ -153,7 +153,7 @@ class Phase58ERadiusAccuracyTest extends TestCase
         $this->assertSame(20, $this->office->fresh()->radius_meters);
     }
 
-    // ── 6-8: classifyLocation() three-way decision (unit-level, exact inputs) ─
+    // ── 6-8: classifyLocation() is distance-only — accuracy never affects it ──
 
     public function test_classify_distance5_accuracy5_radius20_is_inside(): void
     {
@@ -163,12 +163,12 @@ class Phase58ERadiusAccuracyTest extends TestCase
         $this->assertSame(AttendanceService::INSIDE_RADIUS, $service->classifyLocation(5, 5, $office));
     }
 
-    public function test_classify_distance15_accuracy10_radius20_is_uncertain(): void
+    public function test_classify_distance15_radius20_is_inside_regardless_of_large_accuracy(): void
     {
         $service = app(AttendanceService::class);
         $office  = new OfficeLocation(['radius_meters' => 20]);
 
-        $this->assertSame(AttendanceService::LOCATION_UNCERTAIN, $service->classifyLocation(15, 10, $office));
+        $this->assertSame(AttendanceService::INSIDE_RADIUS, $service->classifyLocation(15, 10, $office));
     }
 
     public function test_classify_distance40_accuracy10_radius20_is_outside(): void
@@ -179,9 +179,9 @@ class Phase58ERadiusAccuracyTest extends TestCase
         $this->assertSame(AttendanceService::OUTSIDE_RADIUS, $service->classifyLocation(40, 10, $office));
     }
 
-    // ── 9-11: LOCATION_UNCERTAIN blocks everything ──────────────────────────
+    // ── 9-11: large GPS accuracy inside the radius still auto-approves ───────
 
-    public function test_uncertain_location_does_not_create_attendance_record(): void
+    public function test_large_accuracy_inside_radius_creates_approved_attendance_record(): void
     {
         $this->actingAs($this->employeeUser)
             ->post('/attendance/check-in', [
@@ -190,12 +190,15 @@ class Phase58ERadiusAccuracyTest extends TestCase
                 'accuracy' => 10,
                 'photo'    => $this->photo(),
             ])
-            ->assertSessionHasErrors('general');
+            ->assertRedirect('/attendance/history');
 
-        $this->assertDatabaseMissing('attendance_records', ['employee_id' => $this->employee->id]);
+        $this->assertDatabaseHas('attendance_records', [
+            'employee_id' => $this->employee->id,
+            'status'      => 'APPROVED',
+        ]);
     }
 
-    public function test_uncertain_location_does_not_store_selfie(): void
+    public function test_large_accuracy_inside_radius_stores_selfie(): void
     {
         $this->actingAs($this->employeeUser)
             ->post('/attendance/check-in', [
@@ -205,10 +208,11 @@ class Phase58ERadiusAccuracyTest extends TestCase
                 'photo'    => $this->photo(),
             ]);
 
-        $this->assertEmpty(Storage::disk('local')->allFiles('attendance'));
+        $record = AttendanceRecord::where('employee_id', $this->employee->id)->first();
+        Storage::disk('local')->assertExists($record->check_in_photo_path);
     }
 
-    public function test_uncertain_location_does_not_create_notification(): void
+    public function test_large_accuracy_inside_radius_does_not_create_notification(): void
     {
         User::factory()->create(['role' => 'admin_hr', 'is_active' => true]);
         User::factory()->create(['role' => 'super_admin', 'is_active' => true]);
@@ -224,9 +228,9 @@ class Phase58ERadiusAccuracyTest extends TestCase
         $this->assertSame(0, Notification::count());
     }
 
-    // ── 12-13: OUTSIDE → rejected outright, INSIDE → existing normal flow ────
+    // ── 12-13: OUTSIDE → allowed with reason (PENDING_REVIEW), INSIDE → normal flow ──
 
-    public function test_outside_radius_is_rejected_and_creates_no_record(): void
+    public function test_outside_radius_without_reason_is_rejected_and_creates_no_record(): void
     {
         $this->actingAs($this->employeeUser)
             ->post('/attendance/check-in', [
@@ -235,9 +239,27 @@ class Phase58ERadiusAccuracyTest extends TestCase
                 'accuracy' => 10,
                 'photo'    => $this->photo(),
             ])
-            ->assertSessionHasErrors('general');
+            ->assertSessionHasErrors('reason');
 
         $this->assertDatabaseMissing('attendance_records', ['employee_id' => $this->employee->id]);
+    }
+
+    public function test_outside_radius_with_reason_creates_pending_review_record(): void
+    {
+        $this->actingAs($this->employeeUser)
+            ->post('/attendance/check-in', [
+                'lat'      => $this->latAtDistance(40),
+                'lng'      => $this->officeLng(),
+                'accuracy' => 10,
+                'photo'    => $this->photo(),
+                'reason'   => 'Kunjungan klien di luar kantor hari ini.',
+            ])
+            ->assertRedirect('/attendance/history');
+
+        $this->assertDatabaseHas('attendance_records', [
+            'employee_id' => $this->employee->id,
+            'status'      => 'PENDING_REVIEW',
+        ]);
     }
 
     public function test_inside_radius_results_in_normal_approved_status(): void
@@ -271,7 +293,7 @@ class Phase58ERadiusAccuracyTest extends TestCase
                 'status'         => 'APPROVED',
                 'classification' => 'INSIDE_RADIUS',
             ])
-            ->assertSessionHasErrors('general');
+            ->assertSessionHasErrors('reason');
 
         $this->assertDatabaseMissing('attendance_records', ['employee_id' => $this->employee->id]);
     }
@@ -305,9 +327,9 @@ class Phase58ERadiusAccuracyTest extends TestCase
         $this->assertDatabaseMissing('attendance_records', ['employee_id' => $this->employee->id]);
     }
 
-    // ── 17: check-out applies the same classification rule ──────────────────
+    // ── 17: check-out is never blocked by radius or accuracy ─────────────────
 
-    public function test_checkout_with_uncertain_location_is_rejected_and_not_recorded(): void
+    public function test_checkout_with_large_accuracy_still_succeeds_and_is_recorded(): void
     {
         AttendanceRecord::create([
             'employee_id'     => $this->employee->id,
@@ -322,10 +344,10 @@ class Phase58ERadiusAccuracyTest extends TestCase
                 'lng'      => $this->officeLng(),
                 'accuracy' => 10,
             ])
-            ->assertSessionHasErrors('general');
+            ->assertRedirect('/attendance/history');
 
         $record = AttendanceRecord::where('employee_id', $this->employee->id)->first();
-        $this->assertNull($record->check_out_time);
+        $this->assertNotNull($record->check_out_time);
     }
 
     // ── 18: check-in and check-out accuracy are both persisted ──────────────

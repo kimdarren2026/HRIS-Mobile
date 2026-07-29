@@ -16,12 +16,13 @@ use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
 /**
- * Phase 58F: strict attendance radius. INSIDE_RADIUS is the only classification
- * that may ever create/update an AttendanceRecord for check-in or check-out.
- * OUTSIDE_RADIUS and LOCATION_UNCERTAIN are both rejected outright — there is
- * no more out-of-radius submission, PENDING_REVIEW-on-check-in, or HR
- * notification path. Legacy PENDING_REVIEW/APPROVED/REJECTED rows and the HR
- * approval queue must keep working unchanged.
+ * Phase 58F introduced a strict radius policy that rejected OUTSIDE_RADIUS
+ * check-ins/check-outs outright and added an accuracy-margin LOCATION_UNCERTAIN
+ * classification. Phase 58G corrects this: the radius decision is distance-only
+ * (INSIDE_RADIUS vs OUTSIDE_RADIUS, no uncertain state), OUTSIDE_RADIUS check-in
+ * is allowed with a mandatory reason and lands in PENDING_REVIEW with an HR
+ * notification, and check-out is never blocked by radius or accuracy. This file
+ * now documents and asserts that corrected behavior.
  */
 class Phase58FStrictRadiusTest extends TestCase
 {
@@ -69,6 +70,11 @@ class Phase58FStrictRadiusTest extends TestCase
         return UploadedFile::fake()->image('selfie.jpg', 200, 200)->size(100);
     }
 
+    private function validReason(): string
+    {
+        return 'Kunjungan klien di luar kantor hari ini.';
+    }
+
     /**
      * Pure north/south latitude offset from the office by the given distance
      * in metres — for a pure latitude offset the haversine formula reduces to
@@ -90,14 +96,15 @@ class Phase58FStrictRadiusTest extends TestCase
         return ['lat' => $this->latAtDistance(10), 'lng' => $this->officeLng(), 'accuracy' => 5];
     }
 
-    // 200m out with tight accuracy — unambiguously OUTSIDE_RADIUS (dist - acc > radius).
+    // 200m out with tight accuracy — unambiguously OUTSIDE_RADIUS.
     private function outsideCoords(): array
     {
         return ['lat' => $this->latAtDistance(200), 'lng' => $this->officeLng(), 'accuracy' => 5];
     }
 
-    // 100m out with 30m accuracy — dist+acc=130>100 and dist-acc=70<100 → LOCATION_UNCERTAIN.
-    private function uncertainCoords(): array
+    // Exactly at the radius boundary with large accuracy — accuracy must not
+    // affect the decision: distance <= radius is still INSIDE_RADIUS.
+    private function boundaryCoordsWithLargeAccuracy(): array
     {
         return ['lat' => $this->latAtDistance(100), 'lng' => $this->officeLng(), 'accuracy' => 30];
     }
@@ -128,47 +135,52 @@ class Phase58FStrictRadiusTest extends TestCase
         ]);
     }
 
-    // ── 2. Check-in outside radius ditolak ───────────────────────────────────
+    // ── 2. Check-in outside radius tanpa alasan ditolak ──────────────────────
 
-    public function test_checkin_outside_radius_is_rejected(): void
+    public function test_checkin_outside_radius_without_reason_is_rejected(): void
     {
         $this->actingAs($this->employeeUser)
             ->post('/attendance/check-in', array_merge($this->outsideCoords(), ['photo' => $this->photo()]))
-            ->assertSessionHasErrors('general');
-    }
-
-    // ── 3. Check-in uncertain ditolak ────────────────────────────────────────
-
-    public function test_checkin_uncertain_is_rejected(): void
-    {
-        $this->actingAs($this->employeeUser)
-            ->post('/attendance/check-in', array_merge($this->uncertainCoords(), ['photo' => $this->photo()]))
-            ->assertSessionHasErrors('general');
-    }
-
-    // ── 4. Outside tidak membuat attendance record ───────────────────────────
-
-    public function test_outside_radius_does_not_create_attendance_record(): void
-    {
-        $this->actingAs($this->employeeUser)
-            ->post('/attendance/check-in', array_merge($this->outsideCoords(), ['photo' => $this->photo()]));
+            ->assertSessionHasErrors('reason');
 
         $this->assertDatabaseMissing('attendance_records', ['employee_id' => $this->employee->id]);
     }
 
-    // ── 5. Uncertain tidak membuat attendance record ─────────────────────────
+    // ── 3. Distance persis di radius, accuracy besar → tetap INSIDE_RADIUS ──
 
-    public function test_uncertain_does_not_create_attendance_record(): void
+    public function test_distance_at_radius_boundary_with_large_accuracy_is_inside_and_approved(): void
     {
         $this->actingAs($this->employeeUser)
-            ->post('/attendance/check-in', array_merge($this->uncertainCoords(), ['photo' => $this->photo()]));
+            ->post('/attendance/check-in', array_merge($this->boundaryCoordsWithLargeAccuracy(), ['photo' => $this->photo()]))
+            ->assertRedirect('/attendance/history');
 
-        $this->assertDatabaseMissing('attendance_records', ['employee_id' => $this->employee->id]);
+        $this->assertDatabaseHas('attendance_records', [
+            'employee_id' => $this->employee->id,
+            'status'      => 'APPROVED',
+        ]);
     }
 
-    // ── 6. Outside tidak menyimpan selfie ────────────────────────────────────
+    // ── 4. Outside dengan alasan valid membuat PENDING_REVIEW ────────────────
 
-    public function test_outside_radius_does_not_store_selfie(): void
+    public function test_outside_radius_with_reason_creates_pending_review_record(): void
+    {
+        $this->actingAs($this->employeeUser)
+            ->post('/attendance/check-in', array_merge($this->outsideCoords(), [
+                'photo'  => $this->photo(),
+                'reason' => $this->validReason(),
+            ]))
+            ->assertRedirect('/attendance/history');
+
+        $this->assertDatabaseHas('attendance_records', [
+            'employee_id'          => $this->employee->id,
+            'status'               => 'PENDING_REVIEW',
+            'out_of_radius_reason' => $this->validReason(),
+        ]);
+    }
+
+    // ── 5. Outside tanpa alasan tidak menyimpan selfie ───────────────────────
+
+    public function test_outside_radius_without_reason_does_not_store_selfie(): void
     {
         $this->actingAs($this->employeeUser)
             ->post('/attendance/check-in', array_merge($this->outsideCoords(), ['photo' => $this->photo()]));
@@ -176,40 +188,56 @@ class Phase58FStrictRadiusTest extends TestCase
         $this->assertEmpty(Storage::disk('local')->allFiles('attendance'));
     }
 
-    // ── 7. Uncertain tidak menyimpan selfie ──────────────────────────────────
+    // ── 6. Outside dengan alasan valid menyimpan selfie ──────────────────────
 
-    public function test_uncertain_does_not_store_selfie(): void
+    public function test_outside_radius_with_reason_stores_selfie(): void
     {
         $this->actingAs($this->employeeUser)
-            ->post('/attendance/check-in', array_merge($this->uncertainCoords(), ['photo' => $this->photo()]));
+            ->post('/attendance/check-in', array_merge($this->outsideCoords(), [
+                'photo'  => $this->photo(),
+                'reason' => $this->validReason(),
+            ]));
 
-        $this->assertEmpty(Storage::disk('local')->allFiles('attendance'));
+        $record = AttendanceRecord::where('employee_id', $this->employee->id)->first();
+        Storage::disk('local')->assertExists($record->check_in_photo_path);
     }
 
-    // ── 8. Outside tidak membuat notification ────────────────────────────────
+    // ── 7. Outside dengan alasan valid membuat notification HR ───────────────
 
-    public function test_outside_radius_does_not_create_notification(): void
+    public function test_outside_radius_with_reason_creates_hr_notification(): void
     {
         User::factory()->create(['role' => 'admin_hr', 'is_active' => true]);
         User::factory()->create(['role' => 'super_admin', 'is_active' => true]);
 
         $this->actingAs($this->employeeUser)
-            ->post('/attendance/check-in', array_merge($this->outsideCoords(), ['photo' => $this->photo()]));
+            ->post('/attendance/check-in', array_merge($this->outsideCoords(), [
+                'photo'  => $this->photo(),
+                'reason' => $this->validReason(),
+            ]));
+
+        $this->assertSame(2, Notification::count());
+    }
+
+    // ── 8. Inside radius tidak membuat notification review ───────────────────
+
+    public function test_inside_radius_does_not_create_notification(): void
+    {
+        User::factory()->create(['role' => 'admin_hr', 'is_active' => true]);
+        User::factory()->create(['role' => 'super_admin', 'is_active' => true]);
+
+        $this->actingAs($this->employeeUser)
+            ->post('/attendance/check-in', array_merge($this->insideCoords(), ['photo' => $this->photo()]));
 
         $this->assertSame(0, Notification::count());
     }
 
-    // ── 9. Outside tidak membuat PENDING_REVIEW ──────────────────────────────
+    // ── 9. Outside tanpa alasan tidak membuat PENDING_REVIEW ─────────────────
 
-    public function test_outside_radius_does_not_create_pending_review(): void
+    public function test_outside_radius_without_reason_does_not_create_any_record(): void
     {
         $this->actingAs($this->employeeUser)
             ->post('/attendance/check-in', array_merge($this->outsideCoords(), ['photo' => $this->photo()]));
 
-        $this->assertDatabaseMissing('attendance_records', [
-            'employee_id' => $this->employee->id,
-            'status'      => 'PENDING_REVIEW',
-        ]);
         $this->assertSame(0, AttendanceRecord::where('employee_id', $this->employee->id)->count());
     }
 
@@ -223,7 +251,7 @@ class Phase58FStrictRadiusTest extends TestCase
                 'status'         => 'APPROVED',
                 'classification' => 'INSIDE_RADIUS',
             ]))
-            ->assertSessionHasErrors('general');
+            ->assertSessionHasErrors('reason');
 
         $this->assertDatabaseMissing('attendance_records', ['employee_id' => $this->employee->id]);
     }
@@ -242,48 +270,42 @@ class Phase58FStrictRadiusTest extends TestCase
         $this->assertNotNull($record->check_out_time);
     }
 
-    // ── 12. Check-out outside radius ditolak ─────────────────────────────────
+    // ── 12. Check-out outside radius tetap berhasil (Phase 58G) ─────────────
 
-    public function test_checkout_outside_radius_is_rejected(): void
+    public function test_checkout_outside_radius_still_succeeds(): void
     {
         $this->makeApprovedRecordToday();
 
         $this->actingAs($this->employeeUser)
             ->post('/attendance/check-out', $this->outsideCoords())
-            ->assertSessionHasErrors('general');
+            ->assertRedirect('/attendance/history');
+
+        $record = AttendanceRecord::where('employee_id', $this->employee->id)->first();
+        $this->assertNotNull($record->check_out_time);
     }
 
-    // ── 13. Check-out uncertain ditolak ──────────────────────────────────────
+    // ── 13. Check-out dengan accuracy besar tetap berhasil ───────────────────
 
-    public function test_checkout_uncertain_is_rejected(): void
+    public function test_checkout_with_large_accuracy_still_succeeds(): void
     {
         $this->makeApprovedRecordToday();
 
         $this->actingAs($this->employeeUser)
-            ->post('/attendance/check-out', $this->uncertainCoords())
-            ->assertSessionHasErrors('general');
+            ->post('/attendance/check-out', $this->boundaryCoordsWithLargeAccuracy())
+            ->assertRedirect('/attendance/history');
     }
 
-    // ── 14. Check-out ditolak tanpa mengubah record ──────────────────────────
+    // ── 14. Check-out outside radius tidak membuat notification ──────────────
 
-    public function test_checkout_rejection_does_not_modify_record(): void
+    public function test_checkout_outside_radius_does_not_create_notification(): void
     {
-        $record = $this->makeApprovedRecordToday();
+        User::factory()->create(['role' => 'admin_hr', 'is_active' => true]);
+        $this->makeApprovedRecordToday();
 
         $this->actingAs($this->employeeUser)
             ->post('/attendance/check-out', $this->outsideCoords());
 
-        $fresh = $record->fresh();
-        $this->assertNull($fresh->check_out_time);
-        $this->assertNull($fresh->check_out_lat);
-        $this->assertNull($fresh->check_out_lng);
-        $this->assertNull($fresh->check_out_accuracy);
-
-        $this->actingAs($this->employeeUser)
-            ->post('/attendance/check-out', $this->uncertainCoords());
-
-        $fresh = $record->fresh();
-        $this->assertNull($fresh->check_out_time);
+        $this->assertSame(0, Notification::count());
     }
 
     // ── 15. Data attendance lama PENDING_REVIEW tetap dapat dibaca ───────────
@@ -297,7 +319,7 @@ class Phase58FStrictRadiusTest extends TestCase
             'check_in_lat'         => $this->latAtDistance(200),
             'check_in_lng'         => $this->officeLng(),
             'status'               => 'PENDING_REVIEW',
-            'out_of_radius_reason' => 'Kunjungan klien (data legacy sebelum Phase 58F).',
+            'out_of_radius_reason' => 'Kunjungan klien (data legacy).',
         ]);
 
         $html = $this->actingAs($this->employeeUser)
@@ -331,7 +353,7 @@ class Phase58FStrictRadiusTest extends TestCase
             'attendance_date'      => today()->subDay(),
             'check_in_time'        => now()->subDay(),
             'status'               => 'PENDING_REVIEW',
-            'out_of_radius_reason' => 'Legacy record predating Phase 58F.',
+            'out_of_radius_reason' => 'Legacy record.',
         ]);
 
         $this->actingAs($hrUser)->get('/hr/approval-queue')->assertOk();
@@ -343,33 +365,44 @@ class Phase58FStrictRadiusTest extends TestCase
         $this->assertSame('APPROVED', $legacyRecord->fresh()->status);
     }
 
-    // ── 17. Field alasan luar radius tidak tampil pada UI ────────────────────
+    // ── 17. Field alasan luar radius tampil kembali pada UI ──────────────────
 
-    public function test_out_of_radius_reason_field_is_not_present_in_checkin_ui(): void
+    public function test_out_of_radius_reason_field_is_present_in_checkin_ui(): void
     {
         $html = $this->actingAs($this->employeeUser)
             ->get('/attendance/checkin')
             ->assertOk()
             ->getContent();
 
-        $this->assertStringNotContainsString('name="reason"', $html);
-        $this->assertStringNotContainsString('Alasan absen di luar radius', $html);
-        $this->assertStringNotContainsString('Kirim untuk Review HR', $html);
+        $this->assertStringContainsString('name="reason"', $html);
+        $this->assertStringContainsString('id="reason-section"', $html);
+        $this->assertStringContainsString('Kirim untuk Review HR', $html);
     }
 
-    // ── 18/19. Tombol submit disabled saat outside/uncertain ─────────────────
+    // ── 18. Reason field hidden by default (JS toggles it once distance is known) ──
 
-    public function test_submit_button_starts_disabled_and_js_blocks_outside_and_uncertain(): void
+    public function test_reason_section_hidden_by_default(): void
     {
         $html = $this->actingAs($this->employeeUser)
             ->get('/attendance/checkin')
             ->assertOk()
             ->getContent();
 
-        $this->assertMatchesRegularExpression('/id="submit-btn"[^>]*disabled/s', $html);
+        $this->assertMatchesRegularExpression('/id="reason-section"[^>]*hidden/s', $html);
+    }
+
+    // ── 19. Submit button tidak lagi diblokir oleh klasifikasi OUTSIDE_RADIUS ──
+
+    public function test_submit_button_js_no_longer_blocks_outside_radius(): void
+    {
+        $html = $this->actingAs($this->employeeUser)
+            ->get('/attendance/checkin')
+            ->assertOk()
+            ->getContent();
+
         $this->assertStringContainsString("classification === 'OUTSIDE_RADIUS'", $html);
-        $this->assertStringContainsString("classification === 'LOCATION_UNCERTAIN'", $html);
-        $this->assertStringContainsString('locationBlocked = true', $html);
+        $this->assertStringNotContainsString("classification === 'LOCATION_UNCERTAIN'", $html);
+        $this->assertStringNotContainsString('locationBlocked', $html);
     }
 
     // ── 20. Radius dan accuracy tetap ditampilkan ────────────────────────────

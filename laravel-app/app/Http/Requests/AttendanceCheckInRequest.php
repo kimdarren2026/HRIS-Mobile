@@ -18,6 +18,9 @@ class AttendanceCheckInRequest extends FormRequest
             'lng'      => ['required', 'numeric', 'between:-180,180'],
             'accuracy' => ['required', 'numeric', 'min:0', 'max:100000'],
             'photo'    => ['required', 'image', 'mimes:jpeg,png', 'max:5120'],
+            // Conditional 'required if outside radius' is enforced in the controller,
+            // since the radius decision itself depends on a server-side distance calc.
+            'reason'   => ['nullable', 'string', 'max:500'],
         ];
     }
 
