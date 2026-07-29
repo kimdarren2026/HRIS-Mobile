@@ -137,7 +137,7 @@ class Phase57LocalizationPayslipTest extends TestCase
 
         $this->actingAs($this->employeeUser)
             ->post('/attendance/check-in', [
-                'lat' => -6.2, 'lng' => 106.8166, 'photo' => $photo,
+                'lat' => -6.2, 'lng' => 106.8166, 'accuracy' => 5, 'photo' => $photo,
             ])
             ->assertSessionHasErrors('general');
 

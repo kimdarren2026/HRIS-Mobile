@@ -89,8 +89,8 @@ tailwind.config = {
         <input type="number" id="radius_meters" name="radius_meters"
           value="{{ old('radius_meters', 100) }}"
           class="border border-outline-variant rounded-lg px-3 py-2 text-body-md focus:outline-none focus:ring-2 focus:ring-primary/30"
-          min="50" max="10000" required/>
-        <p class="text-label-md text-on-surface-variant mt-0.5">Pegawai dalam radius ini otomatis disetujui saat check-in. Minimal 50m, maksimal 10000m.</p>
+          min="20" max="10000" step="1" required/>
+        <p class="text-label-md text-on-surface-variant mt-0.5">Radius minimum 20 meter. Radius kecil memerlukan akurasi GPS yang baik.</p>
         @error('radius_meters')<p class="text-error text-label-md mt-1">{{ $message }}</p>@enderror
       </div>
 

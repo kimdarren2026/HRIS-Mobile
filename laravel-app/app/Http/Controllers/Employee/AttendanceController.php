@@ -63,12 +63,23 @@ class AttendanceController extends Controller
             ]);
         }
 
-        $lat = (float) $request->lat;
-        $lng = (float) $request->lng;
+        $lat      = (float) $request->lat;
+        $lng      = (float) $request->lng;
+        $accuracy = (float) $request->accuracy;
 
         // Server-side radius decision — never trust client-supplied status
-        $distance     = round($this->attendanceService->calculateDistance($lat, $lng, $office), 2);
-        $withinRadius = $distance <= $office->radius_meters;
+        $distance       = round($this->attendanceService->calculateDistance($lat, $lng, $office), 2);
+        $classification = $this->attendanceService->classifyLocation($distance, $accuracy, $office);
+
+        if ($classification === AttendanceService::LOCATION_UNCERTAIN) {
+            // No attendance record, no selfie, no notification — the photo upload is
+            // never touched, so nothing is written to disk for a rejected location.
+            return back()->withErrors([
+                'general' => "Lokasi belum cukup akurat. Aktifkan Lokasi Akurat dan coba kembali. (Akurasi GPS saat ini: {$accuracy} meter)",
+            ]);
+        }
+
+        $withinRadius = $classification === AttendanceService::INSIDE_RADIUS;
 
         if (! $withinRadius) {
             $request->validate([
@@ -100,6 +111,7 @@ class AttendanceController extends Controller
             'check_in_lat'         => $lat,
             'check_in_lng'         => $lng,
             'distance_from_office' => $distance,
+            'check_in_accuracy'    => $accuracy,
             'check_in_photo_path'  => $photoPath,
             'status'               => $status,
             'out_of_radius_reason' => $withinRadius ? null : $request->reason,
@@ -151,12 +163,33 @@ class AttendanceController extends Controller
             return back()->withErrors(['general' => 'Anda sudah melakukan check-out hari ini.']);
         }
 
+        $lat      = (float) $request->lat;
+        $lng      = (float) $request->lng;
+        $accuracy = (float) $request->accuracy;
+
+        // Same accuracy rule as check-in: an office may have been configured after
+        // check-in, so recompute against whatever is active now. No office simply
+        // means there is nothing to classify against — checkout proceeds as before.
+        $office = $this->attendanceService->getActiveOffice();
+
+        if ($office) {
+            $distance       = $this->attendanceService->calculateDistance($lat, $lng, $office);
+            $classification = $this->attendanceService->classifyLocation($distance, $accuracy, $office);
+
+            if ($classification === AttendanceService::LOCATION_UNCERTAIN) {
+                return back()->withErrors([
+                    'general' => "Lokasi belum cukup akurat. Aktifkan Lokasi Akurat dan coba kembali. (Akurasi GPS saat ini: {$accuracy} meter)",
+                ]);
+            }
+        }
+
         // Status is intentionally NOT changed on checkout — PENDING_REVIEW records
         // remain under HR review regardless of when the employee checks out.
         $record->update([
-            'check_out_time' => now(),
-            'check_out_lat'  => (float) $request->lat,
-            'check_out_lng'  => (float) $request->lng,
+            'check_out_time'     => now(),
+            'check_out_lat'      => $lat,
+            'check_out_lng'      => $lng,
+            'check_out_accuracy' => $accuracy,
         ]);
 
         AuditLogService::log(

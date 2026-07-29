@@ -356,10 +356,11 @@ class FunctionalNotificationsTest extends TestCase
         $this->makeOffice();
 
         $response = $this->actingAs($this->employeeUser)->post('/attendance/check-in', [
-            'lat'    => -6.2100000, // ~1.1 km outside radius
-            'lng'    => 106.8166660,
-            'reason' => 'Remote work — client site',
-            'photo'  => UploadedFile::fake()->image('selfie.jpg', 200, 200)->size(80),
+            'lat'      => -6.2100000, // ~1.1 km outside radius
+            'lng'      => 106.8166660,
+            'accuracy' => 5,
+            'reason'   => 'Remote work — client site',
+            'photo'    => UploadedFile::fake()->image('selfie.jpg', 200, 200)->size(80),
         ]);
 
         $response->assertRedirect();                                       // 1
@@ -376,9 +377,10 @@ class FunctionalNotificationsTest extends TestCase
         $this->makeOffice();
 
         $this->actingAs($this->employeeUser)->post('/attendance/check-in', [
-            'lat'   => -6.2001000, // within 100 m
-            'lng'   => 106.8166660,
-            'photo' => UploadedFile::fake()->image('selfie.jpg', 200, 200)->size(80),
+            'lat'      => -6.2001000, // within 100 m
+            'lng'      => 106.8166660,
+            'accuracy' => 5,
+            'photo'    => UploadedFile::fake()->image('selfie.jpg', 200, 200)->size(80),
         ])->assertRedirect();                                               // 1
 
         $this->assertSame(0, Notification::count());                       // 2

@@ -12,14 +12,14 @@ use Illuminate\View\View;
 
 class OfficeLocationController extends Controller
 {
-    // 50m keeps a small single-building office usable; 10000m (10km) caps
-    // obviously mistaken entries (e.g. a wrong decimal place) without ruling
-    // out a legitimately large campus radius.
+    // 20m is the floor below which consumer GPS accuracy makes the radius
+    // unreliable; 10000m (10km) caps obviously mistaken entries (e.g. a wrong
+    // decimal place) without ruling out a legitimately large campus radius.
     private const RULES = [
         'name'          => ['required', 'string', 'max:100'],
         'latitude'      => ['required', 'numeric', 'between:-90,90'],
         'longitude'     => ['required', 'numeric', 'between:-180,180'],
-        'radius_meters' => ['required', 'integer', 'min:50', 'max:10000'],
+        'radius_meters' => ['required', 'integer', 'min:20', 'max:10000'],
     ];
 
     public function create(): View

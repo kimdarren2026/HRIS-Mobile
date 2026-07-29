@@ -214,6 +214,7 @@
 @csrf
 <input type="hidden" id="co-lat" name="lat">
 <input type="hidden" id="co-lng" name="lng">
+<input type="hidden" id="co-accuracy" name="accuracy">
 <main class="flex-1 mt-16 px-container-margin py-unit-md flex flex-col gap-unit-lg">
 <div class="flex justify-center -mt-unit-sm -mb-unit-sm">
 <div id="checkin-success-anim" class="w-[320px] h-[320px] max-w-[85vw] max-h-[85vw]" aria-hidden="true"></div>
@@ -269,6 +270,12 @@ Absen pulang akan dicatat. Status Menunggu Review HR tetap menunggu keputusan HR
 <p class="font-label-sm text-label-sm text-error" id="co-gps-error-text">Izin lokasi ditolak. Aktifkan GPS di pengaturan browser.</p>
 <button type="button" onclick="retryCoGps()" class="mt-1 text-primary font-label-sm text-label-sm underline">Coba lagi</button>
 </div>
+<div id="co-gps-uncertain-msg" class="hidden flex-col items-center gap-2 text-center px-4">
+<span class="material-symbols-outlined text-warning text-[32px]">gps_not_fixed</span>
+<p class="font-label-sm text-label-sm text-warning">Lokasi belum cukup akurat. Aktifkan Lokasi Akurat dan coba kembali.</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant" id="co-gps-uncertain-acc">Akurasi: --</p>
+<button type="button" onclick="retryCoGps()" class="mt-1 text-primary font-label-sm text-label-sm underline">Coba Lagi</button>
+</div>
 <div id="co-gps-ok" class="hidden items-center justify-center w-full h-full">
 <div class="relative flex items-center justify-center">
 <div class="absolute w-12 h-12 rounded-full bg-primary/20 animate-pin-pulse"></div>
@@ -316,6 +323,7 @@ Absen pulang akan dicatat. Status Menunggu Review HR tetap menunggu keputusan HR
 @csrf
 <input type="hidden" id="lat" name="lat">
 <input type="hidden" id="lng" name="lng">
+<input type="hidden" id="accuracy" name="accuracy">
 
 <main class="flex-1 mt-16 px-container-margin py-unit-md flex flex-col gap-unit-lg">
 
@@ -356,6 +364,12 @@ Absen pulang akan dicatat. Status Menunggu Review HR tetap menunggu keputusan HR
 <span class="material-symbols-outlined text-error text-[32px]">location_off</span>
 <p class="font-label-sm text-label-sm text-error" id="gps-error-text">Izin lokasi ditolak. Aktifkan GPS di pengaturan browser.</p>
 <button type="button" onclick="retryGps()" class="mt-1 text-primary font-label-sm text-label-sm underline">Coba lagi</button>
+</div>
+<div id="gps-uncertain-msg" class="hidden flex-col items-center gap-2 text-center px-4">
+<span class="material-symbols-outlined text-warning text-[32px]">gps_not_fixed</span>
+<p class="font-label-sm text-label-sm text-warning">Lokasi belum cukup akurat. Aktifkan Lokasi Akurat dan coba kembali.</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant" id="gps-uncertain-acc">Akurasi: --</p>
+<button type="button" onclick="retryGps()" class="mt-1 text-primary font-label-sm text-label-sm underline">Coba Lagi</button>
 </div>
 <div id="gps-ok" class="hidden items-center justify-center w-full h-full">
 <div class="relative flex items-center justify-center">
@@ -477,14 +491,25 @@ Alasan absen di luar radius <span class="text-danger">*</span>
         return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
     }
 
+    // ── Radius classification ────────────────────────────────────────────────
+    // Mirrors AttendanceService::classifyLocation() exactly — the backend
+    // recomputes and enforces this independently, this copy only drives the UI.
+    function classifyLocation(distance, accuracy, radius) {
+        if (distance + accuracy <= radius) return 'INSIDE_RADIUS';
+        if (distance - accuracy > radius) return 'OUTSIDE_RADIUS';
+        return 'LOCATION_UNCERTAIN';
+    }
+
     // ── Submit guard ───────────────────────────────────────────────────────
     // Check-in is blocked server-side too when no office location is active —
     // this only avoids sending an employee through the GPS/camera flow for a
-    // submission that would be rejected anyway.
+    // submission that would be rejected anyway. locationUncertain additionally
+    // blocks submit entirely — an uncertain reading must never create a record.
+    let locationUncertain = false;
     function updateSubmit() {
         const btn = document.getElementById('submit-btn');
         if (!btn) return;
-        btn.disabled = OFFICE_LAT === null || !(gpsReady && photoReady);
+        btn.disabled = OFFICE_LAT === null || locationUncertain || !(gpsReady && photoReady);
     }
 
     // ── GPS ────────────────────────────────────────────────────────────────
@@ -493,40 +518,65 @@ Alasan absen di luar radius <span class="text-danger">*</span>
             showGpsError('Perangkat/browser ini tidak mendukung GPS. Gunakan browser yang mendukung geolocation.');
             return;
         }
-        const loadEl = document.getElementById('gps-loading');
-        const okEl   = document.getElementById('gps-ok');
-        const errDiv = document.getElementById('gps-error-msg');
-        if (errDiv) { errDiv.classList.add('hidden'); errDiv.classList.remove('flex'); }
-        if (okEl)   { okEl.classList.add('hidden'); okEl.classList.remove('flex'); }
+        const loadEl      = document.getElementById('gps-loading');
+        const okEl        = document.getElementById('gps-ok');
+        const errDiv      = document.getElementById('gps-error-msg');
+        const uncertainEl = document.getElementById('gps-uncertain-msg');
+        if (errDiv)      { errDiv.classList.add('hidden'); errDiv.classList.remove('flex'); }
+        if (uncertainEl) { uncertainEl.classList.add('hidden'); uncertainEl.classList.remove('flex'); }
+        if (okEl)        { okEl.classList.add('hidden'); okEl.classList.remove('flex'); }
         if (loadEl) loadEl.classList.remove('hidden');
+        locationUncertain = false;
+        gpsReady = false;
+        updateSubmit();
 
         navigator.geolocation.getCurrentPosition(
             function(pos) {
                 const lat = pos.coords.latitude;
                 const lng = pos.coords.longitude;
-                const acc = Math.round(pos.coords.accuracy);
+                const acc = pos.coords.accuracy;
+                const accRounded = Math.round(acc);
 
-                document.getElementById('lat').value = lat;
-                document.getElementById('lng').value = lng;
+                document.getElementById('lat').value      = lat;
+                document.getElementById('lng').value      = lng;
+                document.getElementById('accuracy').value = acc;
 
                 if (loadEl) loadEl.classList.add('hidden');
-                if (okEl)   { okEl.classList.remove('hidden'); okEl.classList.add('flex'); }
 
-                gpsReady = true;
-                updateSubmit();
+                const badge  = document.getElementById('radius-badge');
+                const detail = document.getElementById('gps-detail');
+                const reason = document.getElementById('reason-section');
+                const label  = document.getElementById('submit-label');
 
-                // Check radius to show/hide reason field and update badge
-                let withinRadius = true;
                 if (OFFICE_LAT !== null) {
-                    const dist = haversine(lat, lng, OFFICE_LAT, OFFICE_LNG);
-                    withinRadius = dist <= OFFICE_RADIUS;
+                    const dist           = haversine(lat, lng, OFFICE_LAT, OFFICE_LNG);
+                    const classification = classifyLocation(dist, acc, OFFICE_RADIUS);
 
-                    const badge   = document.getElementById('radius-badge');
-                    const detail  = document.getElementById('gps-detail');
-                    const reason  = document.getElementById('reason-section');
-                    const label   = document.getElementById('submit-label');
+                    if (classification === 'LOCATION_UNCERTAIN') {
+                        locationUncertain = true;
+                        gpsReady = false;
+                        if (okEl) { okEl.classList.add('hidden'); okEl.classList.remove('flex'); }
+                        if (uncertainEl) {
+                            uncertainEl.classList.remove('hidden');
+                            uncertainEl.classList.add('flex');
+                            const accEl = document.getElementById('gps-uncertain-acc');
+                            if (accEl) accEl.innerText = 'Akurasi: ' + accRounded + 'm';
+                        }
+                        badge.className = 'flex items-center gap-1.5 px-2 py-1 rounded-full bg-warning/10 border border-warning/20';
+                        badge.innerHTML = '<span class="material-symbols-outlined text-warning text-[14px]">gps_not_fixed</span><span class="font-status-badge text-status-badge text-warning">Lokasi belum akurat</span>';
+                        if (detail) detail.innerText = 'Akurasi: ' + accRounded + 'm';
+                        if (reason) reason.classList.add('hidden');
+                        updateSubmit();
+                        return;
+                    }
 
-                    detail.innerText = 'Akurasi: ' + acc + 'm';
+                    locationUncertain = false;
+                    gpsReady = true;
+                    if (uncertainEl) { uncertainEl.classList.add('hidden'); uncertainEl.classList.remove('flex'); }
+                    if (okEl)        { okEl.classList.remove('hidden'); okEl.classList.add('flex'); }
+
+                    const withinRadius = classification === 'INSIDE_RADIUS';
+                    detail.innerText = 'Akurasi: ' + accRounded + 'm';
 
                     if (withinRadius) {
                         badge.className   = 'flex items-center gap-1.5 px-2 py-1 rounded-full bg-success/10 border border-success/20';
@@ -536,15 +586,18 @@ Alasan absen di luar radius <span class="text-danger">*</span>
                     } else {
                         badge.className   = 'flex items-center gap-1.5 px-2 py-1 rounded-full bg-error-container border border-error/20';
                         badge.innerHTML   = '<div class="w-1.5 h-1.5 rounded-full bg-error animate-pulse"></div><span class="font-status-badge text-status-badge text-error">Di luar radius kantor</span>';
-                        const distM       = Math.round(haversine(lat, lng, OFFICE_LAT, OFFICE_LNG));
-                        detail.innerText  = 'Akurasi: ' + acc + 'm • ' + distM + 'm dari kantor';
+                        const distM       = Math.round(dist);
+                        detail.innerText  = 'Akurasi: ' + accRounded + 'm • ' + distM + 'm dari kantor';
                         if (reason) reason.classList.remove('hidden');
                         if (label)  label.innerText = 'Kirim untuk Review HR';
                     }
                 } else {
-                    const detail = document.getElementById('gps-detail');
-                    if (detail) detail.innerText = 'Akurasi: ' + acc + 'm — lokasi kantor belum diatur';
+                    gpsReady = true;
+                    if (okEl) { okEl.classList.remove('hidden'); okEl.classList.add('flex'); }
+                    if (detail) detail.innerText = 'Akurasi: ' + accRounded + 'm — lokasi kantor belum diatur';
                 }
+
+                updateSubmit();
             },
             function(err) {
                 const msgs = {
@@ -561,7 +614,12 @@ Alasan absen di luar radius <span class="text-danger">*</span>
     window.retryGps = function() { startGps(); };
 
     function showGpsError(msg) {
-        const loadEl = document.getElementById('gps-loading');
+        const loadEl      = document.getElementById('gps-loading');
+        const uncertainEl = document.getElementById('gps-uncertain-msg');
+        if (uncertainEl) { uncertainEl.classList.add('hidden'); uncertainEl.classList.remove('flex'); }
+        locationUncertain = false;
+        gpsReady = false;
+        updateSubmit();
         const errDiv = document.getElementById('gps-error-msg');
         const okDiv  = document.getElementById('gps-ok');
         const errTxt = document.getElementById('gps-error-text');
@@ -722,11 +780,12 @@ Alasan absen di luar radius <span class="text-danger">*</span>
     // ── Check-out GPS ──────────────────────────────────────────────────────
     if (document.getElementById('checkout-form')) {
         let coGpsReady = false;
+        let coLocationUncertain = false;
 
         function updateCoSubmit() {
             const btn = document.getElementById('co-submit-btn');
             if (!btn) return;
-            btn.disabled = !coGpsReady;
+            btn.disabled = coLocationUncertain || !coGpsReady;
         }
 
         function startCoGps() {
@@ -734,35 +793,62 @@ Alasan absen di luar radius <span class="text-danger">*</span>
                 showCoGpsError('Perangkat/browser ini tidak mendukung GPS.');
                 return;
             }
-            const loadEl = document.getElementById('co-gps-loading');
-            const okEl   = document.getElementById('co-gps-ok');
-            const errDiv = document.getElementById('co-gps-error-msg');
-            if (errDiv) { errDiv.classList.add('hidden'); errDiv.classList.remove('flex'); }
-            if (okEl)   { okEl.classList.add('hidden'); okEl.classList.remove('flex'); }
+            const loadEl      = document.getElementById('co-gps-loading');
+            const okEl        = document.getElementById('co-gps-ok');
+            const errDiv      = document.getElementById('co-gps-error-msg');
+            const uncertainEl = document.getElementById('co-gps-uncertain-msg');
+            if (errDiv)      { errDiv.classList.add('hidden'); errDiv.classList.remove('flex'); }
+            if (uncertainEl) { uncertainEl.classList.add('hidden'); uncertainEl.classList.remove('flex'); }
+            if (okEl)        { okEl.classList.add('hidden'); okEl.classList.remove('flex'); }
             if (loadEl) loadEl.classList.remove('hidden');
+            coLocationUncertain = false;
+            coGpsReady = false;
+            updateCoSubmit();
 
             navigator.geolocation.getCurrentPosition(
                 function(pos) {
                     const lat = pos.coords.latitude;
                     const lng = pos.coords.longitude;
-                    const acc = Math.round(pos.coords.accuracy);
+                    const acc = pos.coords.accuracy;
+                    const accRounded = Math.round(acc);
 
-                    document.getElementById('co-lat').value = lat;
-                    document.getElementById('co-lng').value = lng;
+                    document.getElementById('co-lat').value      = lat;
+                    document.getElementById('co-lng').value      = lng;
+                    document.getElementById('co-accuracy').value = acc;
 
                     if (loadEl) loadEl.classList.add('hidden');
-                    if (okEl)   { okEl.classList.remove('hidden'); okEl.classList.add('flex'); }
-
-                    coGpsReady = true;
-                    updateCoSubmit();
 
                     const badge  = document.getElementById('co-radius-badge');
                     const detail = document.getElementById('co-gps-detail');
 
                     if (OFFICE_LAT !== null) {
-                        const dist        = haversine(lat, lng, OFFICE_LAT, OFFICE_LNG);
-                        const withinRadius = dist <= OFFICE_RADIUS;
-                        const distM       = Math.round(dist);
+                        const dist           = haversine(lat, lng, OFFICE_LAT, OFFICE_LNG);
+                        const classification = classifyLocation(dist, acc, OFFICE_RADIUS);
+
+                        if (classification === 'LOCATION_UNCERTAIN') {
+                            coLocationUncertain = true;
+                            coGpsReady = false;
+                            if (okEl) { okEl.classList.add('hidden'); okEl.classList.remove('flex'); }
+                            if (uncertainEl) {
+                                uncertainEl.classList.remove('hidden');
+                                uncertainEl.classList.add('flex');
+                                const accEl = document.getElementById('co-gps-uncertain-acc');
+                                if (accEl) accEl.innerText = 'Akurasi: ' + accRounded + 'm';
+                            }
+                            badge.className = 'flex items-center gap-1.5 px-2 py-1 rounded-full bg-warning/10 border border-warning/20';
+                            badge.innerHTML = '<span class="material-symbols-outlined text-warning text-[14px]">gps_not_fixed</span><span class="font-status-badge text-status-badge text-warning">Lokasi belum akurat</span>';
+                            if (detail) detail.innerText = 'Akurasi: ' + accRounded + 'm';
+                            updateCoSubmit();
+                            return;
+                        }
+
+                        coLocationUncertain = false;
+                        coGpsReady = true;
+                        if (uncertainEl) { uncertainEl.classList.add('hidden'); uncertainEl.classList.remove('flex'); }
+                        if (okEl)        { okEl.classList.remove('hidden'); okEl.classList.add('flex'); }
+
+                        const withinRadius = classification === 'INSIDE_RADIUS';
+                        const distM        = Math.round(dist);
 
                         if (withinRadius) {
                             badge.className = 'flex items-center gap-1.5 px-2 py-1 rounded-full bg-success/10 border border-success/20';
@@ -771,10 +857,14 @@ Alasan absen di luar radius <span class="text-danger">*</span>
                             badge.className = 'flex items-center gap-1.5 px-2 py-1 rounded-full bg-warning/10 border border-warning/20';
                             badge.innerHTML = '<div class="w-1.5 h-1.5 rounded-full bg-warning animate-pulse"></div><span class="font-status-badge text-status-badge text-warning">Di luar radius</span>';
                         }
-                        if (detail) detail.innerText = 'Akurasi: ' + acc + 'm' + (withinRadius ? '' : ' • ' + distM + 'm dari kantor');
+                        if (detail) detail.innerText = 'Akurasi: ' + accRounded + 'm' + (withinRadius ? '' : ' • ' + distM + 'm dari kantor');
                     } else {
-                        if (detail) detail.innerText = 'Akurasi: ' + acc + 'm';
+                        coGpsReady = true;
+                        if (okEl) { okEl.classList.remove('hidden'); okEl.classList.add('flex'); }
+                        if (detail) detail.innerText = 'Akurasi: ' + accRounded + 'm';
                     }
+
+                    updateCoSubmit();
                 },
                 function(err) {
                     const msgs = {
@@ -791,7 +881,12 @@ Alasan absen di luar radius <span class="text-danger">*</span>
         window.retryCoGps = function() { startCoGps(); };
 
         function showCoGpsError(msg) {
-            const loadEl = document.getElementById('co-gps-loading');
+            const loadEl      = document.getElementById('co-gps-loading');
+            const uncertainEl = document.getElementById('co-gps-uncertain-msg');
+            if (uncertainEl) { uncertainEl.classList.add('hidden'); uncertainEl.classList.remove('flex'); }
+            coLocationUncertain = false;
+            coGpsReady = false;
+            updateCoSubmit();
             const errDiv = document.getElementById('co-gps-error-msg');
             const okDiv  = document.getElementById('co-gps-ok');
             const errTxt = document.getElementById('co-gps-error-text');

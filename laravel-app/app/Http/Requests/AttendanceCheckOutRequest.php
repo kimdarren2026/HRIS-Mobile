@@ -14,8 +14,9 @@ class AttendanceCheckOutRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'lat' => ['required', 'numeric', 'between:-90,90'],
-            'lng' => ['required', 'numeric', 'between:-180,180'],
+            'lat'      => ['required', 'numeric', 'between:-90,90'],
+            'lng'      => ['required', 'numeric', 'between:-180,180'],
+            'accuracy' => ['required', 'numeric', 'min:0', 'max:100000'],
             // TODO (Phase 38): add 'photo' required selfie for checkout, mirroring check-in.
         ];
     }
@@ -23,12 +24,16 @@ class AttendanceCheckOutRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'lat.required' => 'Koordinat GPS diperlukan. Pastikan izin lokasi diaktifkan.',
-            'lat.numeric'  => 'Koordinat latitude tidak valid.',
-            'lat.between'  => 'Latitude harus antara -90 dan 90.',
-            'lng.required' => 'Koordinat GPS diperlukan. Pastikan izin lokasi diaktifkan.',
-            'lng.numeric'  => 'Koordinat longitude tidak valid.',
-            'lng.between'  => 'Longitude harus antara -180 dan 180.',
+            'lat.required'      => 'Koordinat GPS diperlukan. Pastikan izin lokasi diaktifkan.',
+            'lat.numeric'       => 'Koordinat latitude tidak valid.',
+            'lat.between'       => 'Latitude harus antara -90 dan 90.',
+            'lng.required'      => 'Koordinat GPS diperlukan. Pastikan izin lokasi diaktifkan.',
+            'lng.numeric'       => 'Koordinat longitude tidak valid.',
+            'lng.between'       => 'Longitude harus antara -180 dan 180.',
+            'accuracy.required' => 'Akurasi GPS diperlukan. Pastikan izin lokasi diaktifkan.',
+            'accuracy.numeric'  => 'Akurasi GPS tidak valid.',
+            'accuracy.min'      => 'Akurasi GPS tidak valid.',
+            'accuracy.max'      => 'Akurasi GPS tidak wajar.',
         ];
     }
 }
