@@ -350,10 +350,10 @@ class FunctionalNotificationsTest extends TestCase
 
     // ── Notification events ────────────────────────────────────────────────────
 
-    public function test_outside_radius_check_in_is_rejected_and_notifies_nobody(): void
+    public function test_outside_radius_check_in_without_reason_is_rejected_and_notifies_nobody(): void
     {
-        // Phase 58F: out-of-radius check-in no longer creates a PENDING_REVIEW
-        // record or an HR/super_admin review notification — it is rejected outright.
+        // Phase 58G: out-of-radius check-in requires a reason. Without one it is
+        // rejected outright and creates no PENDING_REVIEW record or notification.
         $this->makeEmployee($this->employeeUser);
         $this->makeOffice();
 
@@ -364,8 +364,29 @@ class FunctionalNotificationsTest extends TestCase
             'photo'    => UploadedFile::fake()->image('selfie.jpg', 200, 200)->size(80),
         ]);
 
-        $response->assertSessionHasErrors('general');                     // 1
+        $response->assertSessionHasErrors('reason');                      // 1
         $this->assertSame(0, Notification::count());                     // 2
+    }
+
+    public function test_outside_radius_check_in_with_reason_notifies_hr_and_super_admin(): void
+    {
+        // Phase 58G: with a valid reason, out-of-radius check-in creates a
+        // PENDING_REVIEW record and notifies admin_hr + super_admin. setUp()
+        // already seeds one active hrUser and one active superAdminUser.
+        $this->makeEmployee($this->employeeUser);
+        $this->makeOffice();
+
+        $response = $this->actingAs($this->employeeUser)->post('/attendance/check-in', [
+            'lat'      => -6.2100000, // ~1.1 km outside radius
+            'lng'      => 106.8166660,
+            'accuracy' => 5,
+            'photo'    => UploadedFile::fake()->image('selfie.jpg', 200, 200)->size(80),
+            'reason'   => 'Kunjungan klien di luar kantor hari ini.',
+        ]);
+
+        $response->assertRedirect('/attendance/history');                 // 1
+        // hrUser (admin_hr) + superAdminUser (super_admin), both seeded in setUp().
+        $this->assertSame(2, Notification::count());                      // 2
     }
 
     public function test_within_radius_check_in_does_not_notify(): void

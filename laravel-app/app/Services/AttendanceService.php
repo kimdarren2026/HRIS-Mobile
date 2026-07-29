@@ -6,11 +6,9 @@ use App\Models\OfficeLocation;
 
 class AttendanceService
 {
-    public const INSIDE_RADIUS      = 'INSIDE_RADIUS';
+    public const INSIDE_RADIUS  = 'INSIDE_RADIUS';
 
-    public const OUTSIDE_RADIUS     = 'OUTSIDE_RADIUS';
-
-    public const LOCATION_UNCERTAIN = 'LOCATION_UNCERTAIN';
+    public const OUTSIDE_RADIUS = 'OUTSIDE_RADIUS';
 
     public function calculateDistance(float $lat, float $lng, OfficeLocation $office): float
     {
@@ -29,25 +27,15 @@ class AttendanceService
     }
 
     /**
-     * Classify a GPS reading against the office radius, treating GPS accuracy
-     * as an uncertainty margin rather than trusting the raw distance:
-     *   - INSIDE_RADIUS   only if distance + accuracy <= radius (worst case still inside)
-     *   - OUTSIDE_RADIUS  only if distance - accuracy >  radius (best case still outside)
-     *   - LOCATION_UNCERTAIN otherwise (the radius boundary falls inside the error margin)
+     * Classify a GPS reading against the office radius by distance alone.
+     * GPS accuracy is stored for display/audit but never factors into this
+     * decision — it cannot block or reclassify a check-in/check-out.
      */
     public function classifyLocation(float $distance, float $accuracy, OfficeLocation $office): string
     {
-        $radius = (float) $office->radius_meters;
-
-        if ($distance + $accuracy <= $radius) {
-            return self::INSIDE_RADIUS;
-        }
-
-        if ($distance - $accuracy > $radius) {
-            return self::OUTSIDE_RADIUS;
-        }
-
-        return self::LOCATION_UNCERTAIN;
+        return $distance <= (float) $office->radius_meters
+            ? self::INSIDE_RADIUS
+            : self::OUTSIDE_RADIUS;
     }
 
     public function getActiveOffice(): ?OfficeLocation

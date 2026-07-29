@@ -117,9 +117,9 @@ class Phase30AttendanceHardeningTest extends TestCase
         $this->assertDatabaseMissing('attendance_records', ['employee_id' => $this->employee->id]);
     }
 
-    // ── 5. Out-of-radius check-in is rejected outright (Phase 58F) ──────────
+    // ── 5. Out-of-radius check-in without a reason is rejected (Phase 58G) ──
 
-    public function test_out_of_radius_checkin_is_rejected(): void
+    public function test_out_of_radius_checkin_without_reason_is_rejected(): void
     {
         OfficeLocation::create([
             'name'          => 'Main Office',
@@ -138,14 +138,14 @@ class Phase30AttendanceHardeningTest extends TestCase
                 'accuracy' => 5,
                 'photo'    => $photo,
             ])
-            ->assertSessionHasErrors('general');
+            ->assertSessionHasErrors('reason');
 
         $this->assertDatabaseMissing('attendance_records', ['employee_id' => $this->employee->id]);
     }
 
-    // ── 6. Out-of-radius check-in is rejected even with a reason supplied ───
+    // ── 6. Out-of-radius check-in with a valid reason is accepted as PENDING_REVIEW ──
 
-    public function test_out_of_radius_checkin_is_rejected_even_with_a_reason_supplied(): void
+    public function test_out_of_radius_checkin_with_valid_reason_creates_pending_review(): void
     {
         OfficeLocation::create([
             'name'          => 'Main Office',
@@ -165,9 +165,12 @@ class Phase30AttendanceHardeningTest extends TestCase
                 'photo'    => $photo,
                 'reason'   => 'Bekerja dari kantor klien, telah mendapat persetujuan manajer.',
             ])
-            ->assertSessionHasErrors('general');
+            ->assertRedirect('/attendance/history');
 
-        $this->assertDatabaseMissing('attendance_records', ['employee_id' => $this->employee->id]);
+        $this->assertDatabaseHas('attendance_records', [
+            'employee_id' => $this->employee->id,
+            'status'      => 'PENDING_REVIEW',
+        ]);
     }
 
     // ── 7. Attendance history is scoped to the authenticated employee ────────

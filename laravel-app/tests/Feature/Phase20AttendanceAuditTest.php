@@ -126,18 +126,36 @@ class Phase20AttendanceAuditTest extends TestCase
         $this->assertSame(0, $pending->total());
     }
 
-    // ── Part A: Finance outside radius → rejected outright (Phase 58F) ──────
+    // ── Part A: Finance outside radius without reason → rejected (Phase 58G) ─
 
-    public function test_finance_checkin_outside_radius_is_rejected(): void
+    public function test_finance_checkin_outside_radius_without_reason_is_rejected(): void
     {
         $coords = $this->coordsOutside();
 
         $this->actingAs($this->financeUser)->post('/attendance/check-in', [
             ...$coords,
             'photo' => $this->photo(),
-        ])->assertSessionHasErrors('general');
+        ])->assertSessionHasErrors('reason');
 
         $this->assertDatabaseMissing('attendance_records', ['employee_id' => $this->financeEmployee->id]);
+    }
+
+    // ── Part A: Finance outside radius with reason → PENDING_REVIEW ─────────
+
+    public function test_finance_checkin_outside_radius_with_reason_creates_pending_review(): void
+    {
+        $coords = $this->coordsOutside();
+
+        $this->actingAs($this->financeUser)->post('/attendance/check-in', [
+            ...$coords,
+            'photo'  => $this->photo(),
+            'reason' => 'Kunjungan klien di luar kantor.',
+        ])->assertRedirect('/attendance/history');
+
+        $this->assertDatabaseHas('attendance_records', [
+            'employee_id' => $this->financeEmployee->id,
+            'status'      => 'PENDING_REVIEW',
+        ]);
     }
 
     public function test_finance_pending_attendance_appears_in_hr_queue(): void
@@ -253,14 +271,14 @@ class Phase20AttendanceAuditTest extends TestCase
         $this->assertSame('APPROVED', $record->status);
     }
 
-    public function test_employee_checkin_outside_radius_is_rejected(): void
+    public function test_employee_checkin_outside_radius_without_reason_is_rejected(): void
     {
         $coords = $this->coordsOutside();
 
         $this->actingAs($this->employeeUser)->post('/attendance/check-in', [
             ...$coords,
             'photo' => $this->photo(),
-        ])->assertSessionHasErrors('general');
+        ])->assertSessionHasErrors('reason');
 
         $this->assertDatabaseMissing('attendance_records', ['employee_id' => $this->regularEmployee->id]);
     }

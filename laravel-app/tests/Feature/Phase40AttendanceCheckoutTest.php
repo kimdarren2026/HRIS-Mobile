@@ -182,8 +182,8 @@ class Phase40AttendanceCheckoutTest extends TestCase
     {
         $this->makeApprovedRecord();
 
-        // Office is at -6.2000000, 106.8166660 with a 100m radius (Phase 58F: checkout
-        // now rejects OUTSIDE_RADIUS, so these coords must stay well inside it).
+        // Office is at -6.2000000, 106.8166660 with a 100m radius. Check-out is
+        // never blocked by radius (Phase 58G), so these coords are arbitrary.
         $this->actingAs($this->employeeUser)
             ->post('/attendance/check-out', ['lat' => -6.2003000, 'lng' => 106.8170000, 'accuracy' => 5]);
 
