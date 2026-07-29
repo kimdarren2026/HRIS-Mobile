@@ -224,24 +224,20 @@ class Phase58ERadiusAccuracyTest extends TestCase
         $this->assertSame(0, Notification::count());
     }
 
-    // ── 12-13: OUTSIDE → PENDING_REVIEW, INSIDE → existing normal flow ───────
+    // ── 12-13: OUTSIDE → rejected outright, INSIDE → existing normal flow ────
 
-    public function test_outside_radius_results_in_pending_review(): void
+    public function test_outside_radius_is_rejected_and_creates_no_record(): void
     {
         $this->actingAs($this->employeeUser)
             ->post('/attendance/check-in', [
                 'lat'      => $this->latAtDistance(40),
                 'lng'      => $this->officeLng(),
                 'accuracy' => 10,
-                'reason'   => 'Bertemu klien di luar kantor hari ini.',
                 'photo'    => $this->photo(),
             ])
-            ->assertRedirect('/attendance/history');
+            ->assertSessionHasErrors('general');
 
-        $this->assertDatabaseHas('attendance_records', [
-            'employee_id' => $this->employee->id,
-            'status'      => 'PENDING_REVIEW',
-        ]);
+        $this->assertDatabaseMissing('attendance_records', ['employee_id' => $this->employee->id]);
     }
 
     public function test_inside_radius_results_in_normal_approved_status(): void
@@ -270,18 +266,14 @@ class Phase58ERadiusAccuracyTest extends TestCase
                 'lat'      => $this->latAtDistance(40),
                 'lng'      => $this->officeLng(),
                 'accuracy' => 10,
-                'reason'   => 'Bertemu klien di luar kantor hari ini.',
                 'photo'    => $this->photo(),
                 // Attacker-controlled fields the request never expects — must be ignored.
                 'status'         => 'APPROVED',
                 'classification' => 'INSIDE_RADIUS',
             ])
-            ->assertRedirect('/attendance/history');
+            ->assertSessionHasErrors('general');
 
-        $this->assertDatabaseHas('attendance_records', [
-            'employee_id' => $this->employee->id,
-            'status'      => 'PENDING_REVIEW',
-        ]);
+        $this->assertDatabaseMissing('attendance_records', ['employee_id' => $this->employee->id]);
     }
 
     // ── 15-16: request validation ────────────────────────────────────────────

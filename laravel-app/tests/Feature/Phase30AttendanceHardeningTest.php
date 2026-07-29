@@ -117,9 +117,9 @@ class Phase30AttendanceHardeningTest extends TestCase
         $this->assertDatabaseMissing('attendance_records', ['employee_id' => $this->employee->id]);
     }
 
-    // ── 5. Out-of-radius without reason is rejected ─────────────────────────
+    // ── 5. Out-of-radius check-in is rejected outright (Phase 58F) ──────────
 
-    public function test_out_of_radius_checkin_without_reason_is_rejected(): void
+    public function test_out_of_radius_checkin_is_rejected(): void
     {
         OfficeLocation::create([
             'name'          => 'Main Office',
@@ -138,14 +138,14 @@ class Phase30AttendanceHardeningTest extends TestCase
                 'accuracy' => 5,
                 'photo'    => $photo,
             ])
-            ->assertSessionHasErrors('reason');
+            ->assertSessionHasErrors('general');
 
         $this->assertDatabaseMissing('attendance_records', ['employee_id' => $this->employee->id]);
     }
 
-    // ── 6. Out-of-radius with valid reason → PENDING_REVIEW ─────────────────
+    // ── 6. Out-of-radius check-in is rejected even with a reason supplied ───
 
-    public function test_out_of_radius_checkin_with_valid_reason_creates_pending_review(): void
+    public function test_out_of_radius_checkin_is_rejected_even_with_a_reason_supplied(): void
     {
         OfficeLocation::create([
             'name'          => 'Main Office',
@@ -165,12 +165,9 @@ class Phase30AttendanceHardeningTest extends TestCase
                 'photo'    => $photo,
                 'reason'   => 'Bekerja dari kantor klien, telah mendapat persetujuan manajer.',
             ])
-            ->assertRedirect('/attendance/history');
+            ->assertSessionHasErrors('general');
 
-        $this->assertDatabaseHas('attendance_records', [
-            'employee_id' => $this->employee->id,
-            'status'      => 'PENDING_REVIEW',
-        ]);
+        $this->assertDatabaseMissing('attendance_records', ['employee_id' => $this->employee->id]);
     }
 
     // ── 7. Attendance history is scoped to the authenticated employee ────────

@@ -8,7 +8,6 @@ use App\Http\Requests\AttendanceCheckOutRequest;
 use App\Models\AttendanceRecord;
 use App\Services\AttendanceService;
 use App\Services\AuditLogService;
-use App\Services\NotificationService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -18,7 +17,6 @@ class AttendanceController extends Controller
 {
     public function __construct(
         private readonly AttendanceService $attendanceService,
-        private readonly NotificationService $notifications,
     ) {}
 
     public function showCheckIn(): View
@@ -67,27 +65,24 @@ class AttendanceController extends Controller
         $lng      = (float) $request->lng;
         $accuracy = (float) $request->accuracy;
 
-        // Server-side radius decision — never trust client-supplied status
+        // Server-side radius decision — never trust client-supplied status.
+        // Only INSIDE_RADIUS may proceed past this point: OUTSIDE_RADIUS and
+        // LOCATION_UNCERTAIN are rejected before the photo is ever touched, so
+        // nothing is written to disk and no AttendanceRecord/notification is
+        // created for a rejected location. There is no more out-of-radius
+        // submission path — Phase 58F removed HR review for new attendance.
         $distance       = round($this->attendanceService->calculateDistance($lat, $lng, $office), 2);
         $classification = $this->attendanceService->classifyLocation($distance, $accuracy, $office);
 
         if ($classification === AttendanceService::LOCATION_UNCERTAIN) {
-            // No attendance record, no selfie, no notification — the photo upload is
-            // never touched, so nothing is written to disk for a rejected location.
             return back()->withErrors([
                 'general' => "Lokasi belum cukup akurat. Aktifkan Lokasi Akurat dan coba kembali. (Akurasi GPS saat ini: {$accuracy} meter)",
             ]);
         }
 
-        $withinRadius = $classification === AttendanceService::INSIDE_RADIUS;
-
-        if (! $withinRadius) {
-            $request->validate([
-                'reason' => ['required', 'string', 'min:10', 'max:500'],
-            ], [
-                'reason.required' => 'Alasan wajib diisi saat check-in di luar radius kantor.',
-                'reason.min'      => 'Alasan minimal 10 karakter.',
-                'reason.max'      => 'Alasan maksimal 500 karakter.',
+        if ($classification === AttendanceService::OUTSIDE_RADIUS) {
+            return back()->withErrors([
+                'general' => 'Anda berada di luar radius kantor. Absensi tidak dapat dilakukan.',
             ]);
         }
 
@@ -102,9 +97,7 @@ class AttendanceController extends Controller
         );
         Storage::disk('local')->put($photoPath, file_get_contents($request->file('photo')->getRealPath()));
 
-        $status = $withinRadius ? 'APPROVED' : 'PENDING_REVIEW';
-
-        $attendanceRecord = AttendanceRecord::create([
+        AttendanceRecord::create([
             'employee_id'          => $employee->id,
             'attendance_date'      => today(),
             'check_in_time'        => now(),
@@ -113,33 +106,17 @@ class AttendanceController extends Controller
             'distance_from_office' => $distance,
             'check_in_accuracy'    => $accuracy,
             'check_in_photo_path'  => $photoPath,
-            'status'               => $status,
-            'out_of_radius_reason' => $withinRadius ? null : $request->reason,
+            'status'               => 'APPROVED',
         ]);
-
-        if (! $withinRadius) {
-            $this->notifications->notifyRoles(
-                ['admin_hr', 'super_admin'],
-                'Presensi perlu ditinjau',
-                'Ada absen masuk di luar radius kantor yang menunggu review HR.',
-                'attendance',
-                '/hr/approval-queue',
-                $attendanceRecord,
-            );
-        }
 
         AuditLogService::log(
             $user,
             'submit_attendance',
             'attendance',
-            "Employee #{$employee->id} check-in. Status: {$status}. Coords: {$lat},{$lng}."
+            "Employee #{$employee->id} check-in. Status: APPROVED. Coords: {$lat},{$lng}."
         );
 
-        $message = $withinRadius
-            ? 'Check-in berhasil. Presensi Anda telah disetujui otomatis.'
-            : 'Check-in terkirim. Presensi Anda menunggu review HR.';
-
-        return redirect('/attendance/history')->with('success', $message);
+        return redirect('/attendance/history')->with('success', 'Check-in berhasil. Presensi Anda telah disetujui otomatis.');
     }
 
     public function checkOut(AttendanceCheckOutRequest $request): RedirectResponse
@@ -167,9 +144,10 @@ class AttendanceController extends Controller
         $lng      = (float) $request->lng;
         $accuracy = (float) $request->accuracy;
 
-        // Same accuracy rule as check-in: an office may have been configured after
+        // Same radius rule as check-in: an office may have been configured after
         // check-in, so recompute against whatever is active now. No office simply
         // means there is nothing to classify against — checkout proceeds as before.
+        // Only INSIDE_RADIUS may check out; the record is left untouched on rejection.
         $office = $this->attendanceService->getActiveOffice();
 
         if ($office) {
@@ -179,6 +157,12 @@ class AttendanceController extends Controller
             if ($classification === AttendanceService::LOCATION_UNCERTAIN) {
                 return back()->withErrors([
                     'general' => "Lokasi belum cukup akurat. Aktifkan Lokasi Akurat dan coba kembali. (Akurasi GPS saat ini: {$accuracy} meter)",
+                ]);
+            }
+
+            if ($classification === AttendanceService::OUTSIDE_RADIUS) {
+                return back()->withErrors([
+                    'general' => 'Anda berada di luar radius kantor. Absensi tidak dapat dilakukan.',
                 ]);
             }
         }

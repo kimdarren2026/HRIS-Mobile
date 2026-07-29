@@ -182,12 +182,14 @@ class Phase40AttendanceCheckoutTest extends TestCase
     {
         $this->makeApprovedRecord();
 
+        // Office is at -6.2000000, 106.8166660 with a 100m radius (Phase 58F: checkout
+        // now rejects OUTSIDE_RADIUS, so these coords must stay well inside it).
         $this->actingAs($this->employeeUser)
-            ->post('/attendance/check-out', ['lat' => -6.2050000, 'lng' => 106.8200000, 'accuracy' => 5]);
+            ->post('/attendance/check-out', ['lat' => -6.2003000, 'lng' => 106.8170000, 'accuracy' => 5]);
 
         $record = AttendanceRecord::where('employee_id', $this->employee->id)->first();
-        $this->assertEqualsWithDelta(-6.2050000, (float) $record->check_out_lat, 0.00001);
-        $this->assertEqualsWithDelta(106.8200000, (float) $record->check_out_lng, 0.00001);
+        $this->assertEqualsWithDelta(-6.2003000, (float) $record->check_out_lat, 0.00001);
+        $this->assertEqualsWithDelta(106.8170000, (float) $record->check_out_lng, 0.00001);
     }
 
     // ── Checkout POST failure ─────────────────────────────────────────────────
