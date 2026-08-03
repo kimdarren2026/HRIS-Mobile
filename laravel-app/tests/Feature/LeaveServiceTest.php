@@ -126,15 +126,26 @@ class LeaveServiceTest extends TestCase
         $this->assertSame('APPROVED', $request->fresh()->status);
     }
 
-    // ── Idempotency guard ───────────────────────────────────────────────────
+    // ── Concurrency guard (Phase 59D) ────────────────────────────────────────
 
+    // Phase 59D: approving an already-APPROVED request now fails in a
+    // controlled way (ValidationException from the in-transaction status
+    // re-check) instead of silently no-op'ing — this is the intended,
+    // explicit behavior for a losing/repeat approval attempt. The original
+    // intent of this test (no double deduction) is preserved below.
     public function test_approve_twice_does_not_double_deduct_balance(): void
     {
         $this->seedBalance(quota: 12, used: 0);
         $request = $this->makeRequest($this->balanceType, days: 3);
 
         $this->service->approve($request, $this->hrUser, 'First approval.');
-        $this->service->approve($request->fresh(), $this->hrUser, 'Second call (should be no-op).');
+
+        try {
+            $this->service->approve($request->fresh(), $this->hrUser, 'Second call (must fail, not no-op).');
+            $this->fail('Expected ValidationException for approving an already-processed leave request.');
+        } catch (ValidationException) {
+            // expected
+        }
 
         $balance = LeaveBalance::where('employee_id', $this->employee->id)->first();
         // used should still be 3, not 6
