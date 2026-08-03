@@ -28,84 +28,113 @@ class LeaveService
 
     public function submit(Employee $employee, array $data, ?UploadedFile $attachment = null): LeaveRequest
     {
-        $startDate    = Carbon::parse($data['start_date']);
-        $endDate      = Carbon::parse($data['end_date']);
-        $totalDays    = $startDate->diffInDays($endDate) + 1;
-        $durationType = $data['duration_type'] ?? 'FULL_DAY';
-        $isHalfDay    = $durationType === 'HALF_DAY';
+        return DB::transaction(function () use ($employee, $data, $attachment): LeaveRequest {
+            // Phase 59D lock order: Employee -> LeaveRequest -> LeaveBalance.
+            // Locking the employee row first serializes concurrent submissions
+            // for the same employee, so the overlap check below and the
+            // eventual create() always see a consistent, committed view of
+            // that employee's existing requests — a second concurrent
+            // submission cannot read the overlap check before the first one's
+            // create() has committed.
+            $lockedEmployee = Employee::whereKey($employee->id)->lockForUpdate()->first();
 
-        // Defensive invariant guard: start_date/end_date are date-only columns
-        // and diffInDays always yields a whole number, so this can never
-        // actually trip today. Kept in case a time-of-day input is ever added
-        // later. Half-day leave itself is handled below via duration_type —
-        // it is a supported, whole-day-equivalent request, not a fractional
-        // total_days/chargeable_days value (half-day policy correction).
-        if ($totalDays != floor($totalDays)) {
-            throw ValidationException::withMessages([
-                'start_date' => 'Tanggal cuti tidak valid.',
+            if (! $lockedEmployee) {
+                throw ValidationException::withMessages([
+                    'employee' => 'Data karyawan tidak ditemukan.',
+                ]);
+            }
+
+            $startDate    = Carbon::parse($data['start_date']);
+            $endDate      = Carbon::parse($data['end_date']);
+            $totalDays    = $startDate->diffInDays($endDate) + 1;
+            $durationType = $data['duration_type'] ?? 'FULL_DAY';
+            $isHalfDay    = $durationType === 'HALF_DAY';
+
+            // Defensive invariant guard: start_date/end_date are date-only columns
+            // and diffInDays always yields a whole number, so this can never
+            // actually trip today. Kept in case a time-of-day input is ever added
+            // later. Half-day leave itself is handled below via duration_type —
+            // it is a supported, whole-day-equivalent request, not a fractional
+            // total_days/chargeable_days value (half-day policy correction).
+            if ($totalDays != floor($totalDays)) {
+                throw ValidationException::withMessages([
+                    'start_date' => 'Tanggal cuti tidak valid.',
+                ]);
+            }
+
+            if ($isHalfDay && ! $startDate->isSameDay($endDate)) {
+                throw ValidationException::withMessages([
+                    'start_date' => 'Cuti setengah hari hanya boleh diajukan untuk satu tanggal kerja.',
+                ]);
+            }
+
+            if ($isHalfDay && $this->isBlockedForHalfDay($startDate)) {
+                throw ValidationException::withMessages([
+                    'start_date' => 'Cuti setengah hari tidak dapat diajukan pada akhir pekan atau hari libur.',
+                ]);
+            }
+
+            // Phase 59D fix: start_date/end_date are cast as 'date' but Eloquent
+            // still serializes them for storage using the connection's full
+            // datetime format (Model::getDateFormat() falls back to the query
+            // grammar's format, e.g. "Y-m-d H:i:s"), so the stored value is
+            // e.g. "2026-08-03 00:00:00". A plain where('start_date', '<=', '2026-08-03')
+            // compares that against the shorter date-only string and, for an
+            // exact same-day boundary, string-sorts "2026-08-03 00:00:00" as
+            // GREATER than "2026-08-03" — silently missing an identical-date
+            // overlap. whereDate() compares only the date part on both sides,
+            // fixing that false negative without changing what counts as an
+            // overlap (still PENDING_HR/APPROVED requests whose date range
+            // intersects, exactly as before).
+            $overlaps = LeaveRequest::where('employee_id', $employee->id)
+                ->whereIn('status', ['PENDING_HR', 'APPROVED'])
+                ->whereDate('start_date', '<=', $endDate->toDateString())
+                ->whereDate('end_date', '>=', $startDate->toDateString())
+                ->exists();
+
+            if ($overlaps) {
+                throw ValidationException::withMessages([
+                    'start_date' => 'You already have a pending or approved leave request that overlaps with this period.',
+                ]);
+            }
+
+            $leaveType = LeaveType::findOrFail($data['leave_type_id']);
+
+            // Half-day policy correction: for leave types that deduct annual
+            // balance, a half-day request always charges exactly 1 whole day —
+            // never a fraction. For non-deducting leave types the normal
+            // calculator result is kept (chargeable_days is inert there anyway,
+            // since approve() only touches balance when deducts_balance is true).
+            if ($isHalfDay && $leaveType->deducts_balance) {
+                $chargeableDays = 1;
+            } else {
+                $chargeableDays = $this->calculator->countChargeableDays(
+                    $startDate,
+                    $endDate,
+                    ! $leaveType->counts_calendar_days,
+                );
+            }
+
+            if ($this->isAnnualEntitlementType($leaveType)) {
+                $this->assertEligibleForAnnualLeave($employee, $startDate);
+                $this->assertWithinMonthlyCap($employee, $startDate, $endDate);
+            }
+
+            $attachmentPath = $attachment?->store('leave-attachments', 'local');
+
+            return LeaveRequest::create([
+                'employee_id'    => $employee->id,
+                'leave_type_id'  => $data['leave_type_id'],
+                'start_date'     => $startDate->toDateString(),
+                'end_date'       => $endDate->toDateString(),
+                'duration_type'  => $durationType,
+                'total_days'     => $totalDays,
+                'chargeable_days'=> $chargeableDays,
+                'reason'         => $data['reason'],
+                'attachment_path'=> $attachmentPath,
+                'status'         => 'PENDING_HR',
             ]);
-        }
-
-        if ($isHalfDay && ! $startDate->isSameDay($endDate)) {
-            throw ValidationException::withMessages([
-                'start_date' => 'Cuti setengah hari hanya boleh diajukan untuk satu tanggal kerja.',
-            ]);
-        }
-
-        if ($isHalfDay && $this->isBlockedForHalfDay($startDate)) {
-            throw ValidationException::withMessages([
-                'start_date' => 'Cuti setengah hari tidak dapat diajukan pada akhir pekan atau hari libur.',
-            ]);
-        }
-
-        $overlaps = LeaveRequest::where('employee_id', $employee->id)
-            ->whereIn('status', ['PENDING_HR', 'APPROVED'])
-            ->where('start_date', '<=', $endDate->toDateString())
-            ->where('end_date', '>=', $startDate->toDateString())
-            ->exists();
-
-        if ($overlaps) {
-            throw ValidationException::withMessages([
-                'start_date' => 'You already have a pending or approved leave request that overlaps with this period.',
-            ]);
-        }
-
-        $leaveType = LeaveType::findOrFail($data['leave_type_id']);
-
-        // Half-day policy correction: for leave types that deduct annual
-        // balance, a half-day request always charges exactly 1 whole day —
-        // never a fraction. For non-deducting leave types the normal
-        // calculator result is kept (chargeable_days is inert there anyway,
-        // since approve() only touches balance when deducts_balance is true).
-        if ($isHalfDay && $leaveType->deducts_balance) {
-            $chargeableDays = 1;
-        } else {
-            $chargeableDays = $this->calculator->countChargeableDays(
-                $startDate,
-                $endDate,
-                ! $leaveType->counts_calendar_days,
-            );
-        }
-
-        if ($this->isAnnualEntitlementType($leaveType)) {
-            $this->assertEligibleForAnnualLeave($employee, $startDate);
-            $this->assertWithinMonthlyCap($employee, $startDate, $endDate);
-        }
-
-        $attachmentPath = $attachment?->store('leave-attachments', 'local');
-
-        return LeaveRequest::create([
-            'employee_id'    => $employee->id,
-            'leave_type_id'  => $data['leave_type_id'],
-            'start_date'     => $startDate->toDateString(),
-            'end_date'       => $endDate->toDateString(),
-            'duration_type'  => $durationType,
-            'total_days'     => $totalDays,
-            'chargeable_days'=> $chargeableDays,
-            'reason'         => $data['reason'],
-            'attachment_path'=> $attachmentPath,
-            'status'         => 'PENDING_HR',
-        ]);
+        });
     }
 
     // Half-day policy point 7: cannot be submitted on Saturday, Sunday, or any
@@ -222,19 +251,48 @@ class LeaveService
 
     public function approve(LeaveRequest $leaveRequest, User $approver, ?string $note): void
     {
-        // Idempotency guard: prevent double-approval from causing double deduction
-        if ($leaveRequest->status === 'APPROVED') {
-            return;
-        }
-
         DB::transaction(function () use ($leaveRequest, $approver, $note): void {
-            $leaveRequest->loadMissing(['leaveType', 'employee']);
-            if ($leaveRequest->leaveType->deducts_balance) {
+            // Phase 59D lock order: Employee -> LeaveRequest -> LeaveBalance.
+            // The employee row is the only row two DIFFERENT LeaveRequests
+            // belonging to the same employee have in common, so locking it
+            // first serializes concurrent approvals that would otherwise
+            // race on the same LeaveBalance pool, and safely serializes the
+            // first-time creation of that LeaveBalance row further below.
+            $employee = Employee::whereKey($leaveRequest->employee_id)->lockForUpdate()->first();
+
+            if (! $employee) {
+                throw ValidationException::withMessages([
+                    'employee' => 'Data karyawan untuk pengajuan cuti ini tidak ditemukan.',
+                ]);
+            }
+
+            // Never trust the caller-supplied instance's status (e.g. a
+            // route-model-bound object fetched before another request
+            // committed a decision on this same row) — re-fetch and lock the
+            // row itself, and make the final PENDING_HR decision only against
+            // this fresh read.
+            $fresh = LeaveRequest::whereKey($leaveRequest->id)->lockForUpdate()->first();
+
+            if (! $fresh) {
+                throw ValidationException::withMessages([
+                    'leave_request' => 'Pengajuan cuti tidak ditemukan.',
+                ]);
+            }
+
+            if ($fresh->status !== 'PENDING_HR') {
+                throw ValidationException::withMessages([
+                    'status' => 'Pengajuan cuti ini sudah diproses sebelumnya.',
+                ]);
+            }
+
+            $fresh->loadMissing(['leaveType', 'employee']);
+
+            if ($fresh->leaveType->deducts_balance) {
                 // Deduct chargeable_days (working days, minus national holidays)
                 // rather than the raw calendar span (policy points 2 & 3).
                 // Requests created before this field existed fall back to
                 // total_days so historical data keeps behaving as before.
-                $deduction = $leaveRequest->chargeable_days ?? $leaveRequest->total_days;
+                $deduction = $fresh->chargeable_days ?? $fresh->total_days;
 
                 // Phase 58C correction: Annual Leave and Personal Leave share
                 // one 18-day pool, so the balance row is always keyed by the
@@ -244,7 +302,7 @@ class LeaveService
                 // can be resolved, fail loudly rather than silently falling
                 // back to the request's own type id (which would fabricate a
                 // balance on the wrong pool).
-                if ($this->isAnnualEntitlementType($leaveRequest->leaveType)) {
+                if ($this->isAnnualEntitlementType($fresh->leaveType)) {
                     $canonicalType = LeaveType::canonicalAnnualEntitlementType();
 
                     if ($canonicalType === null) {
@@ -255,21 +313,36 @@ class LeaveService
 
                     $balanceLeaveTypeId = $canonicalType->id;
                 } else {
-                    $balanceLeaveTypeId = $leaveRequest->leave_type_id;
+                    $balanceLeaveTypeId = $fresh->leave_type_id;
                 }
 
                 // Fallback path: normally leave:initialize-year (Phase 58C)
                 // has already created the year's balance row with the correct
                 // full/prorated entitlement. This only fires if approval
-                // happens before that row exists yet.
-                $balance = LeaveBalance::firstOrCreate(
-                    [
-                        'employee_id'   => $leaveRequest->employee_id,
-                        'leave_type_id' => $balanceLeaveTypeId,
-                        'year'          => $leaveRequest->start_date->year,
-                    ],
-                    $this->defaultBalanceAttributes($leaveRequest)
-                );
+                // happens before that row exists yet. Locked explicitly (in
+                // addition to the employee row above) so the balance check
+                // and mutation below are atomic against any other reader of
+                // this exact row.
+                $balance = LeaveBalance::where('employee_id', $fresh->employee_id)
+                    ->where('leave_type_id', $balanceLeaveTypeId)
+                    ->where('year', $fresh->start_date->year)
+                    ->lockForUpdate()
+                    ->first();
+
+                if (! $balance) {
+                    // Safe from duplicate creation: the employee row lock
+                    // above means only one approve()/reject()/submit() call
+                    // for this employee can be inside this transaction at a
+                    // time, so no concurrent request can race this create().
+                    $balance = LeaveBalance::create(array_merge(
+                        [
+                            'employee_id'   => $fresh->employee_id,
+                            'leave_type_id' => $balanceLeaveTypeId,
+                            'year'          => $fresh->start_date->year,
+                        ],
+                        $this->defaultBalanceAttributes($fresh)
+                    ));
+                }
 
                 if ($balance->remaining < $deduction) {
                     throw ValidationException::withMessages([
@@ -281,7 +354,7 @@ class LeaveService
                 $balance->decrement('remaining', $deduction);
             }
 
-            $leaveRequest->update([
+            $fresh->update([
                 'status'        => 'APPROVED',
                 'approved_by'   => $approver->id,
                 'approved_at'   => now(),
@@ -314,11 +387,39 @@ class LeaveService
 
     public function reject(LeaveRequest $leaveRequest, User $approver, string $note): void
     {
-        $leaveRequest->update([
-            'status'        => 'REJECTED',
-            'approved_by'   => $approver->id,
-            'approved_at'   => now(),
-            'approval_note' => $note,
-        ]);
+        DB::transaction(function () use ($leaveRequest, $approver, $note): void {
+            // Same Employee -> LeaveRequest lock order as approve(), so a
+            // concurrent approve()/reject() race on this same request always
+            // serializes consistently and can never deadlock against each
+            // other.
+            $employee = Employee::whereKey($leaveRequest->employee_id)->lockForUpdate()->first();
+
+            if (! $employee) {
+                throw ValidationException::withMessages([
+                    'employee' => 'Data karyawan untuk pengajuan cuti ini tidak ditemukan.',
+                ]);
+            }
+
+            $fresh = LeaveRequest::whereKey($leaveRequest->id)->lockForUpdate()->first();
+
+            if (! $fresh) {
+                throw ValidationException::withMessages([
+                    'leave_request' => 'Pengajuan cuti tidak ditemukan.',
+                ]);
+            }
+
+            if ($fresh->status !== 'PENDING_HR') {
+                throw ValidationException::withMessages([
+                    'status' => 'Pengajuan cuti ini sudah diproses sebelumnya.',
+                ]);
+            }
+
+            $fresh->update([
+                'status'        => 'REJECTED',
+                'approved_by'   => $approver->id,
+                'approved_at'   => now(),
+                'approval_note' => $note,
+            ]);
+        });
     }
 }

@@ -340,6 +340,13 @@ class LeavePolicyTest extends TestCase
         $this->assertDatabaseMissing('leave_balances', ['employee_id' => $employee->id]);
     }
 
+    // Phase 59D: a second approve() call on an already-APPROVED request now
+    // fails in a controlled way (ValidationException) instead of silently
+    // no-op'ing, so a race between two approval requests is rejected rather
+    // than masked — see LeaveService::approve()'s in-transaction status
+    // re-check. The original intent of this test (balance is never deducted
+    // twice) is preserved: the second call is expected to throw, and the
+    // balance is asserted unchanged afterward.
     public function test_double_approval_does_not_deduct_more_than_one_day(): void
     {
         $employee = $this->makeEmployee(now()->subYears(2)->toDateString());
@@ -349,7 +356,13 @@ class LeavePolicyTest extends TestCase
         $request = $this->submitHalfDay($employee, $monday->toDateString());
 
         $this->service->approve($request, $this->hrUser, 'Approved.');
-        $this->service->approve($request->fresh(), $this->hrUser, 'Approved again.');
+
+        try {
+            $this->service->approve($request->fresh(), $this->hrUser, 'Approved again.');
+            $this->fail('Expected ValidationException for approving an already-processed leave request.');
+        } catch (ValidationException) {
+            // expected — second approval must fail in a controlled way, not silently no-op
+        }
 
         $balance = LeaveBalance::where('employee_id', $employee->id)->first()->fresh();
         $this->assertSame('1.00', $balance->used);
