@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\EnsureUserIsActive;
 use App\Http\Middleware\RoleMiddleware;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Application;
@@ -36,6 +37,13 @@ return Application::configure(basePath: dirname(__DIR__))
             'role'         => RoleMiddleware::class,
             'has_employee' => \App\Http\Middleware\HasEmployee::class,
         ]);
+
+        // Phase 59C: centrally enforce that every authenticated web request
+        // still belongs to an active user, on top of (not instead of) the
+        // per-route 'auth'/'role'/'has_employee' middleware and Policies.
+        // Appended to the 'web' group (not the outer global stack) so it
+        // runs after StartSession, once auth()->user() is resolvable.
+        $middleware->web(append: [EnsureUserIsActive::class]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(

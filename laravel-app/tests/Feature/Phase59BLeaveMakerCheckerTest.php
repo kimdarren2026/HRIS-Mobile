@@ -267,6 +267,17 @@ class Phase59BLeaveMakerCheckerTest extends TestCase
     }
 
     // ── 20. An inactive admin_hr user cannot approve anyone's leave. ──
+    //
+    // Phase 59C note: this user is is_active=false from creation, so the new
+    // centralized EnsureUserIsActive middleware now intercepts the request
+    // before it ever reaches the route's 'role'/'auth' middleware or
+    // LeaveRequestPolicy — the session is force-logged-out and the request
+    // is redirected to /login, rather than falling through to a 403 from the
+    // Policy. The security outcome (approval is refused, status untouched)
+    // is unchanged and in fact enforced earlier; only the HTTP mechanism of
+    // the refusal changed from a Policy-level 403 to a session-level
+    // redirect. Updated per Phase 59C audit findings — not a case of a test
+    // that expected a deactivated session to keep working.
     public function test_inactive_admin_hr_cannot_approve(): void
     {
         [$inactiveUser] = $this->makeUserWithEmployee('admin_hr', 'inactive.a@example.test', false);
@@ -275,12 +286,14 @@ class Phase59BLeaveMakerCheckerTest extends TestCase
 
         $this->actingAs($inactiveUser)
             ->post("/hr/leave/{$leave->id}/approve", ['approval_note' => 'x'])
-            ->assertForbidden();
+            ->assertRedirect('/login');
 
+        $this->assertGuest();
         $this->assertSame('PENDING_HR', $leave->fresh()->status);
     }
 
     // ── 21. An inactive admin_hr user cannot reject anyone's leave. ──
+    // (See Phase 59C note above test_inactive_admin_hr_cannot_approve.)
     public function test_inactive_admin_hr_cannot_reject(): void
     {
         [$inactiveUser] = $this->makeUserWithEmployee('admin_hr', 'inactive.a@example.test', false);
@@ -289,8 +302,9 @@ class Phase59BLeaveMakerCheckerTest extends TestCase
 
         $this->actingAs($inactiveUser)
             ->post("/hr/leave/{$leave->id}/reject", ['approval_note' => 'ten characters minimum'])
-            ->assertForbidden();
+            ->assertRedirect('/login');
 
+        $this->assertGuest();
         $this->assertSame('PENDING_HR', $leave->fresh()->status);
     }
 
