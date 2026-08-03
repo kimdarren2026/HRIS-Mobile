@@ -9,6 +9,7 @@ use App\Services\LeaveService;
 use App\Services\NotificationService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 
 class LeaveApprovalController extends Controller
 {
@@ -19,6 +20,8 @@ class LeaveApprovalController extends Controller
 
     public function approve(Request $request, LeaveRequest $leaveRequest): RedirectResponse
     {
+        Gate::authorize('approve', $leaveRequest);
+
         abort_unless($leaveRequest->status === 'PENDING_HR', 422);
 
         $this->leaveService->approve($leaveRequest, auth()->user(), $request->input('approval_note'));
@@ -47,6 +50,8 @@ class LeaveApprovalController extends Controller
 
     public function reject(Request $request, LeaveRequest $leaveRequest): RedirectResponse
     {
+        Gate::authorize('reject', $leaveRequest);
+
         abort_unless($leaveRequest->status === 'PENDING_HR', 422);
 
         $request->validate([
