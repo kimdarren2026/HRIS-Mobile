@@ -182,6 +182,15 @@
 <span class="material-symbols-outlined text-primary" data-icon="analytics">analytics</span>
 <span class="font-label-md text-label-md">Lihat Laporan</span>
 </button>
+{{-- Phase 60B: super_admin only. admin_hr shares this dashboard, so the entry
+     is role-gated here — the route itself is the real guard, this only keeps
+     the menu honest. --}}
+@if(auth()->user()->role === \App\Models\User::ROLE_SUPER_ADMIN)
+<button class="flex items-center gap-3 bg-surface-container-high text-on-surface p-unit-md rounded-xl active:scale-95 transition-transform text-left border border-outline-variant col-span-2" onclick="window.location.href='{{ route('admin.attendance-discipline.index') }}'">
+<span class="material-symbols-outlined text-primary" data-icon="fact_check">checklist</span>
+<span class="font-label-md text-label-md">Disiplin Kehadiran</span>
+</button>
+@endif
 </div>
 </section>
 <!-- Attendance Overview (Chart) -->

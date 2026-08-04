@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\AttendanceDisciplineController;
 use App\Http\Controllers\Admin\UserManagementController;
 use App\Http\Controllers\AuditLogController;
 use App\Http\Controllers\AuthController;
@@ -203,6 +204,11 @@ Route::middleware(['auth', 'role:employee,admin_hr,finance,super_admin'])->group
 Route::middleware(['auth', 'role:super_admin'])->group(function (): void {
     Route::get('/audit-logs',            [AuditLogController::class, 'index'])->name('audit-logs.index');
     Route::get('/audit-logs/{auditLog}', [AuditLogController::class, 'show'])->name('audit-logs.show');
+
+    // Dashboard Disiplin Kehadiran + export XLSX (Phase 60B) — super_admin only.
+    // admin_hr keeps the existing Approval Queue but gets no access here.
+    Route::get('/admin/attendance-discipline',        [AttendanceDisciplineController::class, 'index'])->name('admin.attendance-discipline.index');
+    Route::get('/admin/attendance-discipline/export', [AttendanceDisciplineController::class, 'export'])->name('admin.attendance-discipline.export');
 
     // User / Role Management (Phase 29)
     Route::get('/admin/users',                             [UserManagementController::class, 'index'])->name('admin.users.index');
