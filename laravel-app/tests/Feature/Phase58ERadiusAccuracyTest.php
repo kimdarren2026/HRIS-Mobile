@@ -189,6 +189,7 @@ class Phase58ERadiusAccuracyTest extends TestCase
                 'lng'      => $this->officeLng(),
                 'accuracy' => 10,
                 'photo'    => $this->photo(),
+                'check_in_work_plan' => 'Menyelesaikan laporan mingguan dan rapat tim.',
             ])
             ->assertRedirect('/attendance/history');
 
@@ -206,6 +207,7 @@ class Phase58ERadiusAccuracyTest extends TestCase
                 'lng'      => $this->officeLng(),
                 'accuracy' => 10,
                 'photo'    => $this->photo(),
+                'check_in_work_plan' => 'Menyelesaikan laporan mingguan dan rapat tim.',
             ]);
 
         $record = AttendanceRecord::where('employee_id', $this->employee->id)->first();
@@ -223,6 +225,7 @@ class Phase58ERadiusAccuracyTest extends TestCase
                 'lng'      => $this->officeLng(),
                 'accuracy' => 10,
                 'photo'    => $this->photo(),
+                'check_in_work_plan' => 'Menyelesaikan laporan mingguan dan rapat tim.',
             ]);
 
         $this->assertSame(0, Notification::count());
@@ -238,6 +241,7 @@ class Phase58ERadiusAccuracyTest extends TestCase
                 'lng'      => $this->officeLng(),
                 'accuracy' => 10,
                 'photo'    => $this->photo(),
+                'check_in_work_plan' => 'Menyelesaikan laporan mingguan dan rapat tim.',
             ])
             ->assertSessionHasErrors('reason');
 
@@ -253,6 +257,7 @@ class Phase58ERadiusAccuracyTest extends TestCase
                 'accuracy' => 10,
                 'photo'    => $this->photo(),
                 'reason'   => 'Kunjungan klien di luar kantor hari ini.',
+                'check_in_work_plan' => 'Menyelesaikan laporan mingguan dan rapat tim.',
             ])
             ->assertRedirect('/attendance/history');
 
@@ -270,6 +275,7 @@ class Phase58ERadiusAccuracyTest extends TestCase
                 'lng'      => $this->officeLng(),
                 'accuracy' => 5,
                 'photo'    => $this->photo(),
+                'check_in_work_plan' => 'Menyelesaikan laporan mingguan dan rapat tim.',
             ])
             ->assertRedirect('/attendance/history');
 
@@ -289,6 +295,7 @@ class Phase58ERadiusAccuracyTest extends TestCase
                 'lng'      => $this->officeLng(),
                 'accuracy' => 10,
                 'photo'    => $this->photo(),
+                'check_in_work_plan' => 'Menyelesaikan laporan mingguan dan rapat tim.',
                 // Attacker-controlled fields the request never expects — must be ignored.
                 'status'         => 'APPROVED',
                 'classification' => 'INSIDE_RADIUS',
@@ -343,6 +350,7 @@ class Phase58ERadiusAccuracyTest extends TestCase
                 'lat'      => $this->latAtDistance(15),
                 'lng'      => $this->officeLng(),
                 'accuracy' => 10,
+                'check_out_work_result' => 'Pekerjaan hari ini selesai dengan baik.',
             ])
             ->assertRedirect('/attendance/history');
 
@@ -360,6 +368,7 @@ class Phase58ERadiusAccuracyTest extends TestCase
                 'lng'      => $this->officeLng(),
                 'accuracy' => 5,
                 'photo'    => $this->photo(),
+                'check_in_work_plan' => 'Menyelesaikan laporan mingguan dan rapat tim.',
             ])
             ->assertRedirect('/attendance/history');
 
@@ -368,6 +377,7 @@ class Phase58ERadiusAccuracyTest extends TestCase
                 'lat'      => $this->latAtDistance(5),
                 'lng'      => $this->officeLng(),
                 'accuracy' => 7,
+                'check_out_work_result' => 'Pekerjaan hari ini selesai dengan baik.',
             ])
             ->assertRedirect('/attendance/history');
 

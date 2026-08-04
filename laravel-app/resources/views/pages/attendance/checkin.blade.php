@@ -285,6 +285,20 @@ Absen pulang akan dicatat. Status Menunggu Review HR tetap menunggu keputusan HR
 </p>
 </div>
 </section>
+<!-- Work Result (required before checkout can be submitted) -->
+<section class="bg-surface rounded-xl border border-border shadow-sm p-4 flex flex-col gap-unit-xs">
+<label class="font-label-md text-label-md text-on-surface flex justify-between" for="check_out_work_result">
+Hasil Pekerjaan Hari Ini <span class="text-danger">*</span>
+</label>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Tuliskan pekerjaan yang selesai, progres, atau kendala utama hari ini.</p>
+@error('check_out_work_result')
+<p class="text-error font-label-sm text-label-sm">{{ $message }}</p>
+@enderror
+<textarea id="check_out_work_result" name="check_out_work_result" rows="4" required
+    class="w-full rounded-lg border border-outline-variant bg-surface px-4 py-3 font-body-md text-body-md text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-shadow resize-none placeholder:text-outline"
+    placeholder="Contoh: Laporan selesai 80%. Data transaksi sudah diverifikasi dan menunggu satu dokumen pendukung."
+    minlength="10" maxlength="2000">{{ old('check_out_work_result') }}</textarea>
+</section>
 </main>
 </form>
 <!-- Fixed checkout submit button -->
@@ -403,6 +417,22 @@ Ambil Selfie
 <button type="button" id="photo-retake" class="hidden absolute bottom-2 right-2 z-20 bg-surface/80 rounded-full px-3 py-1 font-label-sm text-label-sm text-primary backdrop-blur-sm">Ambil Ulang</button>
 </div>
 <canvas id="selfie-canvas" class="hidden"></canvas>
+</section>
+
+<!-- Work Plan (always visible — required for both inside and outside radius check-in) -->
+<section id="work-plan-section" class="flex flex-col gap-unit-xs">
+<label class="font-label-md text-label-md text-on-surface px-1 flex justify-between" for="check_in_work_plan">
+Rencana Kerja Hari Ini <span class="text-danger">*</span>
+</label>
+<p class="font-label-sm text-label-sm text-on-surface-variant px-1">Tuliskan pekerjaan utama yang akan Anda lakukan hari ini.</p>
+@error('check_in_work_plan')
+<p class="text-error font-label-sm text-label-sm px-1">{{ $message }}</p>
+@enderror
+<textarea id="check_in_work_plan" name="check_in_work_plan" rows="3"
+    class="w-full rounded-lg border border-outline-variant bg-surface px-4 py-3 font-body-md text-body-md text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-shadow resize-none placeholder:text-outline"
+    placeholder="Contoh: Menyelesaikan laporan keuangan bulanan dan memeriksa dokumen pendukung."
+    minlength="10" maxlength="1000">{{ old('check_in_work_plan') }}</textarea>
+<p id="work-plan-error" class="font-label-sm text-label-sm text-error hidden"></p>
 </section>
 
 <!-- Reason (hidden until distance > office radius) -->
@@ -693,6 +723,19 @@ Alasan check-in di luar radius <span class="text-danger">*</span>
             const idleLabel   = isOutsideRadius ? 'Kirim untuk Review HR' : 'Konfirmasi Absen Masuk';
             const reasonInput = document.getElementById('reason');
             const reasonError = document.getElementById('reason-error');
+            const workPlanInput = document.getElementById('check_in_work_plan');
+            const workPlanError = document.getElementById('work-plan-error');
+
+            // Work plan is required regardless of inside/outside radius status.
+            const workPlanVal = (workPlanInput?.value || '').trim();
+            if (workPlanVal.length < 10) {
+                if (workPlanError) {
+                    workPlanError.innerText = 'Rencana kerja minimal 10 karakter.';
+                    workPlanError.classList.remove('hidden');
+                }
+                return;
+            }
+            if (workPlanError) workPlanError.classList.add('hidden');
 
             if (isOutsideRadius) {
                 const reasonVal = (reasonInput?.value || '').trim();

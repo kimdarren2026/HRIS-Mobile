@@ -106,6 +106,7 @@ class AttendanceController extends Controller
             'distance_from_office' => $distance,
             'check_in_accuracy'    => $accuracy,
             'check_in_photo_path'  => $photoPath,
+            'check_in_work_plan'   => $request->check_in_work_plan,
             'status'               => $status,
             'out_of_radius_reason' => $withinRadius ? null : $request->reason,
         ]);
@@ -165,10 +166,11 @@ class AttendanceController extends Controller
         // check-in record for today. Status is intentionally NOT changed here —
         // PENDING_REVIEW records remain under HR review regardless of checkout.
         $record->update([
-            'check_out_time'     => now(),
-            'check_out_lat'      => $lat,
-            'check_out_lng'      => $lng,
-            'check_out_accuracy' => $accuracy,
+            'check_out_time'        => now(),
+            'check_out_lat'         => $lat,
+            'check_out_lng'         => $lng,
+            'check_out_accuracy'    => $accuracy,
+            'check_out_work_result' => $request->check_out_work_result,
         ]);
 
         AuditLogService::log(

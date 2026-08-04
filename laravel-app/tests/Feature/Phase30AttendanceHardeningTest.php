@@ -137,6 +137,7 @@ class Phase30AttendanceHardeningTest extends TestCase
                 'lng'      => 106.8166660,
                 'accuracy' => 5,
                 'photo'    => $photo,
+                'check_in_work_plan' => 'Menyelesaikan laporan mingguan dan rapat tim.',
             ])
             ->assertSessionHasErrors('reason');
 
@@ -164,6 +165,7 @@ class Phase30AttendanceHardeningTest extends TestCase
                 'accuracy' => 5,
                 'photo'    => $photo,
                 'reason'   => 'Bekerja dari kantor klien, telah mendapat persetujuan manajer.',
+                'check_in_work_plan' => 'Menyelesaikan laporan mingguan dan rapat tim.',
             ])
             ->assertRedirect('/attendance/history');
 

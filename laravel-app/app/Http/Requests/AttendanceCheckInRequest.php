@@ -11,6 +11,18 @@ class AttendanceCheckInRequest extends FormRequest
         return $this->user() !== null;
     }
 
+    // Phase 60A: trim before validation so a whitespace-only work plan fails
+    // `required`/`min:10` naturally instead of passing as "10 spaces", and so
+    // the trimmed value is what actually gets stored.
+    protected function prepareForValidation(): void
+    {
+        if ($this->has('check_in_work_plan') && is_string($this->input('check_in_work_plan'))) {
+            $this->merge([
+                'check_in_work_plan' => trim($this->input('check_in_work_plan')),
+            ]);
+        }
+    }
+
     public function rules(): array
     {
         return [
@@ -21,6 +33,8 @@ class AttendanceCheckInRequest extends FormRequest
             // Conditional 'required if outside radius' is enforced in the controller,
             // since the radius decision itself depends on a server-side distance calc.
             'reason'   => ['nullable', 'string', 'max:500'],
+            // Phase 60A: required for every new check-in, inside or outside radius.
+            'check_in_work_plan' => ['required', 'string', 'min:10', 'max:1000'],
         ];
     }
 
@@ -41,6 +55,9 @@ class AttendanceCheckInRequest extends FormRequest
             'photo.image'       => 'File yang diunggah harus berupa gambar.',
             'photo.mimes'       => 'Format foto harus JPEG atau PNG.',
             'photo.max'         => 'Ukuran foto tidak boleh melebihi 5 MB.',
+            'check_in_work_plan.required' => 'Rencana kerja hari ini wajib diisi.',
+            'check_in_work_plan.min'      => 'Rencana kerja minimal 10 karakter.',
+            'check_in_work_plan.max'      => 'Rencana kerja maksimal 1000 karakter.',
         ];
     }
 }

@@ -65,13 +65,13 @@ class AttendanceCheckInTest extends TestCase
     // Within 100m of office (lat difference ~11m)
     private function coordsWithin(): array
     {
-        return ['lat' => -6.2001000, 'lng' => 106.8166660, 'accuracy' => 5];
+        return ['lat' => -6.2001000, 'lng' => 106.8166660, 'accuracy' => 5, 'check_in_work_plan' => 'Menyelesaikan laporan mingguan dan rapat tim.'];
     }
 
     // ~1.1km from office
     private function coordsOutside(): array
     {
-        return ['lat' => -6.2100000, 'lng' => 106.8166660, 'accuracy' => 5];
+        return ['lat' => -6.2100000, 'lng' => 106.8166660, 'accuracy' => 5, 'check_in_work_plan' => 'Menyelesaikan laporan mingguan dan rapat tim.'];
     }
 
     private function validPhoto(): UploadedFile
