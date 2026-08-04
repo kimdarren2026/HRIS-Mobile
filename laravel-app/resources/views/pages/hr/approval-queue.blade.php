@@ -395,7 +395,7 @@ function switchTab(tab) {
 <span class="font-label-md text-[10px] mt-1">{{ __('common.nav_approvals') }}</span>
 </button>
 <!-- Reports -->
-<button class="flex flex-col items-center justify-center text-on-surface-variant px-3 py-1.5 hover:bg-surface-container transition-all active:scale-90 duration-200" onclick="window.location.href='/reports'">
+<button class="flex flex-col items-center justify-center text-on-surface-variant px-3 py-1.5 hover:bg-surface-container transition-all active:scale-90 duration-200" onclick="window.location.href='{{ \App\Support\ReportsNavigation::url() }}'">
 <span class="material-symbols-outlined">assessment</span>
 <span class="font-label-md text-[10px] mt-1">{{ __('common.nav_reports') }}</span>
 </button>

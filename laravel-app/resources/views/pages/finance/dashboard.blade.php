@@ -355,7 +355,7 @@ $badgeClass = match($period->status) {
 <span class="material-symbols-outlined">payments</span>
 <span class="font-label-md text-label-md">{{ __('common.nav_payroll') }}</span>
 </a>
-<a class="flex flex-col items-center justify-center text-on-surface-variant px-2 py-1 hover:text-primary active:scale-90 transition-transform duration-200" href="/reports">
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-2 py-1 hover:text-primary active:scale-90 transition-transform duration-200" href="{{ \App\Support\ReportsNavigation::url() }}">
 <span class="material-symbols-outlined">assessment</span>
 <span class="font-label-md text-label-md">{{ __('common.nav_reports') }}</span>
 </a>

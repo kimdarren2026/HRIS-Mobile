@@ -379,7 +379,7 @@
 <span class="material-symbols-outlined">rule</span>
 <span class="font-label-sm text-label-sm mt-1">{{ __('common.nav_approvals') }}</span>
 </a>
-<a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-all active:scale-90 duration-200" href="/reports">
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-all active:scale-90 duration-200" href="{{ \App\Support\ReportsNavigation::url() }}">
 <span class="material-symbols-outlined">assessment</span>
 <span class="font-label-sm text-label-sm mt-1">{{ __('common.nav_reports') }}</span>
 </a>

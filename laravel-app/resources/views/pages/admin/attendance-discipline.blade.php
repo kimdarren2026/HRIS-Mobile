@@ -81,7 +81,10 @@
 <body class="attendance-discipline bg-surface text-on-surface overflow-x-hidden w-full max-w-[390px] mx-auto min-h-screen relative shadow-2xl">
 
 <header class="fixed top-0 left-1/2 -translate-x-1/2 w-full max-w-[390px] z-50 bg-surface border-b border-border shadow-sm h-16 flex items-center px-container-margin gap-3">
-  <a href="/admin/dashboard" class="text-primary p-1" aria-label="Kembali ke dashboard admin">
+  {{-- Phase 60C: named route, never history.back() — the dashboard is reachable
+       from the bottom nav, a filter form GET, and /reports, so "back" has to be
+       one predictable destination rather than whatever the last page was. --}}
+  <a href="{{ route('admin.dashboard') }}" class="text-primary p-1" aria-label="Kembali ke dashboard admin">
     <span class="local-icon" aria-hidden="true">←</span>
   </a>
   <h1 class="font-headline-md text-headline-md font-bold text-primary flex-1 truncate">Disiplin Kehadiran</h1>

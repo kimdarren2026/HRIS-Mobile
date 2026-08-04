@@ -210,7 +210,7 @@
 <span class="material-symbols-outlined" data-icon="rule">rule</span>
 <span class="font-label-sm text-label-sm-mobile mt-1">Persetujuan</span>
 </a>
-<a class="flex flex-col items-center justify-center text-on-surface-variant px-3 py-1 hover:bg-surface-container-high transition-all active:scale-90" href="/reports">
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-3 py-1 hover:bg-surface-container-high transition-all active:scale-90" href="{{ \App\Support\ReportsNavigation::url() }}">
 <span class="material-symbols-outlined" data-icon="assessment">assessment</span>
 <span class="font-label-sm text-label-sm-mobile mt-1">Laporan</span>
 </a>
