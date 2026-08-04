@@ -62,12 +62,12 @@ class Phase20AttendanceAuditTest extends TestCase
 
     private function coordsWithin(): array
     {
-        return ['lat' => -6.2001000, 'lng' => 106.8166660, 'accuracy' => 5];
+        return ['lat' => -6.2001000, 'lng' => 106.8166660, 'accuracy' => 5, 'check_in_work_plan' => 'Menyelesaikan laporan mingguan dan rapat tim.'];
     }
 
     private function coordsOutside(): array
     {
-        return ['lat' => -6.2100000, 'lng' => 106.8166660, 'accuracy' => 5];
+        return ['lat' => -6.2100000, 'lng' => 106.8166660, 'accuracy' => 5, 'check_in_work_plan' => 'Menyelesaikan laporan mingguan dan rapat tim.'];
     }
 
     private function photo(): UploadedFile

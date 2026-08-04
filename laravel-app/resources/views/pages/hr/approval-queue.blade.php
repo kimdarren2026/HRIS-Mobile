@@ -183,7 +183,16 @@ Absen masuk {{ $record->check_in_time?->translatedFormat('d M Y, H:i') }}
 </span>
 </div>
 @if($record->out_of_radius_reason)
-<p class="font-body-md text-on-surface-variant mt-2 italic leading-relaxed">"{{ $record->out_of_radius_reason }}"</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant uppercase mt-2 mb-0.5">Alasan Luar Radius</p>
+<p class="font-body-md text-on-surface-variant italic leading-relaxed">"{{ $record->out_of_radius_reason }}"</p>
+@endif
+@if($record->check_in_work_plan)
+<p class="font-label-sm text-label-sm text-on-surface-variant uppercase mt-2 mb-0.5">Rencana Kerja</p>
+<p class="font-body-md text-on-surface leading-relaxed whitespace-pre-line break-words">{{ $record->check_in_work_plan }}</p>
+@endif
+@if($record->check_out_work_result)
+<p class="font-label-sm text-label-sm text-on-surface-variant uppercase mt-2 mb-0.5">Hasil Pekerjaan</p>
+<p class="font-body-md text-on-surface leading-relaxed whitespace-pre-line break-words">{{ $record->check_out_work_result }}</p>
 @endif
 @if($record->check_in_photo_path)
 <a href="/attendance/photo/{{ $record->id }}" target="_blank"

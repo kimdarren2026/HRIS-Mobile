@@ -11,6 +11,17 @@ class AttendanceCheckOutRequest extends FormRequest
         return $this->user() !== null;
     }
 
+    // Phase 60A: trim before validation so a whitespace-only work result fails
+    // `required`/`min:10` naturally, and the trimmed value is what gets stored.
+    protected function prepareForValidation(): void
+    {
+        if ($this->has('check_out_work_result') && is_string($this->input('check_out_work_result'))) {
+            $this->merge([
+                'check_out_work_result' => trim($this->input('check_out_work_result')),
+            ]);
+        }
+    }
+
     public function rules(): array
     {
         return [
@@ -18,6 +29,8 @@ class AttendanceCheckOutRequest extends FormRequest
             'lng'      => ['required', 'numeric', 'between:-180,180'],
             'accuracy' => ['required', 'numeric', 'min:0', 'max:100000'],
             // TODO (Phase 38): add 'photo' required selfie for checkout, mirroring check-in.
+            // Phase 60A: required for every new checkout, regardless of inside/outside or approval status.
+            'check_out_work_result' => ['required', 'string', 'min:10', 'max:2000'],
         ];
     }
 
@@ -34,6 +47,9 @@ class AttendanceCheckOutRequest extends FormRequest
             'accuracy.numeric'  => 'Akurasi GPS tidak valid.',
             'accuracy.min'      => 'Akurasi GPS tidak valid.',
             'accuracy.max'      => 'Akurasi GPS tidak wajar.',
+            'check_out_work_result.required' => 'Hasil pekerjaan hari ini wajib diisi.',
+            'check_out_work_result.min'      => 'Hasil pekerjaan minimal 10 karakter.',
+            'check_out_work_result.max'      => 'Hasil pekerjaan maksimal 2000 karakter.',
         ];
     }
 }

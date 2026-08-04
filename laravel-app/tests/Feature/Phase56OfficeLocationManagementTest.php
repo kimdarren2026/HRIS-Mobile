@@ -248,6 +248,7 @@ class Phase56OfficeLocationManagementTest extends TestCase
                 'lng'      => 106.8166660,
                 'accuracy' => 5,
                 'photo'    => $photo,
+                'check_in_work_plan' => 'Menyelesaikan laporan mingguan dan rapat tim.',
             ])
             ->assertRedirect()
             ->assertSessionHasErrors('general');
@@ -281,6 +282,7 @@ class Phase56OfficeLocationManagementTest extends TestCase
                 'lng'      => 106.8166660,
                 'accuracy' => 5,
                 'photo'    => $photo,
+                'check_in_work_plan' => 'Menyelesaikan laporan mingguan dan rapat tim.',
             ])
             ->assertRedirect('/attendance/history');
 

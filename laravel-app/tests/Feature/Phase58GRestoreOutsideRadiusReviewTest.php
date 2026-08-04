@@ -71,6 +71,16 @@ class Phase58GRestoreOutsideRadiusReviewTest extends TestCase
         return 'Kunjungan klien di luar kantor hari ini.';
     }
 
+    private function validWorkPlan(): string
+    {
+        return 'Menyelesaikan laporan mingguan dan rapat tim.';
+    }
+
+    private function validWorkResult(): string
+    {
+        return 'Pekerjaan hari ini selesai dengan baik.';
+    }
+
     private function latAtDistance(float $meters): float
     {
         return round((float) $this->office->latitude - ($meters * 180 / (M_PI * 6371000)), 7);
@@ -116,7 +126,7 @@ class Phase58GRestoreOutsideRadiusReviewTest extends TestCase
         $this->actingAs($this->employeeUser)
             ->post('/attendance/check-in', [
                 'lat' => $this->latAtDistance(100), 'lng' => $this->officeLng(),
-                'accuracy' => 5, 'photo' => $this->photo(),
+                'accuracy' => 5, 'photo' => $this->photo(), 'check_in_work_plan' => $this->validWorkPlan(),
             ])
             ->assertRedirect('/attendance/history');
 
@@ -132,7 +142,7 @@ class Phase58GRestoreOutsideRadiusReviewTest extends TestCase
         $this->actingAs($this->employeeUser)
             ->post('/attendance/check-in', [
                 'lat' => $this->latAtDistance(10), 'lng' => $this->officeLng(),
-                'accuracy' => 5, 'photo' => $this->photo(),
+                'accuracy' => 5, 'photo' => $this->photo(), 'check_in_work_plan' => $this->validWorkPlan(),
             ])
             ->assertRedirect('/attendance/history');
 
@@ -148,7 +158,7 @@ class Phase58GRestoreOutsideRadiusReviewTest extends TestCase
         $this->actingAs($this->employeeUser)
             ->post('/attendance/check-in', [
                 'lat' => $this->latAtDistance(200), 'lng' => $this->officeLng(),
-                'accuracy' => 5, 'photo' => $this->photo(),
+                'accuracy' => 5, 'photo' => $this->photo(), 'check_in_work_plan' => $this->validWorkPlan(),
             ])
             ->assertSessionHasErrors('reason');
 
@@ -162,7 +172,7 @@ class Phase58GRestoreOutsideRadiusReviewTest extends TestCase
         $this->actingAs($this->employeeUser)
             ->post('/attendance/check-in', [
                 'lat' => $this->latAtDistance(200), 'lng' => $this->officeLng(),
-                'accuracy' => 5, 'photo' => $this->photo(), 'reason' => $this->validReason(),
+                'accuracy' => 5, 'photo' => $this->photo(), 'reason' => $this->validReason(), 'check_in_work_plan' => $this->validWorkPlan(),
             ])
             ->assertRedirect('/attendance/history');
 
@@ -181,7 +191,7 @@ class Phase58GRestoreOutsideRadiusReviewTest extends TestCase
         $this->actingAs($this->employeeUser)
             ->post('/attendance/check-in', [
                 'lat' => $this->latAtDistance(200), 'lng' => $this->officeLng(),
-                'accuracy' => 12.5, 'photo' => $this->photo(), 'reason' => $this->validReason(),
+                'accuracy' => 12.5, 'photo' => $this->photo(), 'reason' => $this->validReason(), 'check_in_work_plan' => $this->validWorkPlan(),
             ])
             ->assertRedirect('/attendance/history');
 
@@ -204,7 +214,7 @@ class Phase58GRestoreOutsideRadiusReviewTest extends TestCase
         $this->actingAs($this->employeeUser)
             ->post('/attendance/check-in', [
                 'lat' => $this->latAtDistance(10), 'lng' => $this->officeLng(),
-                'accuracy' => 5, 'photo' => $this->photo(),
+                'accuracy' => 5, 'photo' => $this->photo(), 'check_in_work_plan' => $this->validWorkPlan(),
             ]);
 
         $this->assertSame(0, Notification::count());
@@ -217,7 +227,7 @@ class Phase58GRestoreOutsideRadiusReviewTest extends TestCase
         $this->actingAs($this->employeeUser)
             ->post('/attendance/check-in', [
                 'lat' => $this->latAtDistance(50), 'lng' => $this->officeLng(),
-                'accuracy' => 80, 'photo' => $this->photo(),
+                'accuracy' => 80, 'photo' => $this->photo(), 'check_in_work_plan' => $this->validWorkPlan(),
             ])
             ->assertRedirect('/attendance/history')
             ->assertSessionDoesntHaveErrors();
@@ -262,6 +272,7 @@ class Phase58GRestoreOutsideRadiusReviewTest extends TestCase
         $this->actingAs($this->employeeUser)
             ->post('/attendance/check-out', [
                 'lat' => $this->latAtDistance(10), 'lng' => $this->officeLng(), 'accuracy' => 5,
+                'check_out_work_result' => $this->validWorkResult(),
             ])
             ->assertRedirect('/attendance/history');
     }
@@ -273,6 +284,7 @@ class Phase58GRestoreOutsideRadiusReviewTest extends TestCase
         $this->actingAs($this->employeeUser)
             ->post('/attendance/check-out', [
                 'lat' => $this->latAtDistance(500), 'lng' => $this->officeLng(), 'accuracy' => 5,
+                'check_out_work_result' => $this->validWorkResult(),
             ])
             ->assertRedirect('/attendance/history');
 
@@ -287,6 +299,7 @@ class Phase58GRestoreOutsideRadiusReviewTest extends TestCase
         $this->actingAs($this->employeeUser)
             ->post('/attendance/check-out', [
                 'lat' => $this->latAtDistance(10), 'lng' => $this->officeLng(), 'accuracy' => 999,
+                'check_out_work_result' => $this->validWorkResult(),
             ])
             ->assertRedirect('/attendance/history');
     }
@@ -300,6 +313,7 @@ class Phase58GRestoreOutsideRadiusReviewTest extends TestCase
         $this->actingAs($this->employeeUser)
             ->post('/attendance/check-out', [
                 'lat' => $this->latAtDistance(500), 'lng' => $this->officeLng(), 'accuracy' => 5,
+                'check_out_work_result' => $this->validWorkResult(),
             ]);
 
         $this->assertSame(1, AttendanceRecord::where('employee_id', $this->employee->id)->count());
@@ -314,6 +328,7 @@ class Phase58GRestoreOutsideRadiusReviewTest extends TestCase
         $this->actingAs($this->employeeUser)
             ->post('/attendance/check-out', [
                 'lat' => $this->latAtDistance(500), 'lng' => $this->officeLng(), 'accuracy' => 5,
+                'check_out_work_result' => $this->validWorkResult(),
             ]);
 
         $this->assertSame(0, Notification::count());
@@ -328,6 +343,7 @@ class Phase58GRestoreOutsideRadiusReviewTest extends TestCase
         $this->actingAs($this->employeeUser)
             ->post('/attendance/check-out', [
                 'lat' => $this->latAtDistance(10), 'lng' => $this->officeLng(), 'accuracy' => 33.5,
+                'check_out_work_result' => $this->validWorkResult(),
             ]);
 
         $record = AttendanceRecord::where('employee_id', $this->employee->id)->first();
@@ -364,7 +380,7 @@ class Phase58GRestoreOutsideRadiusReviewTest extends TestCase
         $this->actingAs($this->employeeUser)
             ->post('/attendance/check-in', [
                 'lat' => $this->latAtDistance(200), 'lng' => $this->officeLng(),
-                'accuracy' => 5, 'photo' => $this->photo(),
+                'accuracy' => 5, 'photo' => $this->photo(), 'check_in_work_plan' => $this->validWorkPlan(),
                 'status' => 'APPROVED', 'classification' => 'INSIDE_RADIUS',
             ])
             ->assertSessionHasErrors('reason');
@@ -379,7 +395,7 @@ class Phase58GRestoreOutsideRadiusReviewTest extends TestCase
         $this->actingAs($this->employeeUser)
             ->post('/attendance/check-in', [
                 'lat' => $this->latAtDistance(200), 'lng' => $this->officeLng(),
-                'accuracy' => 5, 'photo' => $this->photo(), 'reason' => $this->validReason(),
+                'accuracy' => 5, 'photo' => $this->photo(), 'reason' => $this->validReason(), 'check_in_work_plan' => $this->validWorkPlan(),
             ]);
 
         $hr = $this->makeHrApprover();
@@ -398,7 +414,7 @@ class Phase58GRestoreOutsideRadiusReviewTest extends TestCase
         $this->actingAs($this->employeeUser)
             ->post('/attendance/check-in', [
                 'lat' => $this->latAtDistance(200), 'lng' => $this->officeLng(),
-                'accuracy' => 5, 'photo' => $this->photo(), 'reason' => $this->validReason(),
+                'accuracy' => 5, 'photo' => $this->photo(), 'reason' => $this->validReason(), 'check_in_work_plan' => $this->validWorkPlan(),
             ]);
 
         $record = AttendanceRecord::where('employee_id', $this->employee->id)->first();
@@ -416,7 +432,7 @@ class Phase58GRestoreOutsideRadiusReviewTest extends TestCase
         $this->actingAs($this->employeeUser)
             ->post('/attendance/check-in', [
                 'lat' => $this->latAtDistance(200), 'lng' => $this->officeLng(),
-                'accuracy' => 5, 'photo' => $this->photo(), 'reason' => $this->validReason(),
+                'accuracy' => 5, 'photo' => $this->photo(), 'reason' => $this->validReason(), 'check_in_work_plan' => $this->validWorkPlan(),
             ]);
 
         $record = AttendanceRecord::where('employee_id', $this->employee->id)->first();

@@ -57,7 +57,7 @@ class Phase40AttendanceCheckoutTest extends TestCase
 
     private function coordsWithin(): array
     {
-        return ['lat' => -6.2001000, 'lng' => 106.8166660, 'accuracy' => 5];
+        return ['lat' => -6.2001000, 'lng' => 106.8166660, 'accuracy' => 5, 'check_out_work_result' => 'Pekerjaan hari ini selesai dengan baik.'];
     }
 
     private function makeApprovedRecord(): AttendanceRecord
@@ -185,7 +185,7 @@ class Phase40AttendanceCheckoutTest extends TestCase
         // Office is at -6.2000000, 106.8166660 with a 100m radius. Check-out is
         // never blocked by radius (Phase 58G), so these coords are arbitrary.
         $this->actingAs($this->employeeUser)
-            ->post('/attendance/check-out', ['lat' => -6.2003000, 'lng' => 106.8170000, 'accuracy' => 5]);
+            ->post('/attendance/check-out', ['lat' => -6.2003000, 'lng' => 106.8170000, 'accuracy' => 5, 'check_out_work_result' => 'Pekerjaan hari ini selesai dengan baik.']);
 
         $record = AttendanceRecord::where('employee_id', $this->employee->id)->first();
         $this->assertEqualsWithDelta(-6.2003000, (float) $record->check_out_lat, 0.00001);

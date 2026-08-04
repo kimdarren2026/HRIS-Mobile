@@ -90,23 +90,31 @@ class Phase58FStrictRadiusTest extends TestCase
         return (float) $this->office->longitude;
     }
 
+    // Phase 60A: included on every helper below (harmless no-op extra field
+    // for whichever of check-in/check-out doesn't define it) so these shared
+    // coord helpers keep working for both endpoints without duplicating them.
+    private const WORK_NOTES = [
+        'check_in_work_plan'    => 'Menyelesaikan laporan mingguan dan rapat tim.',
+        'check_out_work_result' => 'Pekerjaan hari ini selesai dengan baik.',
+    ];
+
     // Well inside the 100m radius, tight accuracy.
     private function insideCoords(): array
     {
-        return ['lat' => $this->latAtDistance(10), 'lng' => $this->officeLng(), 'accuracy' => 5];
+        return ['lat' => $this->latAtDistance(10), 'lng' => $this->officeLng(), 'accuracy' => 5] + self::WORK_NOTES;
     }
 
     // 200m out with tight accuracy — unambiguously OUTSIDE_RADIUS.
     private function outsideCoords(): array
     {
-        return ['lat' => $this->latAtDistance(200), 'lng' => $this->officeLng(), 'accuracy' => 5];
+        return ['lat' => $this->latAtDistance(200), 'lng' => $this->officeLng(), 'accuracy' => 5] + self::WORK_NOTES;
     }
 
     // Exactly at the radius boundary with large accuracy — accuracy must not
     // affect the decision: distance <= radius is still INSIDE_RADIUS.
     private function boundaryCoordsWithLargeAccuracy(): array
     {
-        return ['lat' => $this->latAtDistance(100), 'lng' => $this->officeLng(), 'accuracy' => 30];
+        return ['lat' => $this->latAtDistance(100), 'lng' => $this->officeLng(), 'accuracy' => 30] + self::WORK_NOTES;
     }
 
     private function makeApprovedRecordToday(): AttendanceRecord

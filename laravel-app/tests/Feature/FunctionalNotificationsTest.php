@@ -362,6 +362,7 @@ class FunctionalNotificationsTest extends TestCase
             'lng'      => 106.8166660,
             'accuracy' => 5,
             'photo'    => UploadedFile::fake()->image('selfie.jpg', 200, 200)->size(80),
+            'check_in_work_plan' => 'Menyelesaikan laporan mingguan dan rapat tim.',
         ]);
 
         $response->assertSessionHasErrors('reason');                      // 1
@@ -382,6 +383,7 @@ class FunctionalNotificationsTest extends TestCase
             'accuracy' => 5,
             'photo'    => UploadedFile::fake()->image('selfie.jpg', 200, 200)->size(80),
             'reason'   => 'Kunjungan klien di luar kantor hari ini.',
+            'check_in_work_plan' => 'Menyelesaikan laporan mingguan dan rapat tim.',
         ]);
 
         $response->assertRedirect('/attendance/history');                 // 1
@@ -399,6 +401,7 @@ class FunctionalNotificationsTest extends TestCase
             'lng'      => 106.8166660,
             'accuracy' => 5,
             'photo'    => UploadedFile::fake()->image('selfie.jpg', 200, 200)->size(80),
+            'check_in_work_plan' => 'Menyelesaikan laporan mingguan dan rapat tim.',
         ])->assertRedirect();                                               // 1
 
         $this->assertSame(0, Notification::count());                       // 2

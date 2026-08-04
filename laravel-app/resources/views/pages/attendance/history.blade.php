@@ -221,6 +221,18 @@ $badgeLabel = match($record->status) {
 <p class="text-label-sm font-label-sm text-on-surface-variant italic">"{{ $record->out_of_radius_reason }}"</p>
 </div>
 @endif
+@if($record->check_in_work_plan)
+<div class="pl-2 mt-1 bg-surface-container p-2 rounded-lg border border-outline-variant/30">
+<p class="text-label-sm font-label-sm text-on-surface-variant uppercase mb-1">Rencana Kerja</p>
+<p class="text-body-md font-body-md text-on-background whitespace-pre-line break-words">{{ $record->check_in_work_plan }}</p>
+</div>
+@endif
+@if($record->check_out_work_result)
+<div class="pl-2 mt-1 bg-surface-container p-2 rounded-lg border border-outline-variant/30">
+<p class="text-label-sm font-label-sm text-on-surface-variant uppercase mb-1">Hasil Pekerjaan</p>
+<p class="text-body-md font-body-md text-on-background whitespace-pre-line break-words">{{ $record->check_out_work_result }}</p>
+</div>
+@endif
 @if($record->status === 'REJECTED' && $record->approval_note)
 <div class="pl-2 mt-1 bg-error-container/30 p-2 rounded-lg border border-danger/20 flex gap-2 items-start">
 <span class="material-symbols-outlined text-danger text-[16px] mt-0.5">cancel</span>
