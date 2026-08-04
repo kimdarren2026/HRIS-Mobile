@@ -16,6 +16,7 @@ use App\Http\Controllers\HR\EmployeeController as HREmployeeController;
 use App\Http\Controllers\HR\LeaveApprovalController;
 use App\Http\Controllers\HR\LeaveBalanceController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\ReportLandingController;
 use App\Http\Controllers\Settings\LeaveTypeSettingsController;
 use App\Http\Controllers\Settings\OfficeLocationController;
 use App\Http\Controllers\Settings\SettingsController;
@@ -102,7 +103,9 @@ Route::middleware(['auth', 'has_employee'])->group(function (): void {
 
 // ── HR / Super Admin routes ──────────────────────────────────────────────────
 Route::middleware(['auth', 'role:admin_hr,super_admin'])->group(function (): void {
-    Route::get('/admin/dashboard', [DashboardController::class, 'adminDashboard']);
+    // Named in Phase 60C so navigation (e.g. the Dashboard Disiplin Kehadiran
+    // back button) can target it without a raw URL. The path is unchanged.
+    Route::get('/admin/dashboard', [DashboardController::class, 'adminDashboard'])->name('admin.dashboard');
 
     // Attendance approval — functional (Phase 5)
     Route::get('/hr/approval-queue',                           [AttendanceApprovalController::class, 'index']);
@@ -170,7 +173,10 @@ Route::middleware(['auth', 'role:admin_hr,finance,super_admin'])->group(function
 
 // ── HR + Finance + Super Admin ───────────────────────────────────────────────
 Route::middleware(['auth', 'role:admin_hr,finance,super_admin'])->group(function (): void {
-    Route::view('/reports', 'pages.reports.index');
+    // Phase 60C: role-aware report landing. super_admin owns the only report
+    // module that exists (Phase 60B) and is redirected there; admin_hr and
+    // finance keep the existing placeholder. Middleware is unchanged.
+    Route::get('/reports', ReportLandingController::class)->name('reports.index');
 
     // Finance Expenses — read/create/edit/submit accessible to admin_hr+finance+super_admin (Phase 20)
     Route::get('/finance/expenses',                        [ExpenseController::class, 'index'])->name('finance.expenses.index');

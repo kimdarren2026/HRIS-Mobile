@@ -209,7 +209,7 @@ tailwind.config = {
     <span class="material-symbols-outlined">rule</span>
     <span class="font-label-md text-label-md">{{ __('common.nav_approvals') }}</span>
   </a>
-  <a href="/reports" class="flex flex-col items-center justify-center text-on-surface-variant px-3 py-1.5 hover:bg-surface-container transition-all active:scale-90 duration-200">
+  <a href="{{ \App\Support\ReportsNavigation::url() }}" class="flex flex-col items-center justify-center text-on-surface-variant px-3 py-1.5 hover:bg-surface-container transition-all active:scale-90 duration-200">
     <span class="material-symbols-outlined">assessment</span>
     <span class="font-label-md text-label-md">{{ __('common.nav_reports') }}</span>
   </a>

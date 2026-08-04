@@ -133,7 +133,9 @@ class AuthRoleRoutingTest extends TestCase
             ['super_admin', '/hr/employees'],
             ['super_admin', '/finance/dashboard'],
             ['super_admin', '/payroll/periods'],
-            ['super_admin', '/reports'],
+            // '/reports' is deliberately absent for super_admin: since Phase 60C it
+            // redirects them to the Dashboard Disiplin Kehadiran instead of rendering
+            // the placeholder. Covered by Phase60CReportNavigationIntegrationTest.
             ['super_admin', '/settings'],
             ['super_admin', '/profile'],
         ];

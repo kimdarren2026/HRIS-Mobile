@@ -332,7 +332,10 @@
 <span class="font-label-sm text-label-sm">{{ __('common.nav_approvals') }}</span>
 </button>
 <!-- Reports -->
-<button class="flex flex-col items-center justify-center text-outline hover:bg-surface-container-low transition-all active:scale-95 duration-200" onclick="window.location.href='/reports'">
+{{-- Phase 60C: destination is role-aware (see App\Support\ReportsNavigation).
+     Deliberately a Blade comment, not an HTML one: this dashboard is shared with
+     admin_hr, and an HTML comment would ship super_admin-only wording to them. --}}
+<button class="flex flex-col items-center justify-center text-outline hover:bg-surface-container-low transition-all active:scale-95 duration-200" onclick="window.location.href='{{ \App\Support\ReportsNavigation::url() }}'">
 <span class="material-symbols-outlined" data-icon="analytics">analytics</span>
 <span class="font-label-sm text-label-sm">{{ __('common.nav_reports') }}</span>
 </button>
